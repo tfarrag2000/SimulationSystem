@@ -1,0 +1,19 @@
+{
+  "algorithm": "ga",
+  "algorithm_params": {
+    "parallel_processing": true,
+    "population_size": 50,
+    "num_generations": 100,
+    "mutation_rate": 0.1,
+    "crossover_rate": 0.8,
+    "elitism": 10
+  },
+  "parallel_processing": true,
+  "environment": {
+    "width": 100,
+    "height": 100,
+    "num_drones": 20,
+    "sensing_radius": 20
+  },
+  "timestamp": "2025-06-08T20:33:09.439009"
+}
