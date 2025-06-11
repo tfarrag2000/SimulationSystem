@@ -15,6 +15,7 @@ import traceback
 import json
 import os
 from enum import Enum
+import plotly.io as pio
 
 # Enhanced simulation state management
 class SimState(Enum):
@@ -292,7 +293,9 @@ app.layout = dbc.Container([
             dbc.Tabs([
                 # Simulation View Tab
                 dbc.Tab([
-                    dcc.Graph(id="simulation-graph", style={'height': '85vh', 'width': '100%'})
+                    dcc.Graph(id="simulation-graph", style={'height': '85vh', 'width': '100%'}),
+                    html.Button("Download Plot", id="download-plot-btn", className="mb-2"),
+                    dcc.Download(id="download-plot"),
                 ], label="🎯 Simulation View"),
                 
                 # Metrics Tab
@@ -1239,6 +1242,20 @@ def set_button_states(sim_disabled, sim_state_data):
         reset_dis = True
 
     return init_dis, run_dis, pause_dis, step_dis, stop_dis, reset_dis
+
+# Download plot callback
+@app.callback(
+    Output("download-plot", "data"),
+    Input("download-plot-btn", "n_clicks"),
+    State("simulation-graph", "figure"),
+    prevent_initial_call=True,
+)
+def download_plot(n_clicks, fig):
+    if n_clicks:
+        # Increase scale for higher resolution (e.g., 3 or 4)
+        img_bytes = pio.to_image(fig, format="png", width=1600, height=1200, scale=3)
+        return dcc.send_bytes(img_bytes, filename="simulation_plot.png")
+    return dash.no_update
 
 # Run the app
 if __name__ == '__main__':
