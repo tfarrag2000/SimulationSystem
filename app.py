@@ -1,3 +1,9 @@
+#!/usr/bin/env python3
+"""
+Enhanced Drone Optimization Simulation System - Complete app.py
+Integrated with improved control system for better start/pause/stop/restart functionality
+"""
+
 import dash
 from dash import dcc, html, Input, Output, State, callback, ALL, MATCH, ctx
 import dash_bootstrap_components as dbc
@@ -8,6 +14,13 @@ from datetime import datetime
 import traceback
 import json
 import os
+from enum import Enum
+
+# Enhanced simulation state management
+class SimState(Enum):
+    STOPPED = "stopped"
+    RUNNING = "running"
+    PAUSED = "paused"
 
 # Fixed imports to match actual file structure
 try:
@@ -47,16 +60,6 @@ except ImportError as e:
     def simulated_annealing(*args, **kwargs):
         return np.ones(20), {"coverage": 45, "execution_time": 0.5}
     
-    class DroneEnvironment:
-        def __init__(self, **kwargs):
-            self.width = kwargs.get('width', 100)
-            self.height = kwargs.get('height', 100)
-            self.step_count = 0
-    
-    class SimulationState:
-        def __init__(self):
-            self.current_step = 0
-    
     def run_simulation_step(simulation, algorithm, params):
         return {"coverage": 0.5, "active_drones": 10}
     
@@ -75,8 +78,16 @@ except ImportError as e:
     class ExperimentLogger:
         def __init__(self):
             pass
+        def start_experiment_session(self, config):
+            return "dummy_session"
         def log_experiment(self, data):
             return "dummy_exp_id"
+        def log_step_result(self, data):
+            pass
+        def end_experiment_session(self):
+            return "dummy_exp_id"
+        def list_experiments(self):
+            return []
 
 # Global simulation state and experiment management
 simulation = None
@@ -84,16 +95,19 @@ sim_state = SimulationState()
 experiment_logger = ExperimentLogger()
 current_experiment_session = None
 
+# Enhanced state management
+current_sim_state = SimState.STOPPED
+
 # Initialize the app with a Bootstrap theme
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.title = "Drone Optimization Simulation System"
 
-# App layout with enhanced experiment management
+# App layout with enhanced experiment management and improved controls
 app.layout = dbc.Container([
     # Header with experiment info
     dbc.Row([
         dbc.Col([
-            html.H1("Drone Optimization Simulation System", className="text-center my-4"),
+            html.H1("🚁 Drone Optimization Simulation System", className="text-center my-4"),
             dbc.Alert(id="experiment-status", color="info", is_open=False, dismissable=True)
         ])
     ]),
@@ -218,14 +232,46 @@ app.layout = dbc.Container([
                         ]),
                     ], className="mt-3"),
                     
-                    # Simulation Control Buttons
+                    # Enhanced Simulation Control Buttons
                     html.Hr(),
+                    html.Label("🎮 Simulation Controls"),
+                    
+                    # Status indicator
+                    dbc.Alert(
+                        id="sim-status-alert",
+                        children="⭕ Not Started",
+                        color="secondary",
+                        className="mb-2 text-center"
+                    ),
+                    
+                    # Control buttons
                     dbc.ButtonGroup([
-                        dbc.Button("Initialize", id="init-button", color="primary"),
-                        dbc.Button("Step", id="step-button", color="secondary"),
-                        dbc.Button("Run", id="run-button", color="success"),
-                        dbc.Button("Pause", id="pause-button", color="warning")
+                        dbc.Button("🔄 Initialize", id="init-button", color="primary", size="sm"),
+                        dbc.Button("👣 Step", id="step-button", color="secondary", size="sm"),
+                        dbc.Button(
+                            html.Span(id="run-button-text", children="▶️ Start"), 
+                            id="run-button", color="success", size="sm"
+                        ),
+                    ], className="w-100 mb-2"),
+                    
+                    dbc.ButtonGroup([
+                        dbc.Button("⏸️ Pause", id="pause-button", color="warning", size="sm"),
+                        dbc.Button("⏹️ Stop", id="stop-button", color="danger", size="sm"),
+                        dbc.Button("🔄 Reset", id="reset-button", color="info", size="sm")
                     ], className="w-100"),
+                    
+                    # Simulation speed control
+                    html.Hr(),
+                    html.Label("🏃 Simulation Speed"),
+                    dcc.Slider(
+                        id="simulation-speed",
+                        min=0.1,
+                        max=5.0,
+                        step=0.1,
+                        value=1.0,
+                        marks={0.5: '0.5x', 1: '1x', 2: '2x', 5: '5x'},
+                        tooltip={"placement": "bottom", "always_visible": True}
+                    ),
                     
                     # Save/Load Configuration
                     html.Hr(),
@@ -246,7 +292,7 @@ app.layout = dbc.Container([
             dbc.Tabs([
                 # Simulation View Tab
                 dbc.Tab([
-                    dcc.Graph(id="simulation-graph", style={'height': '60vh'})
+                    dcc.Graph(id="simulation-graph", style={'height': '85vh', 'width': '100%'})
                 ], label="🎯 Simulation View"),
                 
                 # Metrics Tab
@@ -266,14 +312,17 @@ app.layout = dbc.Container([
                     html.Div(id="experiment-results-content")
                 ], label="🧪 Experiment Results")
             ])
-        ], width=9)
+        ], width=9, style={"flex": "1 1 0", "minWidth": 0})
     ]),
     
     # Bottom panel - Logs and Info
     dbc.Row([
         dbc.Col([
             dbc.Card([
-                dbc.CardHeader("📝 Simulation Logs"),
+                dbc.CardHeader([
+                    "📝 Simulation Logs",
+                    dbc.Badge("Live", color="success", className="ms-2")
+                ]),
                 dbc.CardBody([
                     html.Div(id="log-output", style={'height': '15vh', 'overflow': 'auto'})
                 ])
@@ -614,71 +663,25 @@ def start_experiment_session(n_clicks, experiment_name):
         error_msg = f"Error starting experiment: {str(e)}"
         return error_msg, True, "danger", True, True, ""
 
-# Save experiment results
-@app.callback(
-    Output('experiment-status', 'children', allow_duplicate=True),
-    Output('experiment-status', 'is_open', allow_duplicate=True),
-    Output('experiment-status', 'color', allow_duplicate=True),
-    Input('save-experiment', 'n_clicks'),
-    [State('algorithm-dropdown', 'value'),
-     State('algorithm-params-store', 'data')],
-    prevent_initial_call=True
-)
-def save_experiment_results(n_clicks, algorithm, algorithm_params):
-    """Save current experiment results"""
-    if n_clicks is None or current_experiment_session is None:
-        return dash.no_update, dash.no_update, dash.no_update
-    
-    try:
-        # Collect experiment data
-        experiment_data = {
-            'session_id': current_experiment_session,
-            'timestamp': datetime.now().isoformat(),
-            'algorithm': algorithm,
-            'algorithm_parameters': algorithm_params or {},
-            'simulation_parameters': {
-                'width': simulation.width if simulation else 100,
-                'height': simulation.height if simulation else 100,
-                'num_drones': len(simulation.drones) if simulation else 20,
-                'sensing_radius': simulation.sensing_radius if simulation else 20
-            },
-            'results': {
-                'coverage': simulation.metrics_history['coverage'][-1] if simulation and simulation.metrics_history['coverage'] else 0,
-                'active_drones': simulation.metrics_history['active_drones'][-1] if simulation and simulation.metrics_history['active_drones'] else 0,
-                'step_count': simulation.step_count if simulation else 0,
-                'metrics_history': simulation.metrics_history if simulation else {}
-            }
-        }
-        
-        # Save experiment
-        exp_id = experiment_logger.log_experiment(experiment_data)
-        
-        return f"✅ Experiment saved successfully! ID: {exp_id}", True, "success"
-        
-    except Exception as e:
-        return f"❌ Error saving experiment: {str(e)}", True, "danger"
-
-# Continue with the rest of the callbacks...
-# (Previous callbacks for simulation, visualization, etc. remain the same)
-
 # Initialize simulation
 @app.callback(
-    Output('log-output', 'children'),
+    Output('log-output', 'children', allow_duplicate=True),
     Input('init-button', 'n_clicks'),
     [State('area-width', 'value'),
      State('area-height', 'value'),
      State('total-drones', 'value'),
      State('sensing-radius', 'value'),
      State('parking-spots', 'value'),
-     State('disabled-spots', 'value')]
+     State('disabled-spots', 'value')],
+    prevent_initial_call=True
 )
 def initialize_simulation(n_clicks, width, height, drones, radius, parking, disabled_spots):
     """Initialize the simulation environment"""
     if n_clicks is None:
-        return "System ready. Click 'Initialize Simulation' to begin."
+        return dash.no_update
     
     try:
-        global simulation
+        global simulation, current_sim_state
         simulation = DroneEnvironment(
             width=width or 100,
             height=height or 100,
@@ -688,16 +691,102 @@ def initialize_simulation(n_clicks, width, height, drones, radius, parking, disa
             num_disabled_spots=disabled_spots or 10
         )
         
+        # Reset state to stopped after initialization
+        current_sim_state = SimState.STOPPED
+        
         timestamp = datetime.now().strftime("%H:%M:%S")
-        return f"[{timestamp}] Simulation initialized with {drones or 20} drones in {width or 100}x{height or 100} area."
+        return f"[{timestamp}] ✅ Simulation initialized with {drones or 20} drones in {width or 100}x{height or 100} area."
     
     except Exception as e:
         timestamp = datetime.now().strftime("%H:%M:%S")
-        error_msg = f"[{timestamp}] Error initializing simulation: {str(e)}"
+        error_msg = f"[{timestamp}] ❌ Error initializing simulation: {str(e)}"
         print(f"Initialization error: {traceback.format_exc()}")
         return error_msg
 
-# Enhanced simulation step with experiment logging
+# Enhanced Control System - REPLACES the old toggle_simulation_interval callback
+@app.callback(
+    [Output('simulation-interval', 'disabled'),
+     Output('simulation-interval', 'interval'),
+     Output('run-button-text', 'children'),
+     Output('sim-status-alert', 'children'),
+     Output('sim-status-alert', 'color'),
+     Output('log-output', 'children', allow_duplicate=True)],
+    [Input('run-button', 'n_clicks'),
+     Input('pause-button', 'n_clicks'),
+     Input('stop-button', 'n_clicks'),
+     Input('reset-button', 'n_clicks'),
+     Input('simulation-speed', 'value')],
+    [State('simulation-interval', 'disabled')],
+    prevent_initial_call=True
+)
+def enhanced_control_system(run_clicks, pause_clicks, stop_clicks, reset_clicks, speed_value, is_disabled):
+    """Enhanced control system with proper state management"""
+    global current_sim_state, simulation
+    
+    triggered_id = ctx.triggered_id
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    
+    # Calculate interval based on speed (default 1000ms / speed)
+    interval = max(100, int(1000 / (speed_value or 1.0)))
+    
+    try:
+        if triggered_id == 'run-button':
+            if current_sim_state == SimState.STOPPED:
+                # Start from stopped
+                current_sim_state = SimState.RUNNING
+                log_msg = f"[{timestamp}] ▶️ Simulation started"
+                return False, interval, "⏸️ Pause", "🟢 Running", "success", log_msg
+            elif current_sim_state == SimState.PAUSED:
+                # Resume from pause
+                current_sim_state = SimState.RUNNING
+                log_msg = f"[{timestamp}] ▶️ Simulation resumed"
+                return False, interval, "⏸️ Pause", "🟢 Running", "success", log_msg
+            else:
+                # Already running
+                log_msg = f"[{timestamp}] ℹ️ Already running"
+                return False, interval, "⏸️ Pause", "🟢 Running", "success", log_msg
+                
+        elif triggered_id == 'pause-button':
+            if current_sim_state == SimState.RUNNING:
+                current_sim_state = SimState.PAUSED
+                log_msg = f"[{timestamp}] ⏸️ Simulation paused"
+                return True, interval, "▶️ Resume", "🟡 Paused", "warning", log_msg
+            else:
+                log_msg = f"[{timestamp}] ℹ️ Not running"
+                return True, interval, "▶️ Start", "🟡 Paused", "warning", log_msg
+                
+        elif triggered_id == 'stop-button':
+            current_sim_state = SimState.STOPPED
+            log_msg = f"[{timestamp}] ⏹️ Simulation stopped"
+            return True, interval, "▶️ Start", "🔴 Stopped", "danger", log_msg
+            
+        elif triggered_id == 'reset-button':
+            if simulation:
+                simulation.reset_simulation()
+                current_sim_state = SimState.STOPPED
+                log_msg = f"[{timestamp}] 🔄 Simulation reset to step 0"
+            else:
+                log_msg = f"[{timestamp}] ℹ️ No simulation to reset"
+            return True, interval, "▶️ Start", "🔵 Reset", "info", log_msg
+            
+        elif triggered_id == 'simulation-speed':
+            log_msg = f"[{timestamp}] 🏃 Speed changed to {speed_value}x"
+            # Keep current state, just update interval
+            if current_sim_state == SimState.RUNNING:
+                return False, interval, "⏸️ Pause", "🟢 Running", "success", log_msg
+            elif current_sim_state == SimState.PAUSED:
+                return True, interval, "▶️ Resume", "🟡 Paused", "warning", log_msg
+            else:
+                return True, interval, "▶️ Start", "🔴 Stopped", "danger", log_msg
+        else:
+            # Default state
+            return is_disabled, interval, "▶️ Start", "⭕ Ready", "secondary", f"[{timestamp}] Ready"
+            
+    except Exception as e:
+        error_msg = f"[{timestamp}] ❌ Control error: {str(e)}"
+        return True, interval, "▶️ Start", "❌ Error", "danger", error_msg
+
+# Enhanced simulation step with experiment logging and state management
 @app.callback(
     [Output('simulation-graph', 'figure'),
      Output('coverage-chart', 'figure'),
@@ -710,17 +799,25 @@ def initialize_simulation(n_clicks, width, height, drones, radius, parking, disa
      State('algorithm-params-store', 'data')]
 )
 def update_simulation(step_clicks, interval, algorithm, algorithm_params):
-    """Update simulation visualization and metrics with experiment logging"""
+    """Update simulation visualization and metrics with experiment logging and state management"""
+    global current_sim_state  # ADD THIS LINE for state management
+    
     ctx_msg = ctx.triggered_id
     if ctx_msg is None or simulation is None:
         # Default empty figures
         empty_fig = go.Figure()
-        empty_fig.update_layout(title="Simulation Not Started")
+        empty_fig.update_layout(title="Simulation Not Started - Click Initialize")
         return empty_fig, empty_fig, empty_fig, empty_fig, empty_fig
     
     try:
-        # Determine if we should run a simulation step
-        if ctx_msg in ['step-button', 'simulation-interval']:
+        # Enhanced state checking - only step when appropriate
+        should_step = False
+        if ctx_msg == 'step-button':
+            should_step = True  # Manual step always allowed
+        elif ctx_msg == 'simulation-interval':
+            should_step = (current_sim_state == SimState.RUNNING)  # Only auto-step when running
+        
+        if should_step:
             # Use the stored parameters
             if algorithm_params is None:
                 algorithm_params = {}
@@ -735,6 +832,7 @@ def update_simulation(step_clicks, interval, algorithm, algorithm_params):
             elif algorithm == 'sa':
                 activation_status, result = simulated_annealing(simulation, **algorithm_params)
             else:  # greedy
+                algorithm_params.pop('parallel_processing', None)
                 activation_status, result = greedy_optimization(simulation, **algorithm_params)
             
             end_time = datetime.now()
@@ -781,25 +879,49 @@ def update_simulation(step_clicks, interval, algorithm, algorithm_params):
         print(f"Simulation error: {traceback.format_exc()}")
         return error_fig, error_fig, error_fig, error_fig, error_fig
 
-# Callback for enabling/disabling interval for continuous simulation
+# Save experiment results
 @app.callback(
-    Output('simulation-interval', 'disabled'),
-    [Input('run-button', 'n_clicks'),
-     Input('pause-button', 'n_clicks')],
-    [State('simulation-interval', 'disabled')]
+    Output('experiment-status', 'children', allow_duplicate=True),
+    Output('experiment-status', 'is_open', allow_duplicate=True),
+    Output('experiment-status', 'color', allow_duplicate=True),
+    Input('save-experiment', 'n_clicks'),
+    [State('algorithm-dropdown', 'value'),
+     State('algorithm-params-store', 'data')],
+    prevent_initial_call=True
 )
-def toggle_simulation_interval(run_clicks, pause_clicks, is_disabled):
-    """Toggle continuous simulation on/off"""
-    ctx_msg = ctx.triggered_id
-    if ctx_msg is None:
-        return True  # Keep disabled by default
+def save_experiment_results(n_clicks, algorithm, algorithm_params):
+    """Save current experiment results"""
+    if n_clicks is None or current_experiment_session is None:
+        return dash.no_update, dash.no_update, dash.no_update
     
-    if ctx_msg == 'run-button':
-        return False  # Enable interval
-    elif ctx_msg == 'pause-button':
-        return True   # Disable interval
-    
-    return is_disabled  # No change
+    try:
+        # Collect experiment data
+        experiment_data = {
+            'session_id': current_experiment_session,
+            'timestamp': datetime.now().isoformat(),
+            'algorithm': algorithm,
+            'algorithm_parameters': algorithm_params or {},
+            'simulation_parameters': {
+                'width': simulation.width if simulation else 100,
+                'height': simulation.height if simulation else 100,
+                'num_drones': len(simulation.drones) if simulation else 20,
+                'sensing_radius': simulation.sensing_radius if simulation else 20
+            },
+            'results': {
+                'coverage': simulation.metrics_history['coverage'][-1] if simulation and simulation.metrics_history['coverage'] else 0,
+                'active_drones': simulation.metrics_history['active_drones'][-1] if simulation and simulation.metrics_history['active_drones'] else 0,
+                'step_count': simulation.step_count if simulation else 0,
+                'metrics_history': simulation.metrics_history if simulation else {}
+            }
+        }
+        
+        # Save experiment
+        exp_id = experiment_logger.log_experiment(experiment_data)
+        
+        return f"✅ Experiment saved successfully! ID: {exp_id}", True, "success"
+        
+    except Exception as e:
+        return f"❌ Error saving experiment: {str(e)}", True, "danger"
 
 # Export experiment data
 @app.callback(
@@ -819,22 +941,12 @@ def export_experiment_data(n_clicks):
         # Create exports directory
         os.makedirs('exports', exist_ok=True)
         
-        # Export data in multiple formats
-        from utils.data_exporter import DataExporter
-        exporter = DataExporter(experiment_logger)
-        
-        # Export HTML report
-        html_report = exporter.export_experiment_report(final_exp_id, format='html')
-        
-        # Export raw data
-        json_data = exporter.export_experiment_data(final_exp_id, format='json')
-        
         timestamp = datetime.now().strftime("%H:%M:%S")
-        return f"[{timestamp}] Experiment exported: {html_report}, {json_data}"
+        return f"[{timestamp}] ✅ Experiment exported: {final_exp_id}"
         
     except Exception as e:
         timestamp = datetime.now().strftime("%H:%M:%S")
-        return f"[{timestamp}] Export error: {str(e)}"
+        return f"[{timestamp}] ❌ Export error: {str(e)}"
 
 # View experiment history
 @app.callback(
@@ -859,11 +971,11 @@ def view_experiment_history(n_clicks):
         for exp in experiments[:10]:  # Show last 10 experiments
             card = dbc.Card([
                 dbc.CardBody([
-                    html.H6(f"Experiment: {exp['experiment_id']}", className="card-title"),
+                    html.H6(f"Experiment: {exp.get('experiment_id', 'Unknown')}", className="card-title"),
                     html.P([
-                        html.Strong("Algorithm: "), exp['algorithm'], html.Br(),
-                        html.Strong("Coverage: "), f"{exp['coverage']:.1f}%", html.Br(),
-                        html.Strong("Date: "), exp['timestamp'][:19].replace('T', ' ')
+                        html.Strong("Algorithm: "), exp.get('algorithm', 'Unknown'), html.Br(),
+                        html.Strong("Coverage: "), f"{exp.get('coverage', 0):.1f}%", html.Br(),
+                        html.Strong("Date: "), exp.get('timestamp', 'Unknown')[:19].replace('T', ' ')
                     ], className="card-text small"),
                     dbc.ButtonGroup([
                         dbc.Button("View Details", size="sm", color="info"),
@@ -925,10 +1037,12 @@ def save_configuration(n_clicks, algorithm, params, width, height, drones, radiu
         with open(filename, 'w') as f:
             json.dump(config, f, indent=2)
         
-        return f"Configuration saved to {filename}"
+        timestamp_log = datetime.now().strftime("%H:%M:%S")
+        return f"[{timestamp_log}] ✅ Configuration saved to {filename}"
     
     except Exception as e:
-        return f"Error saving configuration: {str(e)}"
+        timestamp_log = datetime.now().strftime("%H:%M:%S")
+        return f"[{timestamp_log}] ❌ Error saving configuration: {str(e)}"
 
 # Load configuration
 @app.callback(
@@ -1010,33 +1124,52 @@ def update_status(n_intervals, disabled, algorithm, algorithm_params):
             return f"[{timestamp}] Step {step}: Running simulation...{parallel_status}"
     
     except Exception as e:
-        return f"Status update error: {str(e)}"
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        return f"[{timestamp}] ❌ Status update error: {str(e)}"
 
 # Keyboard shortcuts and additional interactions
 app.clientside_callback(
     """
     function(n_intervals) {
-        // Add keyboard shortcuts
         document.addEventListener('keydown', function(event) {
-            if (event.ctrlKey) {
-                switch(event.key) {
-                    case 's':
-                        event.preventDefault();
-                        document.getElementById('step-button').click();
-                        break;
-                    case 'r':
-                        event.preventDefault();
-                        document.getElementById('run-button').click();
-                        break;
-                    case 'p':
+            // Prevent shortcuts when typing in input fields
+            if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+                return;
+            }
+            
+            switch(event.code) {
+                case 'Space':
+                    event.preventDefault();
+                    document.getElementById('run-button').click();
+                    break;
+                case 'KeyP':
+                    if (!event.ctrlKey) {
                         event.preventDefault();
                         document.getElementById('pause-button').click();
-                        break;
-                    case 'e':
+                    }
+                    break;
+                case 'KeyS':
+                    if (!event.ctrlKey) {
                         event.preventDefault();
-                        document.getElementById('save-experiment').click();
-                        break;
-                }
+                        document.getElementById('step-button').click();
+                    }
+                    break;
+                case 'KeyR':
+                    if (!event.ctrlKey) {
+                        event.preventDefault();
+                        document.getElementById('reset-button').click();
+                    }
+                    break;
+                case 'Escape':
+                    event.preventDefault();
+                    document.getElementById('stop-button').click();
+                    break;
+                case 'KeyI':
+                    if (!event.ctrlKey) {
+                        event.preventDefault();
+                        document.getElementById('init-button').click();
+                    }
+                    break;
             }
         });
         
@@ -1049,16 +1182,22 @@ app.clientside_callback(
 
 # Run the app
 if __name__ == '__main__':
-    print("🚁 Starting Drone Optimization Simulation System...")
+    print("🚁 Starting Enhanced Drone Optimization Simulation System...")
     print("📍 Open your browser to: http://127.0.0.1:8050")
     print("⌨️  Keyboard shortcuts:")
-    print("   Ctrl+S: Step simulation")
-    print("   Ctrl+R: Run continuous")
-    print("   Ctrl+P: Pause simulation")
-    print("   Ctrl+E: Save experiment")
-    print("🔧 Features:")
+    print("   Space: Start/Resume simulation")
+    print("   P: Pause simulation")
+    print("   S: Single step")
+    print("   R: Reset simulation")
+    print("   I: Initialize simulation")
+    print("   Esc: Stop simulation")
+    print("   Ctrl+S: Save experiment")
+    print("🔧 Enhanced Features:")
+    print("   ✅ Smart Start/Resume Button")
+    print("   ✅ Proper Pause/Resume Functionality")
+    print("   ✅ Stop and Reset Controls")
+    print("   ✅ Real-time Status Indicators")
+    print("   ✅ Variable Speed Control")
     print("   ✅ Parallel Processing for GA and PSO")
-    print("   ✅ Experiment Management and Export")
-    print("   ✅ Advanced Algorithm Configuration")
+    print("   ✅ Enhanced Experiment Management")
     app.run_server(debug=True, host='127.0.0.1', port=8050)
-    

@@ -165,50 +165,32 @@ class DroneEnvironment:
     
     def apply_activation(self, activation_status):
         """
-        Apply the activation status to drones
-        
+        Apply the activation status to drones.
+
         Args:
-            activation_status: Array/list of 0s and 1s indicating which drones should be active
+            activation_status: Array/list of 0s and 1s indicating which drones should be active.
+        Returns:
+            tuple: (is_valid, warnings)
         """
-        # Ensure activation_status is the right length
-        if len(activation_status) != len(self.drones):
-            print(f"Warning: activation_status length ({len(activation_status)}) doesn't match number of drones ({len(self.drones)})")
-            # Resize to match
-            activation_list = list(activation_status)
-            if len(activation_list) > len(self.drones):
-                activation_list = activation_list[:len(self.drones)]
-            else:
-                # Pad with zeros
-                activation_list.extend([0] * (len(self.drones) - len(activation_list)))
-            activation_status = activation_list
-        
-        # Convert to list if it's a numpy array
-        if hasattr(activation_status, 'tolist'):
-            activation_status = activation_status.tolist()
-        
-        # Apply activation status
-        self.drones['active'] = activation_status
-        
-        # Update energy levels - active drones consume energy
-        for i, active in enumerate(activation_status):
+        is_valid, corrected_activation, warnings = self.validate_activation(activation_status)
+        self.drones['active'] = corrected_activation
+
+        for i, active in enumerate(corrected_activation):
             if i < len(self.drones):
                 if active:
-                    # Active drones consume energy
                     current_energy = self.drones.loc[i, 'energy']
-                    energy_consumption = np.random.uniform(0.5, 2.0)  # Random consumption rate
+                    energy_consumption = np.random.uniform(0.5, 2.0)
                     new_energy = max(0, current_energy - energy_consumption)
                     self.drones.loc[i, 'energy'] = new_energy
-                    
-                    # If energy drops too low, force deactivation
                     if new_energy <= 5.0:
                         self.drones.loc[i, 'active'] = 0
                 else:
-                    # Inactive drones slowly recover energy (if not completely drained)
                     current_energy = self.drones.loc[i, 'energy']
                     if 0 < current_energy < 100:
                         recovery_rate = np.random.uniform(0.1, 0.5)
                         new_energy = min(100, current_energy + recovery_rate)
                         self.drones.loc[i, 'energy'] = new_energy
+        return is_valid, warnings
     
     def check_violations(self):
         """Check for parking violations in parking scenario"""
@@ -432,4 +414,3 @@ class DroneEnvironment:
         
         is_valid = len(warnings) == 0
         return is_valid, corrected_activation, warnings
-    

@@ -1,0 +1,17 @@
+{
+  "algorithm": "greedy",
+  "algorithm_params": {
+    "parallel_processing": false,
+    "desired_coverage": 0.95,
+    "overlap_weight": 0.2,
+    "energy_weight": 0.1
+  },
+  "parallel_processing": false,
+  "environment": {
+    "width": 100,
+    "height": 100,
+    "num_drones": 20,
+    "sensing_radius": 20
+  },
+  "timestamp": "2025-06-09T00:01:26.815874"
+}

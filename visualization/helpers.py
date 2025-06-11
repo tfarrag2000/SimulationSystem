@@ -156,9 +156,16 @@ def create_simulation_view(simulation):
             xanchor="right",
             x=1
         ),
-        plot_bgcolor='white',
-        width=800,
-        height=600
+        plot_bgcolor='white'
+        # Remove width and height here for responsiveness
+    )
+    
+    fig.add_annotation(
+        text=f"Step {simulation.step_count}",
+        xref="paper", yref="paper",
+        x=0.98, y=0.02, showarrow=False,
+        font=dict(size=16, color="gray"),
+        align="right", bgcolor="white", opacity=0.7
     )
     
     return fig

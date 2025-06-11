@@ -13,12 +13,12 @@ Example:
 """
 
 import argparse
-import os
+import sys
+import sys
 import sys
 import importlib.util
 import logging
 from datetime import datetime
-
 # Setup logging
 logging.basicConfig(
     level=logging.INFO,
