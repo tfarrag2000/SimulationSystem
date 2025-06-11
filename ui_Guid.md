@@ -24,6 +24,8 @@ python run.py
 - **⚙️ Optimization Settings** (Left sidebar)
 - **🎯 Visualization Tabs** (Main area)
 - **📝 Simulation Logs** (Bottom panel)
+- **🌗 Theme Toggle** (Switch between Light and Dark mode)
+- **⬇️ Download Plot** (Export the current simulation visualization as a high-resolution image)
 
 ---
 
@@ -131,4 +133,41 @@ During or after simulation:
 
 1. **Click "Export Data"**:
    - Creates HTML report with visualizations
-   - Exports raw data in JSON forma
+   - Exports raw data in JSON format
+
+### **Step 3: Download High-Resolution Visualization**
+
+1. **Click "Download Plot"** (below the simulation graph):
+   - Exports the current simulation plot as a high-resolution PNG image (suitable for publication or presentations)
+   - Image is generated at increased resolution for clarity
+
+---
+
+## 🧑‍💻 **Step-by-Step Workflow**
+
+```mermaid
+flowchart TD
+    A[Start Experiment] --> B[Configure Settings]
+    B --> C[Initialize Simulation]
+    C --> D{Run or Step}
+    D -->|Run| E[Pause/Stop]
+    D -->|Step| E
+    E --> F[Save Results]
+    F --> G[Export Data or Download Plot]
+    G --> H[View Experiment History]
+```
+
+---
+
+## 🚀 **Advanced Features**
+
+- **🌗 Theme Toggle:** Instantly switch between Light and Dark mode for comfortable viewing.
+- **⬇️ Download Plot:** Export high-resolution images of your simulation for reports or publications.
+- **Keyboard Shortcuts:** Control simulation with keys (see app footer for details).
+- **Experiment Comparison:** Compare results across multiple experiments in the Results tab.
+- **Real-time Logs:** Monitor simulation progress and actions in the log panel.
+
+---
+
+**Need more help?**  
+Check tooltips in the UI or contact the developer for support!

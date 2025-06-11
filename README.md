@@ -9,8 +9,9 @@ A comprehensive web-based system for optimizing drone network coverage using mul
 - **Advanced Visualizations**: 3D plots, heatmaps, network topology
 - **Experiment Management**: Logging, comparison, and export capabilities
 - **Parking Scenario Support**: Specialized for parking violation detection
-- **Theme Management**: Multiple visual themes including accessibility options
+- **Theme Management**: Light/Dark mode toggle for accessibility and comfort
 - **Performance Analytics**: Comprehensive metrics and statistical analysis
+- **Downloadable High-Resolution Plots**: Export simulation visuals as PNG images
 
 ## 🛠️ Installation & Setup
 
@@ -162,7 +163,15 @@ The system tracks multiple performance indicators:
 - Energy level changes
 - Coverage development
 
-## 🔬 Experiment Management
+### High-Resolution Plot Download
+- **Download Plot** button below the simulation graph allows you to export the current visualization as a high-resolution PNG image (great for publications and presentations).
+- Images are generated at increased resolution for clarity.
+
+## 🌗 Theme Management
+
+- Instantly switch between Light and Dark mode using the theme toggle in the UI for comfortable viewing in any environment.
+
+## 🧪 Experiment Management
 
 ### Logging Experiments
 ```python
@@ -313,6 +322,9 @@ For issues and questions:
 - [ ] Cloud deployment capabilities
 - [ ] Advanced 3D visualizations
 - [ ] Mobile-responsive interface
+- [ ] Enhanced experiment comparison tools
+- [ ] More export formats (SVG, PDF)
+- [ ] User accounts and cloud sync
 
 ---
 
