@@ -1180,6 +1180,66 @@ app.clientside_callback(
     Input('simulation-interval', 'n_intervals')
 )
 
+# New callback for setting button states
+@app.callback(
+    [
+        Output('init-button', 'disabled'),
+        Output('run-button', 'disabled'),
+        Output('pause-button', 'disabled'),
+        Output('step-button', 'disabled'),
+        Output('stop-button', 'disabled'),
+        Output('reset-button', 'disabled'),
+    ],
+    [
+        Input('simulation-interval', 'disabled'),
+        Input('simulation-state', 'data'),
+    ],
+    prevent_initial_call=False
+)
+def set_button_states(sim_disabled, sim_state_data):
+    # You may need to parse sim_state_data if it's a dict or string
+    # We'll use the global current_sim_state for simplicity
+    global current_sim_state
+
+    # Default: all disabled
+    init_dis, run_dis, pause_dis, step_dis, stop_dis, reset_dis = True, True, True, True, True, True
+
+    # Logic based on current_sim_state
+    if current_sim_state == SimState.STOPPED:
+        # After stop or reset, allow init, run, step, reset
+        init_dis = False
+        run_dis = False
+        pause_dis = True
+        step_dis = False
+        stop_dis = True
+        reset_dis = False
+    elif current_sim_state == SimState.RUNNING:
+        # Only pause and stop enabled
+        init_dis = True
+        run_dis = True
+        pause_dis = False
+        step_dis = True
+        stop_dis = False
+        reset_dis = True
+    elif current_sim_state == SimState.PAUSED:
+        # Allow run, step, stop, reset
+        init_dis = True
+        run_dis = False
+        pause_dis = True
+        step_dis = False
+        stop_dis = False
+        reset_dis = False
+    else:
+        # Not started or unknown state: only init enabled
+        init_dis = False
+        run_dis = True
+        pause_dis = True
+        step_dis = True
+        stop_dis = True
+        reset_dis = True
+
+    return init_dis, run_dis, pause_dis, step_dis, stop_dis, reset_dis
+
 # Run the app
 if __name__ == '__main__':
     print("🚁 Starting Enhanced Drone Optimization Simulation System...")
