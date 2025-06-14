@@ -1,0 +1,64 @@
+{
+  "session_id": "session_20250611_141532",
+  "timestamp": "2025-06-11T14:15:56.875019",
+  "algorithm": null,
+  "algorithm_parameters": {},
+  "simulation_parameters": {
+    "width": 100,
+    "height": 100,
+    "num_drones": 20,
+    "sensing_radius": 20
+  },
+  "results": {
+    "coverage": 0.9525,
+    "active_drones": 14,
+    "step_count": 6,
+    "metrics_history": {
+      "coverage": [
+        0.965,
+        0.9525,
+        0.9525,
+        0.9525,
+        0.9525,
+        0.9525
+      ],
+      "active_drones": [
+        14,
+        14,
+        14,
+        14,
+        14,
+        14
+      ],
+      "power_consumption": [
+        14.0,
+        14.0,
+        14.0,
+        14.0,
+        14.0,
+        14.0
+      ],
+      "avg_overlap": [
+        1.4300518134715026,
+        1.4120734908136483,
+        1.4120734908136483,
+        1.4908136482939633,
+        1.4855643044619422,
+        1.4908136482939633
+      ],
+      "violations": [
+        1,
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
+    }
+  },
+  "metadata": {
+    "experiment_id": "exp_20250611_141556",
+    "timestamp": "2025-06-11T14:15:56.875019",
+    "version": "1.0"
+  }
+}

@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-"""
-Enhanced Drone Optimization Simulation System - Complete app.py
-Integrated with improved control system for better start/pause/stop/restart functionality
-"""
-
 import dash
 from dash import dcc, html, Input, Output, State, callback, ALL, MATCH, ctx
 import dash_bootstrap_components as dbc

@@ -1,0 +1,824 @@
+{
+  "session_id": "session_20250611_135351",
+  "configuration": {
+    "name": "Tamer",
+    "start_time": "2025-06-11T13:53:51.015253",
+    "algorithm_runs": []
+  },
+  "start_time": "2025-06-11T13:53:51.015253",
+  "end_time": "2025-06-11T14:00:12.250272",
+  "step_results": [
+    {
+      "timestamp": "2025-06-11T13:55:08.949322",
+      "data": {
+        "step": 1,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 45.197896,
+        "result": {
+          "step": 1,
+          "coverage": 0.6225,
+          "active_drones": 15,
+          "power_consumption": 15.0,
+          "avg_overlap": 1.4176706827309238,
+          "violations": 0
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:55:15.274464",
+      "data": {
+        "step": 2,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 50.512385,
+        "result": {
+          "step": 2,
+          "coverage": 0.6425,
+          "active_drones": 15,
+          "power_consumption": 15.0,
+          "avg_overlap": 1.4319066147859922,
+          "violations": 1
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:55:16.217643",
+      "data": {
+        "step": 3,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 49.433722,
+        "result": {
+          "step": 3,
+          "coverage": 0.56,
+          "active_drones": 12,
+          "power_consumption": 12.0,
+          "avg_overlap": 1.2455357142857142,
+          "violations": 0
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:55:22.269928",
+      "data": {
+        "step": 4,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 54.484914,
+        "result": {
+          "step": 4,
+          "coverage": 0.54,
+          "active_drones": 13,
+          "power_consumption": 13.0,
+          "avg_overlap": 1.4814814814814814,
+          "violations": 1
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:55:22.681429",
+      "data": {
+        "step": 5,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 56.895884,
+        "result": {
+          "step": 5,
+          "coverage": 0.6875,
+          "active_drones": 17,
+          "power_consumption": 17.0,
+          "avg_overlap": 1.5272727272727273,
+          "violations": 1
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:55:23.199978",
+      "data": {
+        "step": 6,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 54.368258,
+        "result": {
+          "step": 6,
+          "coverage": 0.6625,
+          "active_drones": 14,
+          "power_consumption": 14.0,
+          "avg_overlap": 1.2754716981132075,
+          "violations": 1
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:56:05.780849",
+      "data": {
+        "step": 7,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 56.174882,
+        "result": {
+          "step": 7,
+          "coverage": 0.6,
+          "active_drones": 14,
+          "power_consumption": 14.0,
+          "avg_overlap": 1.4375,
+          "violations": 1
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:56:11.738712",
+      "data": {
+        "step": 8,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 54.708394,
+        "result": {
+          "step": 8,
+          "coverage": 0.6075,
+          "active_drones": 15,
+          "power_consumption": 15.0,
+          "avg_overlap": 1.522633744855967,
+          "violations": 0
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:56:15.012608",
+      "data": {
+        "step": 9,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 52.349896,
+        "result": {
+          "step": 9,
+          "coverage": 0.5125,
+          "active_drones": 12,
+          "power_consumption": 12.0,
+          "avg_overlap": 1.448780487804878,
+          "violations": 1
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:56:17.008529",
+      "data": {
+        "step": 10,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 60.976188,
+        "result": {
+          "step": 10,
+          "coverage": 0.6575,
+          "active_drones": 18,
+          "power_consumption": 18.0,
+          "avg_overlap": 1.6121673003802282,
+          "violations": 0
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:56:22.821937",
+      "data": {
+        "step": 11,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 58.515846,
+        "result": {
+          "step": 11,
+          "coverage": 0.6325,
+          "active_drones": 16,
+          "power_consumption": 16.0,
+          "avg_overlap": 1.5533596837944663,
+          "violations": 1
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:56:27.134434",
+      "data": {
+        "step": 12,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 64.045222,
+        "result": {
+          "step": 12,
+          "coverage": 0.6125,
+          "active_drones": 18,
+          "power_consumption": 18.0,
+          "avg_overlap": 1.8122448979591836,
+          "violations": 0
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:57:14.301725",
+      "data": {
+        "step": 13,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 68.058522,
+        "result": {
+          "step": 13,
+          "coverage": 0.5675,
+          "active_drones": 13,
+          "power_consumption": 13.0,
+          "avg_overlap": 1.3127753303964758,
+          "violations": 1
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:57:19.813309",
+      "data": {
+        "step": 14,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 67.581863,
+        "result": {
+          "step": 14,
+          "coverage": 0.65,
+          "active_drones": 14,
+          "power_consumption": 14.0,
+          "avg_overlap": 1.2769230769230768,
+          "violations": 0
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:57:25.455008",
+      "data": {
+        "step": 15,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 70.090453,
+        "result": {
+          "step": 15,
+          "coverage": 0.575,
+          "active_drones": 15,
+          "power_consumption": 15.0,
+          "avg_overlap": 1.5434782608695652,
+          "violations": 0
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:57:29.903549",
+      "data": {
+        "step": 16,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 71.830601,
+        "result": {
+          "step": 16,
+          "coverage": 0.6725,
+          "active_drones": 16,
+          "power_consumption": 16.0,
+          "avg_overlap": 1.304832713754647,
+          "violations": 0
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:57:31.502680",
+      "data": {
+        "step": 17,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 68.209412,
+        "result": {
+          "step": 17,
+          "coverage": 0.5775,
+          "active_drones": 14,
+          "power_consumption": 14.0,
+          "avg_overlap": 1.4718614718614718,
+          "violations": 0
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:57:37.278548",
+      "data": {
+        "step": 18,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 69.003969,
+        "result": {
+          "step": 18,
+          "coverage": 0.6275,
+          "active_drones": 16,
+          "power_consumption": 16.0,
+          "avg_overlap": 1.5298804780876494,
+          "violations": 0
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:58:05.082678",
+      "data": {
+        "step": 19,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 50.106996,
+        "result": {
+          "step": 19,
+          "coverage": 0.49,
+          "active_drones": 13,
+          "power_consumption": 13.0,
+          "avg_overlap": 1.586734693877551,
+          "violations": 0
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:58:15.898122",
+      "data": {
+        "step": 20,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 50.063006,
+        "result": {
+          "step": 20,
+          "coverage": 0.475,
+          "active_drones": 11,
+          "power_consumption": 11.0,
+          "avg_overlap": 1.3894736842105264,
+          "violations": 1
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:58:17.369323",
+      "data": {
+        "step": 21,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 57.000805,
+        "result": {
+          "step": 21,
+          "coverage": 0.615,
+          "active_drones": 17,
+          "power_consumption": 17.0,
+          "avg_overlap": 1.6788617886178863,
+          "violations": 1
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:58:25.874915",
+      "data": {
+        "step": 22,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 55.197165,
+        "result": {
+          "step": 22,
+          "coverage": 0.66,
+          "active_drones": 14,
+          "power_consumption": 14.0,
+          "avg_overlap": 1.3143939393939394,
+          "violations": 0
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:58:34.098820",
+      "data": {
+        "step": 23,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 62.192132,
+        "result": {
+          "step": 23,
+          "coverage": 0.7175,
+          "active_drones": 17,
+          "power_consumption": 17.0,
+          "avg_overlap": 1.421602787456446,
+          "violations": 1
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:58:41.542522",
+      "data": {
+        "step": 24,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 63.808385,
+        "result": {
+          "step": 24,
+          "coverage": 0.6125,
+          "active_drones": 17,
+          "power_consumption": 17.0,
+          "avg_overlap": 1.7142857142857142,
+          "violations": 0
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:59:05.085471",
+      "data": {
+        "step": 25,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 59.477031,
+        "result": {
+          "step": 25,
+          "coverage": 0.56,
+          "active_drones": 13,
+          "power_consumption": 13.0,
+          "avg_overlap": 1.40625,
+          "violations": 0
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:59:18.472952",
+      "data": {
+        "step": 26,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 62.137496,
+        "result": {
+          "step": 26,
+          "coverage": 0.6175,
+          "active_drones": 16,
+          "power_consumption": 16.0,
+          "avg_overlap": 1.5020242914979758,
+          "violations": 0
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:59:22.586097",
+      "data": {
+        "step": 27,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 64.533117,
+        "result": {
+          "step": 27,
+          "coverage": 0.5925,
+          "active_drones": 17,
+          "power_consumption": 17.0,
+          "avg_overlap": 1.6455696202531647,
+          "violations": 1
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:59:24.049784",
+      "data": {
+        "step": 28,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 56.175429,
+        "result": {
+          "step": 28,
+          "coverage": 0.6825,
+          "active_drones": 14,
+          "power_consumption": 14.0,
+          "avg_overlap": 1.1684981684981686,
+          "violations": 0
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:59:27.052746",
+      "data": {
+        "step": 29,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 52.518332,
+        "result": {
+          "step": 29,
+          "coverage": 0.575,
+          "active_drones": 12,
+          "power_consumption": 12.0,
+          "avg_overlap": 1.2695652173913043,
+          "violations": 0
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:59:38.138095",
+      "data": {
+        "step": 30,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 55.483258,
+        "result": {
+          "step": 30,
+          "coverage": 0.7125,
+          "active_drones": 16,
+          "power_consumption": 16.0,
+          "avg_overlap": 1.3649122807017544,
+          "violations": 0
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T13:59:57.203468",
+      "data": {
+        "step": 31,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 51.685963,
+        "result": {
+          "step": 31,
+          "coverage": 0.615,
+          "active_drones": 15,
+          "power_consumption": 15.0,
+          "avg_overlap": 1.4390243902439024,
+          "violations": 1
+        },
+        "parallel_processing_used": true
+      }
+    },
+    {
+      "timestamp": "2025-06-11T14:00:08.500376",
+      "data": {
+        "step": 32,
+        "algorithm": "pso",
+        "algorithm_params": {
+          "parallel_processing": true,
+          "swarm_size": 30,
+          "iterations": 100,
+          "inertia": 0.5,
+          "cognitive_weight": 1.5,
+          "social_weight": 1.5
+        },
+        "execution_time": 49.38026,
+        "result": {
+          "step": 32,
+          "coverage": 0.56,
+          "active_drones": 14,
+          "power_consumption": 14.0,
+          "avg_overlap": 1.53125,
+          "violations": 0
+        },
+        "parallel_processing_used": true
+      }
+    }
+  ],
+  "summary": {
+    "total_steps": 32,
+    "duration": 381.235019,
+    "final_coverage": 0,
+    "avg_active_drones": 0.0,
+    "total_power_consumption": 0
+  },
+  "metadata": {
+    "experiment_id": "exp_20250611_140012",
+    "timestamp": "2025-06-11T14:00:12.250272",
+    "version": "1.0"
+  }
+}
