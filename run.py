@@ -1,16 +1,4 @@
 #!/usr/bin/env python3
-"""
-Drone Optimization Simulation System
-
-This script is the main entry point for the drone optimization simulation system.
-It sets up the Dash web application and connects all components.
-
-Usage:
-    python run.py
-
-Example:
-    python run.py --port 8080 --debug
-"""
 
 import argparse
 import sys
@@ -58,6 +46,19 @@ def parse_arguments():
                         help='Run the app in debug mode')
     return parser.parse_args()
 
+# Define allowed params for each algorithm
+ALGORITHM_ALLOWED_PARAMS = {
+    'greedy': ['desired_coverage', 'overlap_weight', 'energy_weight'],
+    'ga': ['population_size', 'num_generations', 'mutation_rate', 'crossover_rate', 'elitism', 'desired_coverage', 'parallel_processing', 'w1', 'w2', 'w3'],
+    'pso': ['swarm_size', 'iterations', 'inertia', 'cognitive_weight', 'social_weight', 'parallel_processing', 'w1', 'w2', 'w3', 'desired_coverage'],
+    'sa': ['initial_temp', 'cooling_rate', 'iterations', 'min_temp', 'desired_coverage'],
+    'ga_sa': ['population_size', 'num_generations', 'mutation_rate', 'crossover_rate', 'elitism_fraction', 'sa_temp', 'sa_cooling', 'sa_iters', 'desired_coverage', 'parallel_processing', 'w1', 'w2', 'w3'],
+}
+
+def filter_params(algorithm_key, params):
+    allowed = ALGORITHM_ALLOWED_PARAMS.get(algorithm_key, [])
+    return {k: v for k, v in params.items() if k in allowed}
+
 def main():
     """Main entry point for the application"""
     # Check if dependencies are satisfied
@@ -88,3 +89,12 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# Example usage in your callback:
+# if selected_algorithm == 'greedy':
+#     filtered_params = filter_params('greedy', algorithm_params)
+#     activation_status, result = greedy_optimization(simulation, **filtered_params)
+# elif selected_algorithm == 'ga':
+#     filtered_params = filter_params('ga', algorithm_params)
+#     activation_status, result = genetic_algorithm(simulation, **filtered_params)
+# ...and so on for other algorithms...

@@ -10,6 +10,7 @@ import json
 import os
 from enum import Enum
 import plotly.io as pio
+import time  # <-- Add this import
 
 # Enhanced simulation state management
 class SimState(Enum):
@@ -24,7 +25,8 @@ try:
         greedy_optimization,
         genetic_algorithm,
         particle_swarm_optimization,
-        simulated_annealing
+        simulated_annealing,
+        genetic_algorithm_with_sa
     )
     
     # Import simulation components
@@ -45,22 +47,22 @@ except ImportError as e:
     # Fallback implementations...
     def greedy_optimization(*args, **kwargs):
         return np.ones(20), {"coverage": 50, "execution_time": 0.1}
-    
+
     def genetic_algorithm(*args, **kwargs):
         return np.ones(20), {"coverage": 60, "execution_time": 1.0}
-    
+
     def particle_swarm_optimization(*args, **kwargs):
         return np.ones(20), {"coverage": 55, "execution_time": 0.8}
-    
+
     def simulated_annealing(*args, **kwargs):
         return np.ones(20), {"coverage": 45, "execution_time": 0.5}
-    
+
     def run_simulation_step(simulation, algorithm, params):
         return {"coverage": 0.5, "active_drones": 10}
-    
+
     def create_simulation_view(simulation):
         return go.Figure().update_layout(title="Simulation not available")
-    
+
     def create_metrics_charts(simulation):
         empty_fig = go.Figure().update_layout(title="Metrics not available")
         return {
@@ -69,7 +71,7 @@ except ImportError as e:
             'overlap': empty_fig,
             'violations': empty_fig
         }
-    
+
     class ExperimentLogger:
         def __init__(self):
             pass
@@ -83,6 +85,39 @@ except ImportError as e:
             return "dummy_exp_id"
         def list_experiments(self):
             return []
+
+    # Dummy SimulationState class
+    class SimulationState:
+        def __init__(self):
+            self.state = "stopped"
+
+    # Dummy DroneEnvironment class
+    class DroneEnvironment:
+        def __init__(self, width=100, height=100, num_drones=20, sensing_radius=20, num_parking_spots=100, num_disabled_spots=10):
+            self.width = width
+            self.height = height
+            self.num_drones = num_drones
+            self.sensing_radius = sensing_radius
+            self.num_parking_spots = num_parking_spots
+            self.num_disabled_spots = num_disabled_spots
+            self.drones = pd.DataFrame({'x': np.random.rand(num_drones)*width, 'y': np.random.rand(num_drones)*height, 'energy': np.ones(num_drones)*100})
+            self.metrics_history = {'coverage': [0.0], 'active_drones': [num_drones]}
+            self.step_count = 0
+
+        def apply_activation(self, activation):
+            # Dummy: just update active drones count
+            self.metrics_history['active_drones'].append(int(np.sum(activation)))
+
+        def step(self):
+            # Dummy: increment step and random coverage
+            self.step_count += 1
+            coverage = np.random.rand()
+            self.metrics_history['coverage'].append(coverage)
+            return {'coverage': coverage, 'active_drones': self.metrics_history['active_drones'][-1]}
+
+        def reset_simulation(self):
+            self.metrics_history = {'coverage': [0.0], 'active_drones': [self.num_drones]}
+            self.step_count = 0
 
 # Global simulation state and experiment management
 simulation = None
@@ -156,7 +191,9 @@ app.layout = dbc.Container([
                             {'label': 'Greedy Algorithm', 'value': 'greedy'},
                             {'label': 'Genetic Algorithm', 'value': 'ga'},
                             {'label': 'Particle Swarm Optimization', 'value': 'pso'},
-                            {'label': 'Simulated Annealing', 'value': 'sa'}
+                            {'label': 'Simulated Annealing', 'value': 'sa'},
+                            {'label': 'Genetic Algorithm + SA', 'value': 'ga_sa'}
+
                         ],
                         value='greedy'
                     ),
@@ -515,6 +552,82 @@ def update_algorithm_params(algorithm, parallel_enabled):
                         ], width=6)
                     ], className="mt-2"),
                     dbc.Alert("ℹ️ Simulated Annealing does not support parallel processing", color="info", className="mt-2")
+                ])
+            ]), params
+            
+        elif algorithm == 'ga_sa':
+            params.update({
+                'population_size': 50,
+                'num_generations': 100,
+                'mutation_rate': 0.1,
+                'crossover_rate': 0.8,
+                'elitism_fraction': 0.2,
+                'sa_initial_temp': 100,
+                'sa_cooling_rate': 0.95,
+                'sa_iterations': 30,
+                'desired_coverage': 0.95
+            })
+            return dbc.Card([
+                dbc.CardBody([
+                    dbc.Row([
+                        dbc.Col([
+                            html.Label("Population Size"),
+                            dbc.Input(id="ga-sa-population-size", type="number", value=50, min=10, max=500),
+                            dbc.FormText("Larger populations explore more solutions", color="muted")
+                        ], width=6),
+                        dbc.Col([
+                            html.Label("Generations"),
+                            dbc.Input(id="ga-sa-generations", type="number", value=100, min=10, max=1000),
+                            dbc.FormText("More generations = better coverage", color="muted")
+                        ], width=6)
+                    ]),
+                    dbc.Row([
+                        dbc.Col([
+                            html.Label("Mutation Rate"),
+                            dbc.Input(id="ga-sa-mutation-rate", type="number", value=0.1, min=0, max=1, step=0.01),
+                            dbc.FormText("0.05-0.2 recommended", color="muted")
+                        ], width=4),
+                        dbc.Col([
+                            html.Label("Crossover Rate"),
+                            dbc.Input(id="ga-sa-crossover-rate", type="number", value=0.8, min=0, max=1, step=0.01),
+                            dbc.FormText("0.6-0.9 recommended", color="muted")
+                        ], width=4),
+                        dbc.Col([
+                            html.Label("Elitism Fraction"),
+                            dbc.Input(id="ga-sa-elitism-fraction", type="number", value=0.2, min=0, max=1, step=0.01),
+                            dbc.FormText("Top fraction of solutions to keep", color="muted")
+                        ], width=4)
+                    ], className="mt-2"),
+                    dbc.Row([
+                        dbc.Col([
+                            html.Label("SA Initial Temp"),
+                            dbc.Input(id="ga-sa-sa-temp", type="number", value=100, min=1, max=1000),
+                            dbc.FormText("Starting temperature for SA", color="muted")
+                        ], width=6),
+                        dbc.Col([
+                            html.Label("SA Cooling Rate"),
+                            dbc.Input(id="ga-sa-sa-cooling", type="number", value=0.95, min=0.8, max=1, step=0.01),
+                            dbc.FormText("Cooling rate for SA", color="muted")
+                        ], width=6)
+                    ], className="mt-2"),
+                    dbc.Row([
+                        dbc.Col([
+                            html.Label("SA Iterations"),
+                            dbc.Input(id="ga-sa-sa-iters", type="number", value=30, min=1, max=500),
+                            dbc.FormText("Iterations for SA", color="muted")
+                        ], width=6),
+                        dbc.Col([
+                            html.Label("Desired Coverage"),
+                            dbc.Input(id="ga-sa-desired-coverage", type="number", value=0.95, min=0, max=1, step=0.01),
+                            dbc.FormText("Target coverage percentage", color="muted")
+                        ], width=6)
+                    ], className="mt-2"),
+                    html.Div([
+                        dbc.Alert([
+                            html.I(className="bi bi-lightning-charge me-2"),
+                            f"Parallel processing: {'Enabled' if parallel_enabled else 'Disabled'}"
+                        ], color="success" if parallel_enabled else "secondary", className="mt-2")
+                    ]) if algorithm == 'ga_sa' else html.Div()
                 ])
             ]), params
             
