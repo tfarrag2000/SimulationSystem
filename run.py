@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import argparse
 import sys
 import sys
@@ -53,6 +51,8 @@ ALGORITHM_ALLOWED_PARAMS = {
     'pso': ['swarm_size', 'iterations', 'inertia', 'cognitive_weight', 'social_weight', 'parallel_processing', 'w1', 'w2', 'w3', 'desired_coverage'],
     'sa': ['initial_temp', 'cooling_rate', 'iterations', 'min_temp', 'desired_coverage'],
     'ga_sa': ['population_size', 'num_generations', 'mutation_rate', 'crossover_rate', 'elitism_fraction', 'sa_temp', 'sa_cooling', 'sa_iters', 'desired_coverage', 'parallel_processing', 'w1', 'w2', 'w3'],
+    'gwo': ['population_size', 'max_iterations', 'desired_coverage', 'w1', 'w2', 'w3', 'parallel_processing'],
+    'mrfo': ['population_size', 'num_generations', 'desired_coverage', 'w1', 'w2', 'w3', 'parallel_processing'],
 }
 
 def filter_params(algorithm_key, params):
@@ -85,16 +85,7 @@ def main():
         sys.exit(1)
     except Exception as e:
         logger.error(f"Error starting application: {e}")
-        sys.exit(1)
+        sys.exit(1) 
 
 if __name__ == '__main__':
     main()
-
-# Example usage in your callback:
-# if selected_algorithm == 'greedy':
-#     filtered_params = filter_params('greedy', algorithm_params)
-#     activation_status, result = greedy_optimization(simulation, **filtered_params)
-# elif selected_algorithm == 'ga':
-#     filtered_params = filter_params('ga', algorithm_params)
-#     activation_status, result = genetic_algorithm(simulation, **filtered_params)
-# ...and so on for other algorithms...

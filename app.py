@@ -21,23 +21,25 @@ class SimState(Enum):
 # Fixed imports to match actual file structure
 try:
     # Import optimization algorithms
-    from optimization.algorithms import (
+    from algorithms import (
         greedy_optimization,
         genetic_algorithm,
         particle_swarm_optimization,
         simulated_annealing,
-        genetic_algorithm_with_sa
+        genetic_algorithm_with_sa,
+        grey_wolf_optimizer,
+        manta_ray_foraging_optimization
     )
     
     # Import simulation components
-    from simulation.environment import DroneEnvironment
+    from environment import DroneEnvironment
     from simulation import SimulationState, run_simulation_step
     
     # Import visualization helpers
-    from visualization.helpers import create_simulation_view, create_metrics_charts
+    from helpers import create_simulation_view, create_metrics_charts
     
     # Import experiment logger
-    from utils.experiment_logger import ExperimentLogger
+    from experiment_logger import ExperimentLogger
     
     print("✅ All modules imported successfully")
     
@@ -138,47 +140,15 @@ app.layout = dbc.Container([
     dbc.Row([
         dbc.Col([
             html.H1("🚁 Drone Optimization Simulation System", className="text-center my-4"),
-            dbc.Alert(id="experiment-status", color="info", is_open=False, dismissable=True)
+            # REMOVE experiment-status alert
+            # dbc.Alert(id="experiment-status", color="info", is_open=False, dismissable=True)
         ])
     ]),
     
     # Main content split into sidebar and visualization
     dbc.Row([
         # Control Panel (Left Sidebar)
-        dbc.Col([
-            # Experiment Management Card
-            dbc.Card([
-                dbc.CardHeader("🧪 Experiment Management"),
-                dbc.CardBody([
-                    dbc.Row([
-                        dbc.Col([
-                            dbc.Input(
-                                id="experiment-name",
-                                placeholder="Enter experiment name...",
-                                value="",
-                                type="text"
-                            )
-                        ], width=8),
-                        dbc.Col([
-                            dbc.Button("Start Experiment", id="start-experiment", color="success", size="sm")
-                        ], width=4)
-                    ]),
-                    html.Div(id="experiment-info", className="mt-2"),
-                    html.Hr(),
-                    dbc.Row([
-                        dbc.Col([
-                            dbc.Button("Save Results", id="save-experiment", color="primary", size="sm", disabled=True)
-                        ], width=4),
-                        dbc.Col([
-                            dbc.Button("Export Data", id="export-experiment", color="info", size="sm", disabled=True)
-                        ], width=4),
-                        dbc.Col([
-                            dbc.Button("View History", id="view-history", color="secondary", size="sm")
-                        ], width=4)
-                    ])
-                ])
-            ], className="mb-3"),
-            
+        dbc.Col([           
             # Algorithm Settings Card
             dbc.Card([
                 dbc.CardHeader("⚙️ Optimization Settings"),
@@ -192,7 +162,9 @@ app.layout = dbc.Container([
                             {'label': 'Genetic Algorithm', 'value': 'ga'},
                             {'label': 'Particle Swarm Optimization', 'value': 'pso'},
                             {'label': 'Simulated Annealing', 'value': 'sa'},
-                            {'label': 'Genetic Algorithm + SA', 'value': 'ga_sa'}
+                            {'label': 'Genetic Algorithm + SA', 'value': 'ga_sa'},
+                            {'label': 'Grey Wolf Optimizer', 'value': 'gwo'},
+                            {'label': 'Manta Ray Foraging Optimizer', 'value': 'mrfo'}
 
                         ],
                         value='greedy'
@@ -726,53 +698,6 @@ def update_pso_params(swarm, iterations, inertia, cognitive, social, algorithm, 
     except Exception:
         return current_params
 
-# Experiment management callbacks
-@app.callback(
-    [Output('experiment-status', 'children'),
-     Output('experiment-status', 'is_open'),
-     Output('experiment-status', 'color'),
-     Output('save-experiment', 'disabled'),
-     Output('export-experiment', 'disabled'),
-     Output('experiment-info', 'children')],
-    Input('start-experiment', 'n_clicks'),
-    State('experiment-name', 'value')
-)
-def start_experiment_session(n_clicks, experiment_name):
-    """Start a new experiment session"""
-    if n_clicks is None:
-        return "", False, "info", True, True, ""
-    
-    global current_experiment_session
-    
-    try:
-        if not experiment_name or experiment_name.strip() == "":
-            experiment_name = f"Experiment_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-        
-        # Start experiment session
-        session_config = {
-            'name': experiment_name,
-            'start_time': datetime.now().isoformat(),
-            'algorithm_runs': []
-        }
-        
-        current_experiment_session = experiment_logger.start_experiment_session(session_config)
-        
-        status_msg = f"🧪 Experiment '{experiment_name}' started!"
-        experiment_info = dbc.Card([
-            dbc.CardBody([
-                html.H6("Active Experiment", className="card-title"),
-                html.P(f"Name: {experiment_name}", className="card-text small"),
-                html.P(f"Session ID: {current_experiment_session}", className="card-text small text-muted"),
-                html.P(f"Started: {datetime.now().strftime('%H:%M:%S')}", className="card-text small text-muted")
-            ])
-        ], color="success", outline=True)
-        
-        return status_msg, True, "success", False, False, experiment_info
-        
-    except Exception as e:
-        error_msg = f"Error starting experiment: {str(e)}"
-        return error_msg, True, "danger", True, True, ""
-
 # Initialize simulation
 @app.callback(
     Output('log-output', 'children', allow_duplicate=True),
@@ -941,6 +866,12 @@ def update_simulation(step_clicks, interval, algorithm, algorithm_params):
                 activation_status, result = particle_swarm_optimization(simulation, **algorithm_params)
             elif algorithm == 'sa':
                 activation_status, result = simulated_annealing(simulation, **algorithm_params)
+            elif algorithm == 'gwo':
+                filtered_params = filter_params('gwo', algorithm_params)
+                activation_status, result = grey_wolf_optimizer(simulation, **filtered_params)
+            elif algorithm == 'mrfo':
+                filtered_params = filter_params('mrfo', algorithm_params)
+                activation_status, result = manta_ray_foraging_optimization(simulation, **filtered_params)
             else:  # greedy
                 algorithm_params.pop('parallel_processing', None)
                 activation_status, result = greedy_optimization(simulation, **algorithm_params)
@@ -988,367 +919,6 @@ def update_simulation(step_clicks, interval, algorithm, algorithm_params):
         error_fig.update_layout(title=error_msg)
         print(f"Simulation error: {traceback.format_exc()}")
         return error_fig, error_fig, error_fig, error_fig, error_fig
-
-# Save experiment results
-@app.callback(
-    Output('experiment-status', 'children', allow_duplicate=True),
-    Output('experiment-status', 'is_open', allow_duplicate=True),
-    Output('experiment-status', 'color', allow_duplicate=True),
-    Input('save-experiment', 'n_clicks'),
-    [State('algorithm-dropdown', 'value'),
-     State('algorithm-params-store', 'data')],
-    prevent_initial_call=True
-)
-def save_experiment_results(n_clicks, algorithm, algorithm_params):
-    """Save current experiment results"""
-    if n_clicks is None or current_experiment_session is None:
-        return dash.no_update, dash.no_update, dash.no_update
-    
-    try:
-        # Collect experiment data
-        experiment_data = {
-            'session_id': current_experiment_session,
-            'timestamp': datetime.now().isoformat(),
-            'algorithm': algorithm,
-            'algorithm_parameters': algorithm_params or {},
-            'simulation_parameters': {
-                'width': simulation.width if simulation else 100,
-                'height': simulation.height if simulation else 100,
-                'num_drones': len(simulation.drones) if simulation else 20,
-                'sensing_radius': simulation.sensing_radius if simulation else 20
-            },
-            'results': {
-                'coverage': simulation.metrics_history['coverage'][-1] if simulation and simulation.metrics_history['coverage'] else 0,
-                'active_drones': simulation.metrics_history['active_drones'][-1] if simulation and simulation.metrics_history['active_drones'] else 0,
-                'step_count': simulation.step_count if simulation else 0,
-                'metrics_history': simulation.metrics_history if simulation else {}
-            }
-        }
-        
-        # Save experiment
-        exp_id = experiment_logger.log_experiment(experiment_data)
-        
-        return f"✅ Experiment saved successfully! ID: {exp_id}", True, "success"
-        
-    except Exception as e:
-        return f"❌ Error saving experiment: {str(e)}", True, "danger"
-
-# Export experiment data
-@app.callback(
-    Output('log-output', 'children', allow_duplicate=True),
-    Input('export-experiment', 'n_clicks'),
-    prevent_initial_call=True
-)
-def export_experiment_data(n_clicks):
-    """Export experiment data to file"""
-    if n_clicks is None or current_experiment_session is None:
-        return dash.no_update
-    
-    try:
-        # End current experiment session and get final results
-        final_exp_id = experiment_logger.end_experiment_session()
-        
-        # Create exports directory
-        os.makedirs('exports', exist_ok=True)
-        
-        timestamp = datetime.now().strftime("%H:%M:%S")
-        return f"[{timestamp}] ✅ Experiment exported: {final_exp_id}"
-        
-    except Exception as e:
-        timestamp = datetime.now().strftime("%H:%M:%S")
-        return f"[{timestamp}] ❌ Export error: {str(e)}"
-
-# View experiment history
-@app.callback(
-    Output('experiment-results-content', 'children'),
-    Input('view-history', 'n_clicks'),
-    prevent_initial_call=True
-)
-def view_experiment_history(n_clicks):
-    """Display experiment history"""
-    if n_clicks is None:
-        return html.Div("Click 'View History' to see past experiments.")
-    
-    try:
-        # Get list of experiments
-        experiments = experiment_logger.list_experiments()
-        
-        if not experiments:
-            return dbc.Alert("No experiments found.", color="info")
-        
-        # Create experiment history table
-        experiment_cards = []
-        for exp in experiments[:10]:  # Show last 10 experiments
-            card = dbc.Card([
-                dbc.CardBody([
-                    html.H6(f"Experiment: {exp.get('experiment_id', 'Unknown')}", className="card-title"),
-                    html.P([
-                        html.Strong("Algorithm: "), exp.get('algorithm', 'Unknown'), html.Br(),
-                        html.Strong("Coverage: "), f"{exp.get('coverage', 0):.1f}%", html.Br(),
-                        html.Strong("Date: "), exp.get('timestamp', 'Unknown')[:19].replace('T', ' ')
-                    ], className="card-text small"),
-                    dbc.ButtonGroup([
-                        dbc.Button("View Details", size="sm", color="info"),
-                        dbc.Button("Compare", size="sm", color="secondary"),
-                        dbc.Button("Export", size="sm", color="success")
-                    ])
-                ])
-            ], className="mb-2")
-            experiment_cards.append(card)
-        
-        return html.Div([
-            html.H5("Experiment History"),
-            html.Hr(),
-            *experiment_cards
-        ])
-        
-    except Exception as e:
-        return dbc.Alert(f"Error loading experiment history: {str(e)}", color="danger")
-
-# Save configuration with parallel processing settings
-@app.callback(
-    Output('log-output', 'children', allow_duplicate=True),
-    Input('save-config', 'n_clicks'),
-    [State('algorithm-dropdown', 'value'),
-     State('algorithm-params-store', 'data'),
-     State('area-width', 'value'),
-     State('area-height', 'value'),
-     State('total-drones', 'value'),
-     State('sensing-radius', 'value'),
-     State('parallel-processing-switch', 'value')],
-    prevent_initial_call=True
-)
-def save_configuration(n_clicks, algorithm, params, width, height, drones, radius, parallel_enabled):
-    """Save current configuration including parallel processing settings"""
-    if n_clicks is None:
-        return dash.no_update
-    
-    try:
-        config = {
-            'algorithm': algorithm,
-            'algorithm_params': params or {},
-            'parallel_processing': parallel_enabled,
-            'environment': {
-                'width': width or 100,
-                'height': height or 100,
-                'num_drones': drones or 20,
-                'sensing_radius': radius or 20
-            },
-            'timestamp': datetime.now().isoformat()
-        }
-        
-        # Create configs directory if it doesn't exist
-        os.makedirs('configs', exist_ok=True)
-        
-        # Save to file
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"configs/config_{algorithm}_{timestamp}.json"
-        
-        with open(filename, 'w') as f:
-            json.dump(config, f, indent=2)
-        
-        timestamp_log = datetime.now().strftime("%H:%M:%S")
-        return f"[{timestamp_log}] ✅ Configuration saved to {filename}"
-    
-    except Exception as e:
-        timestamp_log = datetime.now().strftime("%H:%M:%S")
-        return f"[{timestamp_log}] ❌ Error saving configuration: {str(e)}"
-
-# Load configuration
-@app.callback(
-    [Output('algorithm-dropdown', 'value'),
-     Output('parallel-processing-switch', 'value'),
-     Output('area-width', 'value'),
-     Output('area-height', 'value'),
-     Output('total-drones', 'value'),
-     Output('sensing-radius', 'value')],
-    Input('load-config', 'n_clicks'),
-    prevent_initial_call=True
-)
-def load_configuration(n_clicks):
-    """Load most recent configuration"""
-    if n_clicks is None:
-        return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
-    
-    try:
-        # Find the most recent config file
-        import glob
-        
-        config_files = glob.glob('configs/config_*.json')
-        if not config_files:
-            return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
-        
-        # Get most recent file
-        latest_config = max(config_files, key=os.path.getctime)
-        
-        with open(latest_config, 'r') as f:
-            config = json.load(f)
-        
-        # Extract values
-        algorithm = config.get('algorithm', 'greedy')
-        parallel = config.get('parallel_processing', False)
-        env = config.get('environment', {})
-        
-        return (
-            algorithm,
-            parallel,
-            env.get('width', 100),
-            env.get('height', 100),
-            env.get('num_drones', 20),
-            env.get('sensing_radius', 20)
-        )
-        
-    except Exception as e:
-        print(f"Error loading configuration: {str(e)}")
-        return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
-
-# Status update callback for continuous updates with parallel processing info
-@app.callback(
-    Output('log-output', 'children', allow_duplicate=True),
-    [Input('simulation-interval', 'n_intervals')],
-    [State('simulation-interval', 'disabled'),
-     State('algorithm-dropdown', 'value'),
-     State('algorithm-params-store', 'data')],
-    prevent_initial_call=True
-)
-def update_status(n_intervals, disabled, algorithm, algorithm_params):
-    """Update status during continuous simulation with parallel processing info"""
-    if disabled or simulation is None:
-        return dash.no_update
-    
-    try:
-        timestamp = datetime.now().strftime("%H:%M:%S")
-        step = simulation.step_count
-        
-        # Check if parallel processing is enabled
-        parallel_status = ""
-        if algorithm_params and algorithm_params.get('parallel_processing'):
-            parallel_status = " [Parallel]"
-        
-        # Get latest metrics if available
-        if simulation.metrics_history['coverage']:
-            coverage = simulation.metrics_history['coverage'][-1] * 100
-            active = simulation.metrics_history['active_drones'][-1]
-            return f"[{timestamp}] Step {step}: Coverage {coverage:.1f}%, Active drones: {active}{parallel_status}"
-        else:
-            return f"[{timestamp}] Step {step}: Running simulation...{parallel_status}"
-    
-    except Exception as e:
-        timestamp = datetime.now().strftime("%H:%M:%S")
-        return f"[{timestamp}] ❌ Status update error: {str(e)}"
-
-# Keyboard shortcuts and additional interactions
-app.clientside_callback(
-    """
-    function(n_intervals) {
-        document.addEventListener('keydown', function(event) {
-            // Prevent shortcuts when typing in input fields
-            if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
-                return;
-            }
-            
-            switch(event.code) {
-                case 'Space':
-                    event.preventDefault();
-                    document.getElementById('run-button').click();
-                    break;
-                case 'KeyP':
-                    if (!event.ctrlKey) {
-                        event.preventDefault();
-                        document.getElementById('pause-button').click();
-                    }
-                    break;
-                case 'KeyS':
-                    if (!event.ctrlKey) {
-                        event.preventDefault();
-                        document.getElementById('step-button').click();
-                    }
-                    break;
-                case 'KeyR':
-                    if (!event.ctrlKey) {
-                        event.preventDefault();
-                        document.getElementById('reset-button').click();
-                    }
-                    break;
-                case 'Escape':
-                    event.preventDefault();
-                    document.getElementById('stop-button').click();
-                    break;
-                case 'KeyI':
-                    if (!event.ctrlKey) {
-                        event.preventDefault();
-                        document.getElementById('init-button').click();
-                    }
-                    break;
-            }
-        });
-        
-        return window.dash_clientside.no_update;
-    }
-    """,
-    Output('simulation-state', 'data'),
-    Input('simulation-interval', 'n_intervals')
-)
-
-# New callback for setting button states
-@app.callback(
-    [
-        Output('init-button', 'disabled'),
-        Output('run-button', 'disabled'),
-        Output('pause-button', 'disabled'),
-        Output('step-button', 'disabled'),
-        Output('stop-button', 'disabled'),
-        Output('reset-button', 'disabled'),
-    ],
-    [
-        Input('simulation-interval', 'disabled'),
-        Input('simulation-state', 'data'),
-    ],
-    prevent_initial_call=False
-)
-def set_button_states(sim_disabled, sim_state_data):
-    # You may need to parse sim_state_data if it's a dict or string
-    # We'll use the global current_sim_state for simplicity
-    global current_sim_state
-
-    # Default: all disabled
-    init_dis, run_dis, pause_dis, step_dis, stop_dis, reset_dis = True, True, True, True, True, True
-
-    # Logic based on current_sim_state
-    if current_sim_state == SimState.STOPPED:
-        # After stop or reset, allow init, run, step, reset
-        init_dis = False
-        run_dis = False
-        pause_dis = True
-        step_dis = False
-        stop_dis = True
-        reset_dis = False
-    elif current_sim_state == SimState.RUNNING:
-        # Only pause and stop enabled
-        init_dis = True
-        run_dis = True
-        pause_dis = False
-        step_dis = True
-        stop_dis = False
-        reset_dis = True
-    elif current_sim_state == SimState.PAUSED:
-        # Allow run, step, stop, reset
-        init_dis = True
-        run_dis = False
-        pause_dis = True
-        step_dis = False
-        stop_dis = False
-        reset_dis = False
-    else:
-        # Not started or unknown state: only init enabled
-        init_dis = False
-        run_dis = True
-        pause_dis = True
-        step_dis = True
-        stop_dis = True
-        reset_dis = True
-
-    return init_dis, run_dis, pause_dis, step_dis, stop_dis, reset_dis
 
 # Download plot callback
 @app.callback(
