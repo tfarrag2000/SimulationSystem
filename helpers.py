@@ -7,169 +7,143 @@ from plotly.subplots import make_subplots
 def create_simulation_view(simulation):
     """
     Create the main simulation visualization
-    
+
     Args:
         simulation: DroneEnvironment instance
-        
+
     Returns:
         plotly.graph_objs.Figure: The simulation visualization figure
     """
     fig = go.Figure()
-    
-    # Add grid points
-    fig.add_trace(go.Scatter(
-        x=simulation.grid_points[:, 0],
-        y=simulation.grid_points[:, 1],
-        mode='markers',
-        marker=dict(size=3, color='lightgray', opacity=0.3),
-        name='Grid Points',
-        hoverinfo='skip'
-    ))
-    
-    # Add drones - active and inactive
-    active_drones = simulation.drones[simulation.drones['active'] == 1]
-    inactive_drones = simulation.drones[simulation.drones['active'] == 0]
-    
-    # Active drones
-    fig.add_trace(go.Scatter(
-        x=active_drones['x'],
-        y=active_drones['y'],
-        mode='markers',
-        marker=dict(
-            size=12, 
-            color='green',
-            symbol='triangle-up',
-            line=dict(width=2, color='darkgreen')
-        ),
-        name='Active Drones',
-        text=[f"Drone {row['id']}<br>Energy: {row['energy']:.1f}%" 
-              for _, row in active_drones.iterrows()],
-        hovertemplate="<b>%{text}</b><br>Position: (%{x:.1f}, %{y:.1f})<extra></extra>"
-    ))
-    
-    # Inactive drones
-    fig.add_trace(go.Scatter(
-        x=inactive_drones['x'],
-        y=inactive_drones['y'],
-        mode='markers',
-        marker=dict(
-            size=10, 
-            color='red',
-            symbol='triangle-down',
-            line=dict(width=1, color='darkred')
-        ),
-        name='Inactive Drones',
-        text=[f"Drone {row['id']}<br>Energy: {row['energy']:.1f}%" 
-              for _, row in inactive_drones.iterrows()],
-        hovertemplate="<b>%{text}</b><br>Position: (%{x:.1f}, %{y:.1f})<extra></extra>"
-    ))
-    
-    # Add coverage circles for active drones
-    for _, drone in active_drones.iterrows():
-        fig.add_shape(
-            type="circle",
-            xref="x", yref="y",
-            x0=drone['x'] - simulation.sensing_radius,
-            y0=drone['y'] - simulation.sensing_radius,
-            x1=drone['x'] + simulation.sensing_radius,
-            y1=drone['y'] + simulation.sensing_radius,
-            line_color="green",
-            line_width=1,
-            fillcolor="rgba(0,255,0,0.1)"
-        )
-    
-    # Add parking spots if this is a parking scenario
-    if hasattr(simulation, 'is_parking_scenario') and simulation.is_parking_scenario:
-        # Regular parking spots
-        regular_spots = simulation.parking_spots[simulation.parking_spots['disabled'] == 0]
-        if not regular_spots.empty:
-            fig.add_trace(go.Scatter(
-                x=regular_spots['x'],
-                y=regular_spots['y'],
-                mode='markers',
-                marker=dict(size=8, color='blue', symbol='square'),
-                name='Regular Parking',
-                hovertemplate="Regular Parking Spot<br>Position: (%{x:.1f}, %{y:.1f})<extra></extra>"
-            ))
-        
-        # Disabled parking spots
-        disabled_spots = simulation.parking_spots[simulation.parking_spots['disabled'] == 1]
-        if not disabled_spots.empty:
-            fig.add_trace(go.Scatter(
-                x=disabled_spots['x'],
-                y=disabled_spots['y'],
-                mode='markers',
-                marker=dict(size=8, color='purple', symbol='square'),
-                name='Disabled Parking',
-                hovertemplate="Disabled Parking Spot<br>Position: (%{x:.1f}, %{y:.1f})<extra></extra>"
-            ))
-        
-        # Parked vehicles
-        occupied_spots = simulation.parking_spots[simulation.parking_spots['occupied'] == 1]
-        if not occupied_spots.empty:
-            fig.add_trace(go.Scatter(
-                x=occupied_spots['x'],
-                y=occupied_spots['y'],
-                mode='markers',
-                marker=dict(
-                    size=6, 
-                    color='orange',
-                    symbol='x'
-                ),
-                name='Parked Vehicles',
-                text=[f"Vehicle: {row['vehicle_id']}" for _, row in occupied_spots.iterrows()],
-                hovertemplate="<b>%{text}</b><br>Position: (%{x:.1f}, %{y:.1f})<extra></extra>"
-            ))
-            
-        # Highlight violations
-        violations = []
-        for spot_idx, spot in occupied_spots.iterrows():
-            if spot['disabled'] == 1:
-                vehicle_id = spot['vehicle_id']
-                if vehicle_id is not None:
-                    vehicle = simulation.vehicles[simulation.vehicles['license'] == vehicle_id]
-                    if not vehicle.empty and vehicle.iloc[0]['disabled'] == 0:
-                        violations.append(spot)
-        
-        if violations:
-            violations_df = pd.DataFrame(violations)
-            fig.add_trace(go.Scatter(
-                x=violations_df['x'],
-                y=violations_df['y'],
-                mode='markers',
-                marker=dict(size=12, color='red', symbol='circle-open', line=dict(width=3)),
-                name='Violations',
-                hovertemplate="<b>VIOLATION</b><br>Unauthorized disabled parking<br>Position: (%{x:.1f}, %{y:.1f})<extra></extra>"
-            ))
-    
-    # Update layout
-    fig.update_layout(
-        title=f"Simulation Step {simulation.step_count}",
-        xaxis_title="X Coordinate (m)",
-        yaxis_title="Y Coordinate (m)",
-        xaxis=dict(range=[0, simulation.width], showgrid=True, gridcolor='lightgray'),
-        yaxis=dict(range=[0, simulation.height], showgrid=True, gridcolor='lightgray'),
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.02,
-            xanchor="right",
-            x=1
-        ),
-        plot_bgcolor='white'
-        # Remove width and height here for responsiveness
-    )
-    
-    fig.add_annotation(
-        text=f"Step {simulation.step_count}",
-        xref="paper", yref="paper",
-        x=0.98, y=0.02, showarrow=False,
-        font=dict(size=16, color="gray"),
-        align="right", bgcolor="white", opacity=0.7
-    )
-    
-    return fig
+    grid = simulation.grid_points
+    drones = simulation.drones
 
+    # Plot grid points
+    fig.add_trace(go.Scatter(
+        x=grid[:, 0], y=grid[:, 1],
+        mode='markers',
+        marker=dict(size=3, color='lightgray', opacity=0.6),
+        name='Grid Points',
+        showlegend=True
+    ))
+
+    # Collect drone data for batch plotting
+    active_drones_x = []
+    active_drones_y = []
+    inactive_drones_x = []
+    inactive_drones_y = []
+    
+    # Plot drones and sensing circles
+    for i, drone in drones.iterrows():
+        is_active = drone.get('active', 1) in [1, True]
+        if is_active:
+            active_drones_x.append(drone['x'])
+            active_drones_y.append(drone['y'])
+            
+            # Draw sensing circle for active drones
+            theta = np.linspace(0, 2 * np.pi, 100)
+            circle_x = drone['x'] + simulation.sensing_radius * np.cos(theta)
+            circle_y = drone['y'] + simulation.sensing_radius * np.sin(theta)
+            fig.add_trace(go.Scatter(
+                x=circle_x,
+                y=circle_y,
+                mode='lines',
+                line=dict(color='rgba(0,128,0,0.5)', width=2, dash='dot'),
+                fill='toself',
+                fillcolor='rgba(0,255,0,0.1)',
+                name='Sensing Area' if i == 0 else '',  # Only show legend for first circle
+                showlegend=(i == 0),
+                legendgroup='sensing'
+            ))
+        else:
+            inactive_drones_x.append(drone['x'])
+            inactive_drones_y.append(drone['y'])
+    
+    # Add active drones as a single trace
+    if active_drones_x:
+        fig.add_trace(go.Scatter(
+            x=active_drones_x, y=active_drones_y,
+            mode='markers',
+            marker=dict(size=15, color='green', symbol='circle', 
+                       line=dict(width=2, color='darkgreen')),
+            name='Active Drones',
+            showlegend=True
+        ))
+    
+    # Add inactive drones as a single trace
+    if inactive_drones_x:
+        fig.add_trace(go.Scatter(
+            x=inactive_drones_x, y=inactive_drones_y,
+            mode='markers',
+            marker=dict(size=12, color='gray', symbol='x',
+                       line=dict(width=2, color='darkgray')),
+            name='Inactive Drones',
+            showlegend=True
+        ))
+
+    # Add parking spots and vehicles if this is a parking scenario
+    if hasattr(simulation, 'is_parking_scenario') and simulation.is_parking_scenario:
+        if hasattr(simulation, 'parking_spots') and simulation.parking_spots is not None and not simulation.parking_spots.empty:
+            # Plot parking spots
+            parking_spots = simulation.parking_spots
+            disabled_spots = parking_spots[parking_spots['disabled'] == 1]
+            enabled_spots = parking_spots[parking_spots['disabled'] == 0]
+            
+            # Add enabled parking spots
+            if not enabled_spots.empty:
+                fig.add_trace(go.Scatter(
+                    x=enabled_spots['x'], y=enabled_spots['y'],
+                    mode='markers',
+                    marker=dict(size=8, color='lightblue', symbol='square',
+                               line=dict(width=1, color='blue')),
+                    name='Parking Spots',
+                    showlegend=True
+                ))
+            
+            # Add disabled parking spots
+            if not disabled_spots.empty:
+                fig.add_trace(go.Scatter(
+                    x=disabled_spots['x'], y=disabled_spots['y'],
+                    mode='markers',
+                    marker=dict(size=8, color='red', symbol='square',
+                               line=dict(width=1, color='darkred')),
+                    name='Disabled Spots',
+                    showlegend=True
+                ))
+        
+        # Plot vehicles if they exist and have position data
+        if (hasattr(simulation, 'vehicles') and simulation.vehicles is not None and 
+            not simulation.vehicles.empty and 'x' in simulation.vehicles.columns and 'y' in simulation.vehicles.columns):
+            fig.add_trace(go.Scatter(
+                x=simulation.vehicles['x'], y=simulation.vehicles['y'],
+                mode='markers',
+                marker=dict(size=10, color='orange', symbol='diamond',
+                           line=dict(width=1, color='darkorange')),
+                name='Vehicles',
+                showlegend=True
+            ))
+
+    # Add title with metrics
+    coverage = simulation.metrics_history.get('coverage', [0])[-1]
+    active_nodes = simulation.metrics_history.get('active_drones', [0])[-1]
+    fig.update_layout(
+        title=f"Sensor Deployment - Coverage: {coverage:.2f}% | Active Nodes: {active_nodes}",
+        xaxis_title="X Coordinate",
+        yaxis_title="Y Coordinate",
+        width=1200,
+        height=800,
+        showlegend=True,
+        legend=dict(
+            x=0.02,
+            y=0.98,
+            bgcolor="rgba(255, 255, 255, 0.8)",
+            bordercolor="gray",
+            borderwidth=1,
+            font=dict(size=12)
+        ),
+        template="plotly_white"
+    )
+    return fig
 
 def create_metrics_charts(simulation):
     """
@@ -348,7 +322,6 @@ def create_metrics_charts(simulation):
         'violations': violations_fig
     }
 
-
 def create_algorithm_comparison_chart(results_dict):
     """
     Create a comparison chart for different algorithms
@@ -418,7 +391,6 @@ def create_algorithm_comparison_chart(results_dict):
     
     return fig
 
-
 def create_heatmap(simulation):
     """
     Create a coverage heatmap
@@ -477,7 +449,6 @@ def create_heatmap(simulation):
     )
     
     return fig
-
 
 def create_energy_distribution_chart(simulation):
     """

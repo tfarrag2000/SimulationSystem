@@ -1,16 +1,13 @@
 import dash
-from dash import dcc, html, Input, Output, State, callback, ALL, MATCH, ctx
+from dash import dcc, html, Input, Output, State, ctx
 import dash_bootstrap_components as dbc
 import plotly.graph_objs as go
 import numpy as np
 import pandas as pd
 from datetime import datetime
 import traceback
-import json
-import os
 from enum import Enum
 import plotly.io as pio
-import time  # <-- Add this import
 
 # Enhanced simulation state management
 class SimState(Enum):
@@ -33,7 +30,6 @@ try:
     
     # Import simulation components
     from environment import DroneEnvironment
-    from simulation import SimulationState, run_simulation_step
     
     # Import visualization helpers
     from helpers import create_simulation_view, create_metrics_charts
@@ -46,89 +42,12 @@ try:
 except ImportError as e:
     print(f"Import error: {e}")
     print("Please ensure all modules are in the correct directory structure")
-    # Fallback implementations...
-    def greedy_optimization(*args, **kwargs):
-        return np.ones(20), {"coverage": 50, "execution_time": 0.1}
-
-    def genetic_algorithm(*args, **kwargs):
-        return np.ones(20), {"coverage": 60, "execution_time": 1.0}
-
-    def particle_swarm_optimization(*args, **kwargs):
-        return np.ones(20), {"coverage": 55, "execution_time": 0.8}
-
-    def simulated_annealing(*args, **kwargs):
-        return np.ones(20), {"coverage": 45, "execution_time": 0.5}
-
-    def run_simulation_step(simulation, algorithm, params):
-        return {"coverage": 0.5, "active_drones": 10}
-
-    def create_simulation_view(simulation):
-        return go.Figure().update_layout(title="Simulation not available")
-
-    def create_metrics_charts(simulation):
-        empty_fig = go.Figure().update_layout(title="Metrics not available")
-        return {
-            'coverage': empty_fig,
-            'power': empty_fig,
-            'overlap': empty_fig,
-            'violations': empty_fig
-        }
-
-    class ExperimentLogger:
-        def __init__(self):
-            pass
-        def start_experiment_session(self, config):
-            return "dummy_session"
-        def log_experiment(self, data):
-            return "dummy_exp_id"
-        def log_step_result(self, data):
-            pass
-        def end_experiment_session(self):
-            return "dummy_exp_id"
-        def list_experiments(self):
-            return []
-
-    # Dummy SimulationState class
-    class SimulationState:
-        def __init__(self):
-            self.state = "stopped"
-
-    # Dummy DroneEnvironment class
-    class DroneEnvironment:
-        def __init__(self, width=100, height=100, num_drones=20, sensing_radius=20, num_parking_spots=100, num_disabled_spots=10):
-            self.width = width
-            self.height = height
-            self.num_drones = num_drones
-            self.sensing_radius = sensing_radius
-            self.num_parking_spots = num_parking_spots
-            self.num_disabled_spots = num_disabled_spots
-            self.drones = pd.DataFrame({'x': np.random.rand(num_drones)*width, 'y': np.random.rand(num_drones)*height, 'energy': np.ones(num_drones)*100})
-            self.metrics_history = {'coverage': [0.0], 'active_drones': [num_drones]}
-            self.step_count = 0
-
-        def apply_activation(self, activation):
-            # Dummy: just update active drones count
-            self.metrics_history['active_drones'].append(int(np.sum(activation)))
-
-        def step(self):
-            # Dummy: increment step and random coverage
-            self.step_count += 1
-            coverage = np.random.rand()
-            self.metrics_history['coverage'].append(coverage)
-            return {'coverage': coverage, 'active_drones': self.metrics_history['active_drones'][-1]}
-
-        def reset_simulation(self):
-            self.metrics_history = {'coverage': [0.0], 'active_drones': [self.num_drones]}
-            self.step_count = 0
 
 # Global simulation state and experiment management
 simulation = None
-sim_state = SimulationState()
+current_sim_state = SimState.STOPPED
 experiment_logger = ExperimentLogger()
 current_experiment_session = None
-
-# Enhanced state management
-current_sim_state = SimState.STOPPED
 
 # Initialize the app with a Bootstrap theme
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
@@ -240,6 +159,15 @@ app.layout = dbc.Container([
                     html.Hr(),
                     html.Label("🎮 Simulation Controls"),
                     
+                    # Initialize button
+                    dbc.Button(
+                        "🚀 Initialize Simulation",
+                        id="init-button",
+                        color="primary",
+                        size="sm",
+                        className="w-100 mb-2"
+                    ),
+                    
                     # Status indicator
                     dbc.Alert(
                         id="sim-status-alert",
@@ -250,19 +178,10 @@ app.layout = dbc.Container([
                     
                     # Control buttons
                     dbc.ButtonGroup([
-                        dbc.Button("🔄 Initialize", id="init-button", color="primary", size="sm"),
+                        dbc.Button("▶️ Start", id="main-control-btn", color="success", size="sm"),  # Start/Pause/Resume
                         dbc.Button("👣 Step", id="step-button", color="secondary", size="sm"),
-                        dbc.Button(
-                            html.Span(id="run-button-text", children="▶️ Start"), 
-                            id="run-button", color="success", size="sm"
-                        ),
+                        dbc.Button("🔄 Reset", id="stop-reset-btn", color="info", size="sm"),     # Stop/Reset
                     ], className="w-100 mb-2"),
-                    
-                    dbc.ButtonGroup([
-                        dbc.Button("⏸️ Pause", id="pause-button", color="warning", size="sm"),
-                        dbc.Button("⏹️ Stop", id="stop-button", color="danger", size="sm"),
-                        dbc.Button("🔄 Reset", id="reset-button", color="info", size="sm")
-                    ], className="w-100"),
                     
                     # Simulation speed control
                     html.Hr(),
@@ -288,15 +207,15 @@ app.layout = dbc.Container([
                         ], width=6)
                     ])
                 ])
-            ], className="mb-4")
-        ], width=3),
+            ], className="mb-2")
+        ], width=2),
         
         # Main Visualization Area
         dbc.Col([
             dbc.Tabs([
                 # Simulation View Tab
                 dbc.Tab([
-                    dcc.Graph(id="simulation-graph", style={'height': '85vh', 'width': '100%'}),
+                    dcc.Graph(id="simulation-graph", style={'height': '90vh', 'width': '100%'}),
                     html.Button("Download Plot", id="download-plot-btn", className="mb-2"),
                     dcc.Download(id="download-plot"),
                 ], label="🎯 Simulation View"),
@@ -318,7 +237,7 @@ app.layout = dbc.Container([
                     html.Div(id="experiment-results-content")
                 ], label="🧪 Experiment Results")
             ])
-        ], width=9, style={"flex": "1 1 0", "minWidth": 0})
+        ], width=10, style={"flex": "1 1 0", "minWidth": 0})
     ]),
     
     # Bottom panel - Logs and Info
@@ -603,6 +522,90 @@ def update_algorithm_params(algorithm, parallel_enabled):
                 ])
             ]), params
             
+        elif algorithm == 'gwo':
+            params.update({
+                'population_size': 30,
+                'max_iterations': 100,
+                'desired_coverage': 0.9,
+                'w1': 0.6,
+                'w2': 0.2,
+                'w3': 0.2
+            })
+            return dbc.Card([
+                dbc.CardBody([
+                    dbc.Row([
+                        dbc.Col([
+                            html.Label("Population Size"),
+                            dbc.Input(id="gwo-population", type="number", value=params['population_size'], min=10, max=500),
+                        ], width=6),
+                        dbc.Col([
+                            html.Label("Max Iterations"),
+                            dbc.Input(id="gwo-iterations", type="number", value=params['max_iterations'], min=10, max=1000),
+                        ], width=6)
+                    ]),
+                    dbc.Row([
+                        dbc.Col([
+                            html.Label("Desired Coverage"),
+                            dbc.Input(id="gwo-coverage", type="number", value=params['desired_coverage'], min=0.5, max=1, step=0.01),
+                        ], width=4),
+                        dbc.Col([
+                            html.Label("w1 (Coverage Weight)"),
+                            dbc.Input(id="gwo-w1", type="number", value=params['w1'], min=0, max=1, step=0.01),
+                        ], width=4),
+                        dbc.Col([
+                            html.Label("w2 (Active Nodes Weight)"),
+                            dbc.Input(id="gwo-w2", type="number", value=params['w2'], min=0, max=1, step=0.01),
+                        ], width=4),
+                        dbc.Col([
+                            html.Label("w3 (Overlap Weight)"),
+                            dbc.Input(id="gwo-w3", type="number", value=params['w3'], min=0, max=1, step=0.01),
+                        ], width=4)
+                    ], className="mt-2"),
+                ])
+            ]), params
+
+        elif algorithm == 'mrfo':
+            params.update({
+                'population_size': 50,
+                'num_generations': 200,
+                'desired_coverage': 0.95,
+                'w1': 0.6,
+                'w2': 0.2,
+                'w3': 0.2
+            })
+            return dbc.Card([
+                dbc.CardBody([
+                    dbc.Row([
+                        dbc.Col([
+                            html.Label("Population Size"),
+                            dbc.Input(id="mrfo-population", type="number", value=params['population_size'], min=10, max=500),
+                        ], width=6),
+                        dbc.Col([
+                            html.Label("Generations"),
+                            dbc.Input(id="mrfo-generations", type="number", value=params['num_generations'], min=10, max=1000),
+                        ], width=6)
+                    ]),
+                    dbc.Row([
+                        dbc.Col([
+                            html.Label("Desired Coverage"),
+                            dbc.Input(id="mrfo-coverage", type="number", value=params['desired_coverage'], min=0.5, max=1, step=0.01),
+                        ], width=4),
+                        dbc.Col([
+                            html.Label("w1 (Coverage Weight)"),
+                            dbc.Input(id="mrfo-w1", type="number", value=params['w1'], min=0, max=1, step=0.01),
+                        ], width=4),
+                        dbc.Col([
+                            html.Label("w2 (Active Nodes Weight)"),
+                            dbc.Input(id="mrfo-w2", type="number", value=params['w2'], min=0, max=1, step=0.01),
+                        ], width=4),
+                        dbc.Col([
+                            html.Label("w3 (Overlap Weight)"),
+                            dbc.Input(id="mrfo-w3", type="number", value=params['w3'], min=0, max=1, step=0.01),
+                        ], width=4)
+                    ], className="mt-2"),
+                ])
+            ]), params
+            
         else:  # greedy
             params.update({
                 'desired_coverage': 0.95,
@@ -742,84 +745,64 @@ def initialize_simulation(n_clicks, width, height, drones, radius, parking, disa
 @app.callback(
     [Output('simulation-interval', 'disabled'),
      Output('simulation-interval', 'interval'),
-     Output('run-button-text', 'children'),
+     Output('main-control-btn', 'children'),
+     Output('main-control-btn', 'color'),
+     Output('stop-reset-btn', 'children'),
+     Output('stop-reset-btn', 'color'),
      Output('sim-status-alert', 'children'),
      Output('sim-status-alert', 'color'),
      Output('log-output', 'children', allow_duplicate=True)],
-    [Input('run-button', 'n_clicks'),
-     Input('pause-button', 'n_clicks'),
-     Input('stop-button', 'n_clicks'),
-     Input('reset-button', 'n_clicks'),
+    [Input('main-control-btn', 'n_clicks'),
+     Input('stop-reset-btn', 'n_clicks'),
      Input('simulation-speed', 'value')],
-    [State('simulation-interval', 'disabled')],
+    [State('simulation-interval', 'disabled'),
+     State('log-output', 'children')],
     prevent_initial_call=True
 )
-def enhanced_control_system(run_clicks, pause_clicks, stop_clicks, reset_clicks, speed_value, is_disabled):
-    """Enhanced control system with proper state management"""
+def unified_control(main_clicks, stopreset_clicks, speed_value, is_disabled, log_output):
     global current_sim_state, simulation
-    
     triggered_id = ctx.triggered_id
     timestamp = datetime.now().strftime("%H:%M:%S")
-    
-    # Calculate interval based on speed (default 1000ms / speed)
     interval = max(100, int(1000 / (speed_value or 1.0)))
-    
+
     try:
-        if triggered_id == 'run-button':
+        # Button logic
+        if triggered_id == 'main-control-btn':
             if current_sim_state == SimState.STOPPED:
-                # Start from stopped
+                # Check if simulation is initialized before starting
+                if simulation is None:
+                    return True, interval, "▶️ Start", "danger", "🔄 Reset", "info", "❌ Error", "danger", f"[{timestamp}] ❌ Please initialize simulation first!"
                 current_sim_state = SimState.RUNNING
-                log_msg = f"[{timestamp}] ▶️ Simulation started"
-                return False, interval, "⏸️ Pause", "🟢 Running", "success", log_msg
-            elif current_sim_state == SimState.PAUSED:
-                # Resume from pause
-                current_sim_state = SimState.RUNNING
-                log_msg = f"[{timestamp}] ▶️ Simulation resumed"
-                return False, interval, "⏸️ Pause", "🟢 Running", "success", log_msg
-            else:
-                # Already running
-                log_msg = f"[{timestamp}] ℹ️ Already running"
-                return False, interval, "⏸️ Pause", "🟢 Running", "success", log_msg
-                
-        elif triggered_id == 'pause-button':
-            if current_sim_state == SimState.RUNNING:
+                return False, interval, "⏸️ Pause", "warning", "⏹️ Stop", "danger", "🟢 Running", "success", f"[{timestamp}] ▶️ Simulation started"
+            elif current_sim_state == SimState.RUNNING:
                 current_sim_state = SimState.PAUSED
-                log_msg = f"[{timestamp}] ⏸️ Simulation paused"
-                return True, interval, "▶️ Resume", "🟡 Paused", "warning", log_msg
-            else:
-                log_msg = f"[{timestamp}] ℹ️ Not running"
-                return True, interval, "▶️ Start", "🟡 Paused", "warning", log_msg
-                
-        elif triggered_id == 'stop-button':
-            current_sim_state = SimState.STOPPED
-            log_msg = f"[{timestamp}] ⏹️ Simulation stopped"
-            return True, interval, "▶️ Start", "🔴 Stopped", "danger", log_msg
-            
-        elif triggered_id == 'reset-button':
-            if simulation:
-                simulation.reset_simulation()
-                current_sim_state = SimState.STOPPED
-                log_msg = f"[{timestamp}] 🔄 Simulation reset to step 0"
-            else:
-                log_msg = f"[{timestamp}] ℹ️ No simulation to reset"
-            return True, interval, "▶️ Start", "🔵 Reset", "info", log_msg
-            
-        elif triggered_id == 'simulation-speed':
-            log_msg = f"[{timestamp}] 🏃 Speed changed to {speed_value}x"
-            # Keep current state, just update interval
-            if current_sim_state == SimState.RUNNING:
-                return False, interval, "⏸️ Pause", "🟢 Running", "success", log_msg
+                return True, interval, "▶️ Resume", "success", "⏹️ Stop", "danger", "🟡 Paused", "warning", f"[{timestamp}] ⏸️ Simulation paused"
             elif current_sim_state == SimState.PAUSED:
-                return True, interval, "▶️ Resume", "🟡 Paused", "warning", log_msg
+                current_sim_state = SimState.RUNNING
+                return False, interval, "⏸️ Pause", "warning", "⏹️ Stop", "danger", "🟢 Running", "success", f"[{timestamp}] ▶️ Simulation resumed"
+        elif triggered_id == 'stop-reset-btn':
+            if current_sim_state in [SimState.RUNNING, SimState.PAUSED]:
+                current_sim_state = SimState.STOPPED
+                return True, interval, "▶️ Start", "success", "🔄 Reset", "info", "🔴 Stopped", "danger", f"[{timestamp}] ⏹️ Simulation stopped"
+            elif current_sim_state == SimState.STOPPED:
+                if simulation:
+                    simulation.reset_simulation()
+                current_sim_state = SimState.STOPPED
+                return True, interval, "▶️ Start", "success", "🔄 Reset", "info", "🔵 Reset", "info", f"[{timestamp}] 🔄 Simulation reset"
+        elif triggered_id == 'simulation-speed':
+            # Only update interval, keep other states
+            if current_sim_state == SimState.RUNNING:
+                return False, interval, "⏸️ Pause", "warning", "⏹️ Stop", "danger", "🟢 Running", "success", f"[{timestamp}] 🏃 Speed changed"
+            elif current_sim_state == SimState.PAUSED:
+                return True, interval, "▶️ Resume", "success", "⏹️ Stop", "danger", "🟡 Paused", "warning", f"[{timestamp}] 🏃 Speed changed"
             else:
-                return True, interval, "▶️ Start", "🔴 Stopped", "danger", log_msg
+                return True, interval, "▶️ Start", "success", "🔄 Reset", "info", "⭕ Not Started", "secondary", f"[{timestamp}] 🏃 Speed changed"
         else:
-            # Default state
-            return is_disabled, interval, "▶️ Start", "⭕ Ready", "secondary", f"[{timestamp}] Ready"
-            
+            # Default
+            return is_disabled, interval, "▶️ Start", "success", "🔄 Reset", "info", "⭕ Not Started", "secondary", f"[{timestamp}] Ready"
     except Exception as e:
         error_msg = f"[{timestamp}] ❌ Control error: {str(e)}"
-        return True, interval, "▶️ Start", "❌ Error", "danger", error_msg
+        return True, interval, "▶️ Start", "danger", "🔄 Reset", "danger", "❌ Error", "danger", error_msg
 
 # Enhanced simulation step with experiment logging and state management
 @app.callback(
@@ -934,24 +917,28 @@ def download_plot(n_clicks, fig):
         return dcc.send_bytes(img_bytes, filename="simulation_plot.png")
     return dash.no_update
 
+# Filter parameters for algorithms
+def filter_params(algo, params):
+    allowed = {
+        'gwo': ['population_size', 'max_iterations', 'desired_coverage', 'parallel_processing', 'w1', 'w2', 'w3'],
+        'mrfo': ['population_size', 'num_generations', 'desired_coverage', 'parallel_processing', 'w1', 'w2', 'w3'],
+    }
+    return {k: v for k, v in (params or {}).items() if k in allowed.get(algo, [])}
+
+# Update experiment results display
+@app.callback(
+    Output('experiment-results-content', 'children'),
+    Input('experiment-data-store', 'data')
+)
+def update_experiment_results(data):
+    if not data:
+        return html.Div("No experiment results yet.")
+    # Example: Show a table of results
+    df = pd.DataFrame(data)
+    return dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True)
+
 # Run the app
 if __name__ == '__main__':
     print("🚁 Starting Enhanced Drone Optimization Simulation System...")
     print("📍 Open your browser to: http://127.0.0.1:8050")
-    print("⌨️  Keyboard shortcuts:")
-    print("   Space: Start/Resume simulation")
-    print("   P: Pause simulation")
-    print("   S: Single step")
-    print("   R: Reset simulation")
-    print("   I: Initialize simulation")
-    print("   Esc: Stop simulation")
-    print("   Ctrl+S: Save experiment")
-    print("🔧 Enhanced Features:")
-    print("   ✅ Smart Start/Resume Button")
-    print("   ✅ Proper Pause/Resume Functionality")
-    print("   ✅ Stop and Reset Controls")
-    print("   ✅ Real-time Status Indicators")
-    print("   ✅ Variable Speed Control")
-    print("   ✅ Parallel Processing for GA and PSO")
-    print("   ✅ Enhanced Experiment Management")
     app.run_server(debug=True, host='127.0.0.1', port=8050)

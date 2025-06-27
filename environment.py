@@ -40,6 +40,7 @@ class DroneEnvironment:
             self.is_parking_scenario = True
             self.parking_spots = self._generate_parking_spots(num_parking_spots, num_disabled_spots)
             self.vehicles = self._initialize_vehicles(int(num_parking_spots * 0.3))  # 30% of spots have vehicles
+            self._assign_vehicles_to_spots()  # Assign vehicles to parking spots
             self.violations = []
         else:
             self.is_parking_scenario = False
@@ -414,3 +415,41 @@ class DroneEnvironment:
         
         is_valid = len(warnings) == 0
         return is_valid, corrected_activation, warnings
+    
+    def _assign_vehicles_to_spots(self):
+        """Assign vehicles to available parking spots"""
+        if not self.is_parking_scenario or self.vehicles is None or self.parking_spots is None:
+            return
+            
+        if self.vehicles.empty or self.parking_spots.empty:
+            return
+            
+        # Get available spots (not disabled and not occupied)
+        available_spots = self.parking_spots[(self.parking_spots['disabled'] == 0) & 
+                                           (self.parking_spots['occupied'] == 0)]
+        
+        if available_spots.empty:
+            return
+            
+        # Randomly assign vehicles to available spots
+        num_to_assign = min(len(self.vehicles), len(available_spots))
+        selected_spots = available_spots.sample(n=num_to_assign).reset_index(drop=True)
+        
+        # Add position columns to vehicles
+        if 'x' not in self.vehicles.columns:
+            self.vehicles['x'] = None
+            self.vehicles['y'] = None
+            self.vehicles['spot_id'] = None
+        
+        # Assign positions to vehicles
+        for i in range(num_to_assign):
+            spot = selected_spots.iloc[i]
+            self.vehicles.loc[i, 'x'] = spot['x']
+            self.vehicles.loc[i, 'y'] = spot['y']
+            self.vehicles.loc[i, 'spot_id'] = spot['id']
+            self.vehicles.loc[i, 'parked'] = 1
+            
+            # Mark spot as occupied
+            spot_idx = self.parking_spots[self.parking_spots['id'] == spot['id']].index[0]
+            self.parking_spots.loc[spot_idx, 'occupied'] = 1
+            self.parking_spots.loc[spot_idx, 'vehicle_id'] = self.vehicles.loc[i, 'id']

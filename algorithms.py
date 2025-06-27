@@ -53,7 +53,6 @@ def parallel_fitness_evaluation(particles, fitness_func, num_processes=None):
         print(f"Parallel evaluation failed: {e}. Falling back to serial evaluation.")
         return [fitness_func(p) for p in particles]
 
-
 def greedy_optimization(simulation, desired_coverage=0.95, overlap_weight=0.2, energy_weight=0.1):
     """Simple greedy algorithm for drone activation"""
     start_time = time.time()
@@ -244,6 +243,13 @@ def genetic_algorithm(simulation,
             
     execution_time = time.time() - start_time
     
+    best_particle = post_prune(
+        best_particle, 
+        GridPoints, 
+        SensingRange, 
+        threshold=desired_coverage*100
+    )
+    
     result = AlgorithmResult(
         best_solution=best_particle,
         fitness_history=fitness_history,
@@ -379,6 +385,13 @@ def particle_swarm_optimization(simulation,
 
     execution_time = time.time() - start_time
     
+    gbest = post_prune(
+        gbest,
+        GridPoints,
+        SensingRange,
+        threshold=desired_coverage*100
+    )
+
     result = AlgorithmResult(
         best_solution=gbest,
         fitness_history=fitness_history,
@@ -558,6 +571,13 @@ def genetic_algorithm_with_sa(simulation,
 
     execution_time = time.time() - start_time
     
+    best_particle = post_prune(
+        best_particle, 
+        GridPoints, 
+        SensingRange, 
+        threshold=desired_coverage*100
+    )
+
     result = AlgorithmResult(
         best_solution=best_particle,
         fitness_history=fitness_history,
@@ -706,7 +726,14 @@ def grey_wolf_optimizer(simulation,
 
     execution_time = time.time() - start_time
     best_solution = alpha_pos.reshape(NumNodes, 3)
-    
+
+    best_solution = post_prune(
+        best_solution,
+        GridPoints,
+        SensingRange,
+        threshold=desired_coverage*100
+    )
+
     result = AlgorithmResult(
         best_solution=best_solution,
         fitness_history=fitness_history,
@@ -728,7 +755,6 @@ def grey_wolf_optimizer(simulation,
     )
     activation = convert_to_binary_activation(best_solution, simulation)
     return activation, result
-
 
 def manta_ray_foraging_optimization(simulation,
                                       population_size=50,
@@ -870,3 +896,152 @@ def manta_ray_foraging_optimization(simulation,
     )
     activation = convert_to_binary_activation(best_particle, simulation)
     return activation, result
+
+def simulated_annealing(
+    simulation,
+    num_iterations=200,
+    initial_temp=100,
+    cooling_rate=0.95,
+    perturb_radius=5,
+    desired_coverage=0.90,
+    w1=0.6, w2=0.2, w3=0.2
+):
+    """Standalone Simulated Annealing for drone optimization"""
+    start_time = time.time()
+    AreaWidth, AreaHeight = simulation.width, simulation.height
+    SensingRange = simulation.sensing_radius
+    NumNodes = len(simulation.drones)
+    GridPoints = simulation.grid_points
+    NumGridPoints = len(GridPoints)
+
+    def calculate_coverage(particle):
+        covered = np.zeros(len(GridPoints), dtype=bool)
+        for sensor in particle:
+            if sensor[2] >= 0.5:
+                distances = np.linalg.norm(GridPoints - sensor[:2], axis=1)
+                covered |= distances <= SensingRange
+        return (np.sum(covered) / NumGridPoints) * 100
+
+    def calculate_overlap(particle):
+        overlap_penalty = 0
+        active_nodes = particle[particle[:, 2] >= 0.5]
+        for i in range(len(active_nodes)):
+            for j in range(i + 1, len(active_nodes)):
+                d = np.linalg.norm(active_nodes[i, :2] - active_nodes[j, :2])
+                if d < 2 * SensingRange:
+                    overlap_penalty += 1 - (d / (2 * SensingRange))
+        return overlap_penalty
+
+    def fitness(particle):
+        coverage = calculate_coverage(particle)
+        active_nodes = np.sum(particle[:, 2] >= 0.5)
+        overlap = calculate_overlap(particle)
+        if active_nodes < 3:
+            return -float('inf')
+        return w1 * coverage - w2 * (active_nodes / NumNodes) * 100 - w3 * overlap
+
+    # Initialize solution
+    current = np.hstack((
+        np.random.rand(NumNodes, 2) * [AreaWidth, AreaHeight],
+        np.random.randint(0, 2, (NumNodes, 1))
+    ))
+    best = current.copy()
+    current_fitness = fitness(current)
+    best_fitness = current_fitness
+    T = initial_temp
+
+    fitness_history = [current_fitness]
+    coverage_history = [calculate_coverage(current)]
+    overlap_history = [calculate_overlap(current)]
+    active_nodes_history = [int(np.sum(current[:, 2] >= 0.5))]
+    early_stop = False
+    stop_reason = None
+
+    for iteration in range(num_iterations):
+        # Perturb solution
+        new = current.copy()
+        idx = np.random.randint(0, NumNodes)
+        if np.random.rand() < 0.5:
+            # Move position
+            new[idx, :2] += (np.random.rand(2) - 0.5) * perturb_radius
+            new[idx, :2] = np.clip(new[idx, :2], 0, [AreaWidth, AreaHeight])
+        else:
+            # Flip activation
+            new[idx, 2] = 1 - new[idx, 2]
+
+        new_fitness = fitness(new)
+        delta = new_fitness - current_fitness
+
+        if delta > 0 or np.random.rand() < np.exp(delta / (T + 1e-8)):
+            current = new
+            current_fitness = new_fitness
+            if new_fitness > best_fitness:
+                best = new
+                best_fitness = new_fitness
+
+        T *= cooling_rate
+
+        fitness_history.append(best_fitness)
+        coverage_history.append(calculate_coverage(best))
+        overlap_history.append(calculate_overlap(best))
+        active_nodes_history.append(int(np.sum(best[:, 2] >= 0.5)))
+
+        if coverage_history[-1] >= desired_coverage * 100:
+            print(f"Stopping early: Desired coverage reached.")
+            early_stop = True
+            stop_reason = "Desired coverage reached."
+            break
+
+    execution_time = time.time() - start_time
+
+    best = post_prune(
+        best,
+        GridPoints,
+        SensingRange,
+        threshold=desired_coverage*100
+    )
+
+    result = AlgorithmResult(
+        best_solution=best,
+        fitness_history=fitness_history,
+        coverage=calculate_coverage(best),
+        active_nodes=int(np.sum(best[:, 2] >= 0.5)),
+        overlap=calculate_overlap(best),
+        execution_time=execution_time,
+        algorithm_name="Simulated Annealing",
+        parameters={
+            'num_iterations': num_iterations,
+            'initial_temp': initial_temp,
+            'cooling_rate': cooling_rate,
+            'perturb_radius': perturb_radius,
+            'desired_coverage': desired_coverage,
+            'w1': w1, 'w2': w2, 'w3': w3
+        },
+        coverage_history=coverage_history,
+        overlap_history=overlap_history,
+        active_nodes_history=active_nodes_history,
+        early_stop=early_stop,
+        stop_reason=stop_reason
+    )
+    activation = convert_to_binary_activation(best, simulation)
+    return activation, result
+
+def post_prune(particle, grid_points, sensing_range, threshold=95):
+    """Deactivate redundant sensors while maintaining coverage above threshold."""
+    particle = particle.copy()
+    num_nodes = len(particle)
+    def calc_cov(p):
+        covered = np.zeros(len(grid_points), dtype=bool)
+        for sensor in p:
+            if sensor[2] >= 0.5:
+                distances = np.linalg.norm(grid_points - sensor[:2], axis=1)
+                covered |= distances <= sensing_range
+        return (np.sum(covered) / len(grid_points)) * 100
+
+    for i in range(num_nodes):
+        if particle[i, 2] >= 0.5:
+            temp = particle.copy()
+            temp[i, 2] = 0
+            if calc_cov(temp) >= threshold:
+                particle[i, 2] = 0
+    return particle

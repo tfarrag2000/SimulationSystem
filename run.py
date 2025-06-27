@@ -1,13 +1,11 @@
 import argparse
 import sys
-import sys
-import sys
 import importlib.util
 import logging
 from datetime import datetime
 # Setup logging
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.INFO, 
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
         logging.StreamHandler(sys.stdout)
