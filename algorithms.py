@@ -9,7 +9,7 @@ class AlgorithmResult:
     def __init__(self, best_solution, fitness_history, coverage, active_nodes, 
                  overlap, execution_time, algorithm_name, parameters,
                  coverage_history=None, overlap_history=None, active_nodes_history=None,
-                 early_stop=False, stop_reason=None):
+                 early_stop=False, stop_reason=None, iteration_logs=None):
         self.best_solution = best_solution
         self.fitness_history = fitness_history
         self.coverage = coverage
@@ -24,6 +24,7 @@ class AlgorithmResult:
         self.active_nodes_history = active_nodes_history or []
         self.early_stop = early_stop
         self.stop_reason = stop_reason
+        self.iteration_logs = iteration_logs or []
 
 def convert_to_binary_activation(particle_solution, simulation):
     """Convert particle solution to binary activation array compatible with simulation"""
@@ -53,7 +54,7 @@ def parallel_fitness_evaluation(particles, fitness_func, num_processes=None):
         print(f"Parallel evaluation failed: {e}. Falling back to serial evaluation.")
         return [fitness_func(p) for p in particles]
 
-def greedy_optimization(simulation, desired_coverage=0.95, overlap_weight=0.2, energy_weight=0.1):
+def greedy_optimization(simulation, desired_coverage=0.85, overlap_weight=0.2, energy_weight=0.1):
     """Simple greedy algorithm for drone activation"""
     start_time = time.time()
     num_drones = len(simulation.drones)
@@ -62,6 +63,7 @@ def greedy_optimization(simulation, desired_coverage=0.95, overlap_weight=0.2, e
     coverage_history = []
     active_nodes_history = []
     overlap_history = []
+    iteration_logs = []
     
     # Pre-compute coverage sets for each drone
     coverage_sets = []
@@ -104,6 +106,16 @@ def greedy_optimization(simulation, desired_coverage=0.95, overlap_weight=0.2, e
         # For greedy, overlap calculation is complex to track iteratively, so we set to 0
         overlap_history.append(0) 
         
+        # Add iteration log entry
+        iteration_logs.append({
+            'iteration': len(coverage_history),
+            'fitness': coverage_pct,  # For greedy, use coverage as fitness
+            'coverage': coverage_pct,
+            'algorithm': 'GREEDY'
+        })
+        
+        print(f"Greedy Step {len(coverage_history)}: Activated Drone {best_idx}, Coverage = {coverage_pct:.2f}%") 
+        
         if coverage_pct >= desired_coverage * 100:
             early_stop = True
             stop_reason = "Desired coverage reached."
@@ -125,7 +137,8 @@ def greedy_optimization(simulation, desired_coverage=0.95, overlap_weight=0.2, e
         overlap_history=overlap_history,
         active_nodes_history=active_nodes_history,
         early_stop=early_stop,
-        stop_reason=stop_reason
+        stop_reason=stop_reason,
+        iteration_logs=iteration_logs
     )
     return activation, result
 
@@ -200,6 +213,7 @@ def genetic_algorithm(simulation,
     coverage_history = []
     overlap_history = []
     active_nodes_history = []
+    iteration_logs = []
     early_stop = False
     stop_reason = None
 
@@ -221,6 +235,14 @@ def genetic_algorithm(simulation,
         coverage_history.append(calculate_coverage(best_particle))
         overlap_history.append(calculate_overlap(best_particle))
         active_nodes_history.append(int(np.sum(best_particle[:, 2] >= 0.5)))
+        
+        # Add iteration log entry
+        iteration_logs.append({
+            'iteration': iteration + 1,
+            'fitness': best_fitness,
+            'coverage': coverage_history[-1],
+            'algorithm': 'GA'
+        })
         
         new_population = population[:elitism]
         while len(new_population) < population_size:
@@ -269,7 +291,8 @@ def genetic_algorithm(simulation,
         overlap_history=overlap_history,
         active_nodes_history=active_nodes_history,
         early_stop=early_stop,
-        stop_reason=stop_reason
+        stop_reason=stop_reason,
+        iteration_logs=iteration_logs
     )
     activation = convert_to_binary_activation(best_particle, simulation)
     return activation, result
@@ -334,6 +357,7 @@ def particle_swarm_optimization(simulation,
     coverage_history = []
     overlap_history = []
     active_nodes_history = []
+    iteration_logs = []
     early_stop = False
     stop_reason = None
     
@@ -372,6 +396,14 @@ def particle_swarm_optimization(simulation,
         coverage_history.append(calculate_coverage(gbest))
         overlap_history.append(calculate_overlap(gbest))
         active_nodes_history.append(int(np.sum(gbest[:, 2] >= 0.5)))
+        
+        # Add iteration log entry
+        iteration_logs.append({
+            'iteration': iteration + 1,
+            'fitness': gbest_fitness,
+            'coverage': coverage_history[-1],
+            'algorithm': 'PSO'
+        })
         
         if iteration % 20 == 0:
             print(f"PSO Iteration {iteration + 1}: Best Fitness = {gbest_fitness:.2f}, "
@@ -412,7 +444,8 @@ def particle_swarm_optimization(simulation,
         overlap_history=overlap_history,
         active_nodes_history=active_nodes_history,
         early_stop=early_stop,
-        stop_reason=stop_reason
+        stop_reason=stop_reason,
+        iteration_logs=iteration_logs
     )
     activation = convert_to_binary_activation(gbest, simulation)
     return activation, result
@@ -516,6 +549,7 @@ def genetic_algorithm_with_sa(simulation,
     coverage_history = []
     overlap_history = []
     active_nodes_history = []
+    iteration_logs = []
     early_stop = False
     stop_reason = None
     
@@ -537,6 +571,14 @@ def genetic_algorithm_with_sa(simulation,
         coverage_history.append(calculate_coverage(best_particle))
         overlap_history.append(calculate_overlap(best_particle))
         active_nodes_history.append(int(np.sum(best_particle[:, 2] >= 0.5)))
+        
+        # Add iteration log entry
+        iteration_logs.append({
+            'iteration': generation + 1,
+            'fitness': best_fitness,
+            'coverage': coverage_history[-1],
+            'algorithm': 'GA+SA'
+        })
 
         elite_count = int(elitism_fraction * population_size)
         elites = population[:elite_count]
@@ -601,7 +643,8 @@ def genetic_algorithm_with_sa(simulation,
         overlap_history=overlap_history,
         active_nodes_history=active_nodes_history,
         early_stop=early_stop,
-        stop_reason=stop_reason
+        stop_reason=stop_reason,
+        iteration_logs=iteration_logs
     )
 
     activation = convert_to_binary_activation(best_particle, simulation)
@@ -669,6 +712,7 @@ def grey_wolf_optimizer(simulation,
     coverage_history = []
     overlap_history = []
     active_nodes_history = []
+    iteration_logs = []
     early_stop = False
     stop_reason = None
 
@@ -713,6 +757,14 @@ def grey_wolf_optimizer(simulation,
         coverage_history.append(calculate_coverage(best_solution_2d))
         overlap_history.append(calculate_overlap(best_solution_2d))
         active_nodes_history.append(int(np.sum(best_solution_2d[:, 2] >= 0.5)))
+        
+        # Add iteration log entry
+        iteration_logs.append({
+            'iteration': iteration + 1,
+            'fitness': -alpha_score,
+            'coverage': coverage_history[-1],
+            'algorithm': 'GWO'
+        })
 
         if iteration % 10 == 0:
             print(f"GWO Iteration {iteration + 1}: Best Fitness = {-alpha_score:.2f}, "
@@ -751,7 +803,8 @@ def grey_wolf_optimizer(simulation,
         overlap_history=overlap_history,
         active_nodes_history=active_nodes_history,
         early_stop=early_stop,
-        stop_reason=stop_reason
+        stop_reason=stop_reason,
+        iteration_logs=iteration_logs
     )
     activation = convert_to_binary_activation(best_solution, simulation)
     return activation, result
@@ -814,6 +867,7 @@ def manta_ray_foraging_optimization(simulation,
     coverage_history = []
     overlap_history = []
     active_nodes_history = []
+    iteration_logs = []
     early_stop = False
     stop_reason = None
     
@@ -864,6 +918,14 @@ def manta_ray_foraging_optimization(simulation,
         overlap_history.append(calculate_overlap(best_particle))
         active_nodes_history.append(int(np.sum(best_particle[:, 2] >= 0.5)))
         
+        # Add iteration log entry
+        iteration_logs.append({
+            'iteration': t + 1,
+            'fitness': best_fitness,
+            'coverage': coverage_history[-1],
+            'algorithm': 'MRFO'
+        })
+        
         print(f"MRFO Iteration {t + 1}: Best Fitness = {best_fitness:.2f}, "
               f"Coverage = {coverage_history[-1]:.2f}%")
 
@@ -892,7 +954,8 @@ def manta_ray_foraging_optimization(simulation,
         overlap_history=overlap_history,
         active_nodes_history=active_nodes_history,
         early_stop=early_stop,
-        stop_reason=stop_reason
+        stop_reason=stop_reason,
+        iteration_logs=iteration_logs
     )
     activation = convert_to_binary_activation(best_particle, simulation)
     return activation, result
@@ -954,6 +1017,7 @@ def simulated_annealing(
     coverage_history = [calculate_coverage(current)]
     overlap_history = [calculate_overlap(current)]
     active_nodes_history = [int(np.sum(current[:, 2] >= 0.5))]
+    iteration_logs = []
     early_stop = False
     stop_reason = None
 
@@ -985,6 +1049,14 @@ def simulated_annealing(
         coverage_history.append(calculate_coverage(best))
         overlap_history.append(calculate_overlap(best))
         active_nodes_history.append(int(np.sum(best[:, 2] >= 0.5)))
+        
+        # Add iteration log entry
+        iteration_logs.append({
+            'iteration': iteration + 1,
+            'fitness': best_fitness,
+            'coverage': coverage_history[-1],
+            'algorithm': 'SA'
+        })
 
         if coverage_history[-1] >= desired_coverage * 100:
             print(f"Stopping early: Desired coverage reached.")
@@ -1021,7 +1093,8 @@ def simulated_annealing(
         overlap_history=overlap_history,
         active_nodes_history=active_nodes_history,
         early_stop=early_stop,
-        stop_reason=stop_reason
+        stop_reason=stop_reason,
+        iteration_logs=iteration_logs
     )
     activation = convert_to_binary_activation(best, simulation)
     return activation, result

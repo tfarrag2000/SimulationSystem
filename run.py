@@ -46,11 +46,11 @@ def parse_arguments():
 ALGORITHM_ALLOWED_PARAMS = {
     'greedy': ['desired_coverage', 'overlap_weight', 'energy_weight'],
     'ga': ['population_size', 'num_generations', 'mutation_rate', 'crossover_rate', 'elitism', 'desired_coverage', 'parallel_processing', 'w1', 'w2', 'w3'],
-    'pso': ['swarm_size', 'iterations', 'inertia', 'cognitive_weight', 'social_weight', 'parallel_processing', 'w1', 'w2', 'w3', 'desired_coverage'],
-    'sa': ['initial_temp', 'cooling_rate', 'iterations', 'min_temp', 'desired_coverage'],
+    'pso': ['swarm_size', 'iterations', 'inertia', 'cognitive_weight', 'social_weight', 'w1', 'w2', 'w3', 'desired_coverage', 'parallel_processing'],
+    'sa': ['num_iterations', 'initial_temp', 'cooling_rate', 'perturb_radius', 'desired_coverage', 'w1', 'w2', 'w3'],
     'ga_sa': ['population_size', 'num_generations', 'mutation_rate', 'crossover_rate', 'elitism_fraction', 'sa_temp', 'sa_cooling', 'sa_iters', 'desired_coverage', 'parallel_processing', 'w1', 'w2', 'w3'],
-    'gwo': ['population_size', 'max_iterations', 'desired_coverage', 'w1', 'w2', 'w3', 'parallel_processing'],
-    'mrfo': ['population_size', 'num_generations', 'desired_coverage', 'w1', 'w2', 'w3', 'parallel_processing'],
+    'gwo': ['population_size', 'max_iterations', 'desired_coverage', 'parallel_processing', 'w1', 'w2', 'w3'],
+    'mrfo': ['population_size', 'num_generations', 'desired_coverage', 'parallel_processing', 'w1', 'w2', 'w3'],
 }
 
 def filter_params(algorithm_key, params):

@@ -123,25 +123,39 @@ def create_simulation_view(simulation):
                 showlegend=True
             ))
 
-    # Add title with metrics
+    # Add enhanced title with metrics and step info
     coverage = simulation.metrics_history.get('coverage', [0])[-1]
     active_nodes = simulation.metrics_history.get('active_drones', [0])[-1]
+    total_drones = len(simulation.drones) if hasattr(simulation, 'drones') else 0
+    step_count = simulation.step_count if hasattr(simulation, 'step_count') else 0
+    
+    # Calculate efficiency
+    efficiency = (coverage * 100) / max(active_nodes, 1) if active_nodes > 0 else 0
+    
     fig.update_layout(
-        title=f"Sensor Deployment - Coverage: {coverage:.2f}% | Active Nodes: {active_nodes}",
-        xaxis_title="X Coordinate",
-        yaxis_title="Y Coordinate",
+        title={
+            'text': f"🚁 Drone Network Optimization<br><sub>Step {step_count} | Coverage: {coverage * 100:.1f}% | Active: {active_nodes}/{total_drones} | Efficiency: {efficiency:.1f}%/drone</sub>",
+            'x': 0.5,
+            'xanchor': 'center',
+            'font': {'size': 16, 'family': 'Arial, sans-serif'}
+        },
+        xaxis_title="X Coordinate (m)",
+        yaxis_title="Y Coordinate (m)",
         width=1200,
-        height=800,
+        height=600,
         showlegend=True,
         legend=dict(
             x=0.02,
             y=0.98,
-            bgcolor="rgba(255, 255, 255, 0.8)",
-            bordercolor="gray",
+            bgcolor="rgba(255, 255, 255, 0.9)",
+            bordercolor="rgba(0,0,0,0.1)",
             borderwidth=1,
-            font=dict(size=12)
+            font=dict(size=11)
         ),
-        template="plotly_white"
+        template="plotly_white",
+        margin=dict(t=80, b=40, l=60, r=40),
+        plot_bgcolor='rgba(248,249,250,0.8)',
+        paper_bgcolor='white'
     )
     return fig
 
