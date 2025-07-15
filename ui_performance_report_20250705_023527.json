@@ -1,0 +1,280 @@
+{
+  "issues": [
+    {
+      "timestamp": "2025-07-05T02:35:27.262551",
+      "category": "usability",
+      "severity": "medium",
+      "description": "Initialize button logic needs verification: should be enabled after stop/completion and disabled during run",
+      "component": "init-button",
+      "algorithm": null
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.262551",
+      "category": "usability",
+      "severity": "low",
+      "description": "GA+SA hybrid has many parameters - consider grouping or progressive disclosure",
+      "component": "parameter-form",
+      "algorithm": "ga_sa"
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.263550",
+      "category": "usability",
+      "severity": "medium",
+      "description": "Metrics charts should update smoothly during execution without causing visual jumps",
+      "component": "metrics-charts",
+      "algorithm": null
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.263550",
+      "category": "compatibility",
+      "severity": "high",
+      "description": "Need client-side validation for parameter inputs to prevent invalid combinations",
+      "component": "parameter-validation",
+      "algorithm": null
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.263550",
+      "category": "usability",
+      "severity": "medium",
+      "description": "Long-running algorithms should have timeout protection and ability to cancel",
+      "component": "execution-control",
+      "algorithm": null
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.263550",
+      "category": "compatibility",
+      "severity": "medium",
+      "description": "Some parameter combinations may be mathematically invalid (e.g., cooling_rate >= 1.0 in SA)",
+      "component": "parameter-validation",
+      "algorithm": null
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.264549",
+      "category": "performance",
+      "severity": "medium",
+      "description": "High-frequency callbacks during algorithm execution may impact browser performance",
+      "component": "callback-optimization",
+      "algorithm": null
+    }
+  ],
+  "performance_notes": [
+    {
+      "timestamp": "2025-07-05T02:35:27.261551",
+      "description": "Very low mutation_rate=0.01 may lead to slow convergence and UI responsiveness issues",
+      "algorithm": "ga",
+      "params": {
+        "population_size": 10,
+        "num_generations": 10,
+        "mutation_rate": 0.01,
+        "crossover_rate": 0.1
+      }
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.262551",
+      "description": "High parameter value num_generations=500 may cause UI freezing during execution",
+      "algorithm": "ga",
+      "params": {
+        "population_size": 200,
+        "num_generations": 500,
+        "mutation_rate": 0.5,
+        "crossover_rate": 1.0
+      }
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.262551",
+      "description": "High parameter value iterations=500 may cause UI freezing during execution",
+      "algorithm": "pso",
+      "params": {
+        "swarm_size": 100,
+        "iterations": 500,
+        "inertia": 1.5,
+        "cognitive_weight": 3.0
+      }
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.262551",
+      "description": "High parameter value initial_temp=1000 may cause UI freezing during execution",
+      "algorithm": "sa",
+      "params": {
+        "num_iterations": 100,
+        "initial_temp": 1000,
+        "cooling_rate": 0.95
+      }
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.262551",
+      "description": "High parameter value num_iterations=500 may cause UI freezing during execution",
+      "algorithm": "sa",
+      "params": {
+        "num_iterations": 500,
+        "initial_temp": 5000,
+        "cooling_rate": 0.99
+      }
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.262551",
+      "description": "High parameter value initial_temp=5000 may cause UI freezing during execution",
+      "algorithm": "sa",
+      "params": {
+        "num_iterations": 500,
+        "initial_temp": 5000,
+        "cooling_rate": 0.99
+      }
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.262551",
+      "description": "High parameter value sa_temp=500 may cause UI freezing during execution",
+      "algorithm": "ga_sa",
+      "params": {
+        "population_size": 100,
+        "num_generations": 200,
+        "sa_temp": 500
+      }
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.262551",
+      "description": "High parameter value max_iterations=500 may cause UI freezing during execution",
+      "algorithm": "gwo",
+      "params": {
+        "population_size": 100,
+        "max_iterations": 500
+      }
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.262551",
+      "description": "High parameter value num_generations=500 may cause UI freezing during execution",
+      "algorithm": "mrfo",
+      "params": {
+        "population_size": 100,
+        "num_generations": 500
+      }
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.262551",
+      "description": "Greedy algorithm executes very quickly - UI updates may appear to skip steps",
+      "algorithm": "greedy",
+      "params": null
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.262551",
+      "description": "ga with large population sizes may cause UI lag during fitness evaluation",
+      "algorithm": "ga",
+      "params": null
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.262551",
+      "description": "pso with large population sizes may cause UI lag during fitness evaluation",
+      "algorithm": "pso",
+      "params": null
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.262551",
+      "description": "ga_sa with large population sizes may cause UI lag during fitness evaluation",
+      "algorithm": "ga_sa",
+      "params": null
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.262551",
+      "description": "gwo with large population sizes may cause UI lag during fitness evaluation",
+      "algorithm": "gwo",
+      "params": null
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.262551",
+      "description": "mrfo with large population sizes may cause UI lag during fitness evaluation",
+      "algorithm": "mrfo",
+      "params": null
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.264549",
+      "description": "GA with 500 generations and 200 population may take several minutes - UI should remain responsive",
+      "algorithm": "ga",
+      "params": null
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.264549",
+      "description": "PSO with 500 iterations and 100 swarm size may take several minutes - UI should remain responsive",
+      "algorithm": "pso",
+      "params": null
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.264549",
+      "description": "SA with 500 iterations and slow cooling may take several minutes - UI should remain responsive",
+      "algorithm": "sa",
+      "params": null
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.264549",
+      "description": "Population-based algorithms may consume significant memory for large populations",
+      "algorithm": "population-based",
+      "params": null
+    }
+  ],
+  "usability_notes": [
+    {
+      "timestamp": "2025-07-05T02:35:27.262551",
+      "description": "Left column (2/12) may be too narrow for complex parameter forms on smaller screens",
+      "component": "left-column"
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.262551",
+      "description": "Right column (2/12) appears to have minimal content, could be used more effectively",
+      "component": "right-column"
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.262551",
+      "description": "Button state management appears comprehensive but should be tested with rapid clicking",
+      "component": "control-buttons"
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.262551",
+      "description": "Parameter inputs use size='sm' which may be difficult to interact with on touch devices",
+      "component": "parameter-inputs"
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.262551",
+      "description": "Parallel processing correctly disabled for greedy algorithm",
+      "component": "parallel-toggle"
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.262551",
+      "description": "Parallel processing correctly disabled for sa algorithm",
+      "component": "parallel-toggle"
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.262551",
+      "description": "Step button should be enabled only when simulation is paused or initialized, not during running state",
+      "component": "step-button"
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.262551",
+      "description": "Simulated Annealing temperature parameter should ideally be visualized in real-time",
+      "component": "metrics-display"
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.262551",
+      "description": "Progress bar should show algorithm-specific progress (generation/iteration count)",
+      "component": "progress-indicators"
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.262551",
+      "description": "Status alerts use appropriate colors but could benefit from more descriptive text",
+      "component": "status-alerts"
+    },
+    {
+      "timestamp": "2025-07-05T02:35:27.263550",
+      "description": "Iteration logs display correctly but may become overwhelming for algorithms with many iterations",
+      "component": "logs-display"
+    }
+  ],
+  "summary": {
+    "total_issues": 7,
+    "issues_by_severity": {
+      "medium": 5,
+      "low": 1,
+      "high": 1
+    },
+    "performance_notes_count": 19,
+    "usability_notes_count": 11
+  }
+}

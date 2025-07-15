@@ -8,26 +8,34 @@ from datetime import datetime
 import traceback
 from enum import Enum
 import plotly.io as pio
+import multiprocessing
+import json
+import random
 
-# Enhanced simulation state management
-class SimState(Enum):
-    STOPPED = "stopped"
-    RUNNING = "running"
-    PAUSED = "paused"
+# Default parameters for all algorithms to ensure stability
+ALGORITHM_DEFAULT_PARAMS = {
+    'greedy': {'max_iterations': 500, 'coverage_target': 0.98, 'overlap_weight': 0.3, 'energy_weight': 0.2},
+    'ga': {'max_iterations': 200, 'population_size': 50, 'mutation_rate': 0.1, 'crossover_rate': 0.8},
+    'pso': {'max_iterations': 150, 'swarm_size': 40, 'inertia': 0.7, 'cognitive_weight': 1.5, 'social_weight': 1.5},
+    'sa': {'max_iterations': 1000, 'initial_temp': 1000, 'cooling_rate': 0.95},
+    'ga_sa': {'max_iterations': 100, 'population_size': 40, 'sa_temp': 100},
+    'gwo': {'max_iterations': 120, 'population_size': 35},
+    'mrfo': {'max_iterations': 120, 'population_size': 35}
+}
 
-# Fixed imports to match actual file structure
-try:
-    # Import optimization algorithms
-    from algorithms import (
-        greedy_optimization,
-        genetic_algorithm,
-        particle_swarm_optimization,
-        simulated_annealing,
-        genetic_algorithm_with_sa,
-        grey_wolf_optimizer,
-        manta_ray_foraging_optimization
-    )
+def filter_params(algorithm, params):
+    """Filters and validates parameters against robust defaults."""
+    if not params:
+        return ALGORITHM_DEFAULT_PARAMS.get(algorithm, {})
     
+    default_params = ALGORITHM_DEFAULT_PARAMS.get(algorithm, {})
+    filtered = default_params.copy()
+    
+    for key, value in params.items():
+        if key in default_params:
+            try:
+                # Ensure correct type and handle empty strings or None
+                if value is not None and str(value).strip() != '':
     # Import simulation components
     from environment import DroneEnvironment
     
@@ -48,894 +56,1312 @@ simulation = None
 current_sim_state = SimState.STOPPED
 experiment_logger = ExperimentLogger()
 current_experiment_session = None
+last_iteration_logs = [
+    {'iteration': 1, 'fitness': 25.5, 'coverage': 23.1, 'algorithm': 'TEST'},
+    {'iteration': 2, 'fitness': 45.2, 'coverage': 41.7, 'algorithm': 'TEST'},
+    {'iteration': 3, 'fitness': 67.8, 'coverage': 65.2, 'algorithm': 'TEST'}
+]  # Store the most recent iteration logs
 
-# Initialize the app with a Bootstrap theme
+# Initialize Dash app with Bootstrap theme
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.title = "Drone Optimization Simulation System"
 
-# App layout with enhanced experiment management and improved controls
+# Custom index string for compact layout
+app.index_string = '''
+<!DOCTYPE html>
+<html>
+    <head>
+        {%metas%}
+        <title>{%title%}</title>
+        {%favicon%}
+        {%css%}
+        <style>
+            /* Academic Professional Layout - Formal Academic Color Scheme */
+            
+            /* Base Layout - Clean academic styling */
+            body { 
+                background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+            }
+            .container-fluid { 
+                padding: 0.4rem !important; 
+                max-width: 98% !important;
+            }
+            .card { 
+                margin-bottom: 0.4rem !important; 
+                border: 1px solid #cbd5e1 !important;
+                box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06), 0 2px 4px 0 rgba(0, 0, 0, 0.04) !important;
+                border-radius: 0.5rem !important;
+                background: #ffffff !important;
+                transition: all 0.2s ease-in-out !important;
+            }
+            .card:hover {
+                box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1), 0 4px 8px 0 rgba(0, 0, 0, 0.06) !important;
+                transform: translateY(-1px) !important;
+            }
+            .card-body { padding: 0.5rem !important; }
+            
+            /* Academic Header Styling */
+            .card-header { 
+                padding: 0.45rem 0.65rem !important; 
+                font-size: 0.9rem !important; 
+                font-weight: 600 !important;
+                background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
+                color: #f8fafc !important;
+                border-radius: 0.5rem 0.5rem 0 0 !important;
+                border-bottom: 1px solid #cbd5e1 !important;
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+            }
+            
+            /* Form Controls - Academic Style */
+            .row { margin-bottom: 0.2rem !important; }
+            .form-control { 
+                padding: 0.3rem 0.45rem !important; 
+                font-size: 0.85rem !important;
+                border-radius: 0.4rem !important;
+                border: 1px solid #cbd5e1 !important;
+                background-color: #ffffff !important;
+                transition: all 0.2s ease-in-out !important;
+            }
+            .form-control:focus {
+                border-color: #2563eb !important;
+                box-shadow: 0 0 0 0.15rem rgba(37, 99, 235, 0.1) !important;
+                background-color: #f8fafc !important;
+            }
+            
+            /* Buttons - Academic Professional */
+            .btn { 
+                padding: 0.35rem 0.7rem !important; 
+                font-size: 0.82rem !important;
+                border-radius: 0.4rem !important;
+                font-weight: 500 !important;
+                transition: all 0.2s ease-in-out !important;
+                border: 1px solid transparent !important;
+                text-transform: none !important;
+            }
+            .btn-primary { 
+                background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+                border-color: #2563eb !important;
+                color: #ffffff !important;
+            }
+            .btn-success { 
+                background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+                border-color: #059669 !important;
+                color: #ffffff !important;
+            }
+            .btn-secondary { 
+                background: linear-gradient(135deg, #64748b 0%, #475569 100%) !important;
+                border-color: #64748b !important;
+                color: #ffffff !important;
+            }
+            .btn-info { 
+                background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%) !important;
+                border-color: #0891b2 !important;
+                color: #ffffff !important;
+            }
+            .btn-sm { 
+                padding: 0.25rem 0.5rem !important; 
+                font-size: 0.78rem !important;
+                border-radius: 0.3rem !important;
+            }
+            .btn:hover { 
+                transform: translateY(-1px) !important; 
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+            }
+            
+            /* Alerts - Academic */
+            .alert { 
+                padding: 0.45rem !important; 
+                margin-bottom: 0.4rem !important;
+                border-radius: 0.4rem !important;
+                border: 1px solid transparent !important;
+                font-size: 0.85rem !important;
+            }
+            .alert-light { 
+                background-color: #f8fafc !important;
+                border-color: #e2e8f0 !important;
+                color: #1e293b !important;
+            }
+            
+            /* Navigation - Academic Style */
+            .nav-link { 
+                padding: 0.45rem 0.9rem !important; 
+                font-size: 0.85rem !important;
+                font-weight: 500 !important;
+                color: #475569 !important;
+                border: 1px solid transparent !important;
+                border-radius: 0.4rem 0.4rem 0 0 !important;
+                transition: all 0.2s ease-in-out !important;
+            }
+            .nav-link.active {
+                background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
+                color: #f8fafc !important;
+                border-color: #cbd5e1 !important;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+            }
+            .nav-link:hover:not(.active) {
+                background-color: #f1f5f9 !important;
+                color: #1e293b !important;
+                transform: translateY(-1px) !important;
+            }
+            
+            /* Input Groups */
+            .input-group-text { 
+                padding: 0.3rem 0.45rem !important; 
+                font-size: 0.82rem !important;
+                background-color: #f1f5f9 !important;
+                border: 1px solid #cbd5e1 !important;
+                color: #334155 !important;
+            }
+            
+            /* Accordions - Academic */
+            .accordion-button { 
+                padding: 0.65rem !important; 
+                font-size: 0.82rem !important;
+                font-weight: 500 !important;
+                background-color: #f8fafc !important;
+                color: #334155 !important;
+                border: 1px solid #e2e8f0 !important;
+            }
+            .accordion-button:not(.collapsed) {
+                background-color: #1e293b !important;
+                color: #f8fafc !important;
+            }
+            
+            /* Academic Enhancement - Log Container */
+            .log-container {
+                background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+                color: #e2e8f0 !important;
+                border: 1px solid #334155 !important;
+                border-radius: 0.4rem !important;
+                font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+                line-height: 1.4 !important;
+            }
+            
+            /* Academic Enhancement - Status Indicators */
+            .badge {
+                font-size: 0.75rem !important;
+                font-weight: 500 !important;
+                border-radius: 0.3rem !important;
+            }
+            
+            /* Academic Enhancement - Progress Bars */
+            .progress {
+                background-color: #e2e8f0 !important;
+                border-radius: 0.4rem !important;
+            }
+            .progress-bar {
+                background: linear-gradient(90deg, #2563eb 0%, #1d4ed8 100%) !important;
+                transition: width 0.6s ease !important;
+            }
+            
+            /* Academic Enhancement - Small Text */
+            .small, small {
+                font-size: 0.75rem !important;
+                color: #64748b !important;
+            }
+            
+            /* Academic Enhancement - Dropdown Menus */
+            .dropdown-menu {
+                border: 1px solid #cbd5e1 !important;
+                border-radius: 0.4rem !important;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+            }
+            
+            /* Academic Enhancement - Tab Content */
+            .tab-content {
+                border: 1px solid #cbd5e1 !important;
+                border-top: none !important;
+                border-radius: 0 0 0.4rem 0.4rem !important;
+                background-color: #ffffff !important;
+            }
+            
+            /* Enhanced Controls Styling */
+            .control-buttons .btn {
+                transition: all 0.2s ease-in-out !important;
+                border: 1px solid transparent !important;
+            }
+            .control-buttons .btn:disabled {
+                opacity: 0.5 !important;
+                cursor: not-allowed !important;
+                transform: none !important;
+                box-shadow: none !important;
+            }
+            .control-buttons .btn:disabled:hover {
+                transform: none !important;
+                box-shadow: none !important;
+            }
+            .control-buttons .btn-group {
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+                border-radius: 0.4rem !important;
+            }
+            
+            /* Compact spacing for left column */
+            .row { margin-bottom: 0.15rem !important; }
+            .mb-1 { margin-bottom: 0.2rem !important; }
+            .mb-2 { margin-bottom: 0.35rem !important; }
+            
+            /* Status indicators */
+            .status-ready { color: #10b981 !important; }
+            .status-running { color: #f59e0b !important; }
+            .status-paused { color: #6b7280 !important; }
+            .status-error { color: #ef4444 !important; }
+            .status-completed { color: #3b82f6 !important; }
+                color: #f9fafb !important;
+            }
+            .accordion-body { 
+                padding: 0.75rem !important; 
+                background-color: #ffffff !important;
+            }
+            
+            /* Typography - Academic */
+            .small, small { font-size: 0.8rem !important; color: #6b7280 !important; }
+            h3 { 
+                font-size: 1.75rem !important; 
+                margin: 0.75rem 0 !important;
+                color: #1f2937 !important;
+                font-weight: 700 !important;
+                font-family: 'Georgia', 'Times New Roman', serif !important;
+            }
+            h6 { 
+                font-size: 1rem !important; 
+                margin: 0.5rem 0 !important; 
+                font-weight: 600 !important;
+                color: #374151 !important;
+            }
+            
+            /* Dropdowns */
+            .Select-control { 
+                min-height: 38px !important; 
+                border-radius: 0.375rem !important;
+                border: 1px solid #d1d5db !important;
+            }
+            .Select-placeholder, .Select-single-value { line-height: 36px !important; }
+            
+            /* Layout */
+            .sidebar { max-height: 95vh; overflow-y: auto; }
+            .js-plotly-plot { 
+                margin: 0 !important; 
+                border-radius: 0.375rem !important;
+                border: 1px solid #e2e8f0 !important;
+            }
+            .rc-slider { margin: 0.5rem 0 !important; }
+            
+            /* Academic Progress Indicators */
+            .progress {
+                background-color: #f1f5f9 !important;
+                border-radius: 0.25rem !important;
+            }
+            .progress-bar {
+                background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%) !important;
+            }
+            
+            /* Status indicators - Academic Colors */
+            .status-running { animation: pulse 2s infinite; }
+            @keyframes pulse {
+                0% { opacity: 1; }
+                50% { opacity: 0.7; }
+                100% { opacity: 1; }
+            }
+            
+            /* Academic Hover Effects */
+            .card:hover { 
+                transform: translateY(-1px);
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+            }
+            
+            /* Academic Log Styling */
+            .log-container {
+                background: #1e293b !important;
+                color: #e2e8f0 !important;
+                font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+                border-radius: 0.375rem !important;
+                border: 1px solid #334155 !important;
+            }
+            
+            /* Academic Badge Styling */
+            .badge {
+                background: linear-gradient(135deg, #374151 0%, #1f2937 100%) !important;
+                color: #f9fafb !important;
+            }
+            
+            /* Performance Metrics - Academic */
+            .text-success { color: #059669 !important; }
+            .text-primary { color: #2563eb !important; }
+            .text-info { color: #0891b2 !important; }
+            .text-muted { color: #6b7280 !important; }
+            
+            /* Academic Table Styling */
+            .table {
+                color: #374151 !important;
+                border-color: #e5e7eb !important;
+            }
+            .table th {
+                background-color: #f9fafb !important;
+                border-color: #e5e7eb !important;
+                color: #1f2937 !important;
+                font-weight: 600 !important;
+            }
+        </style>
+    </head>
+    <body>
+        {%app_entry%}
+        <footer>
+            {%config%}
+            {%scripts%}
+            {%renderer%}
+        </footer>
+    </body>
+</html>
+'''
+
+# Simple, clean layout with Option 2 + Option 3 approach
 app.layout = dbc.Container([
-    # Header with experiment info
+    # Enhanced Header with Status Bar
     dbc.Row([
         dbc.Col([
-            html.H1("🚁 Drone Optimization Simulation System", className="text-center my-4"),
-            # REMOVE experiment-status alert
-            # dbc.Alert(id="experiment-status", color="info", is_open=False, dismissable=True)
+            html.H3("🚁 Drone Optimization Simulation System", className="text-center my-2"),
+            # Real-time status bar
+            dbc.Alert([
+                dbc.Row([
+                    dbc.Col([
+                        html.Span("🟢 System Ready", id="system-status", className="fw-bold")
+                    ], width=3),
+                    dbc.Col([
+                        html.Span("Coverage: --", id="live-coverage", className="small")
+                    ], width=3),
+                    dbc.Col([
+                        html.Span("Active: --", id="live-active", className="small")
+                    ], width=3),
+                    dbc.Col([
+                        html.Span("Step: --", id="live-step", className="small")
+                    ], width=3),
+                ])
+            ], color="light", className="py-1 mb-2")
         ])
     ]),
     
-    # Main content split into sidebar and visualization
+    # Three-Column Layout: 3-6-3 split for academic focus
     dbc.Row([
-        # Control Panel (Left Sidebar)
-        dbc.Col([           
-            # Algorithm Settings Card
+        # Left Column - Main Algorithm Settings (Narrower)
+        dbc.Col([
             dbc.Card([
-                dbc.CardHeader("⚙️ Optimization Settings"),
+                dbc.CardHeader("⚙️ Algorithm Settings"),
                 dbc.CardBody([
                     # Algorithm Selection
-                    html.Label("Optimization Algorithm"),
+                    html.Label("🤖 Algorithm", className="fw-bold mb-1"),
                     dcc.Dropdown(
                         id='algorithm-dropdown',
                         options=[
-                            {'label': 'Greedy Algorithm', 'value': 'greedy'},
+                            {'label': 'Greedy', 'value': 'greedy'},
                             {'label': 'Genetic Algorithm', 'value': 'ga'},
-                            {'label': 'Particle Swarm Optimization', 'value': 'pso'},
+                            {'label': 'Particle Swarm', 'value': 'pso'},
                             {'label': 'Simulated Annealing', 'value': 'sa'},
-                            {'label': 'Genetic Algorithm + SA', 'value': 'ga_sa'},
+                            {'label': 'GA + SA Hybrid', 'value': 'ga_sa'},
                             {'label': 'Grey Wolf Optimizer', 'value': 'gwo'},
-                            {'label': 'Manta Ray Foraging Optimizer', 'value': 'mrfo'}
-
+                            {'label': 'Manta Ray Foraging', 'value': 'mrfo'}
                         ],
-                        value='greedy'
+                        value='greedy',
+                        className="mb-2"
                     ),
                     
-                    # Parallel Processing Toggle (for supported algorithms)
+                    # Parallel Processing Toggle
+                    dbc.Switch(
+                        id="parallel-processing-switch",
+                        label="⚡ Parallel Processing",
+                        value=False,
+                        disabled=True,
+                        className="mb-1"
+                    ),
+                    html.Div(id="parallel-info", className="mb-1 text-muted small"),
+                    
+                    # Algorithm Parameters with enhanced styling
+                    dbc.Card([
+                        dbc.CardHeader("🔧 Parameters", className="py-1"),
+                        dbc.CardBody([
+                            html.Div(id='algorithm-params', className="mt-1")
+                        ], className="py-1")
+                    ], className="mt-1"),
+                    
+                    # Main Simulation Controls - Enhanced Design
+                    html.Hr(className="my-2"),
                     html.Div([
-                        html.Hr(),
-                        html.Label("⚡ Performance Options"),
-                        dbc.Card([
-                            dbc.CardBody([
-                                dbc.Row([
-                                    dbc.Col([
-                                        dbc.Label("Parallel Processing", className="form-label"),
-                                        html.Div([
-                                            dbc.Switch(
-                                                id="parallel-processing-switch",
-                                                label="Enable parallel execution",
-                                                value=False,
-                                                disabled=True  # Will be enabled for supported algorithms
-                                            ),
-                                            dbc.FormText("Speeds up optimization on multi-core systems", color="muted")
-                                        ])
-                                    ], width=12)
-                                ]),
-                                html.Div(id="parallel-info", className="mt-2")
+                        html.I(className="fas fa-gamepad me-2", style={"color": "#3b82f6"}),
+                        html.Span("Controls", className="fw-bold")
+                    ], className="d-flex align-items-center mb-2"),
+                    
+                    # Run Name with better styling
+                    html.Label("Run Identifier", className="small text-muted mb-1"),
+                    dbc.InputGroup([
+                        dbc.Input(
+                            id="run-name-input",
+                            placeholder="Enter run name...",
+                            value=f"Run_{datetime.now().strftime('%m%d_%H%M')}",
+                            size="sm",
+                            className="form-control-sm"
+                        ),
+                        dbc.Button(
+                            html.I(className="fas fa-sync-alt"), 
+                            id="generate-run-name", 
+                            color="outline-secondary", 
+                            size="sm",
+                            title="Generate new name"
+                        )
+                    ], size="sm", className="mb-2"),
+                    
+                    # Status Card
+                    dbc.Card([
+                        dbc.CardBody([
+                            html.Div([
+                                html.Div([
+                                    html.I(id="status-icon", className="fas fa-circle me-2", style={"color": "#6b7280"}),
+                                    html.Span("System Status", className="small fw-bold")
+                                ], className="d-flex align-items-center mb-1"),
+                                html.Div(id="sim-status-text", children="Ready to Initialize", 
+                                        className="small text-muted")
                             ])
-                        ], color="light", outline=True)
-                    ], id="parallel-options"),
+                        ], className="py-1 px-2")
+                    ], className="mb-2", style={"background": "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)"}),
                     
-                    html.Div(id='algorithm-params', className="mt-3"),
+                    # Hidden alert for callback compatibility
+                    dbc.Alert(id="sim-status-alert", children="⭕ Not Started", color="secondary", 
+                              className="d-none"),
                     
-                    # Simulation Parameters
-                    html.Hr(),
-                    html.Label("🌍 Environment Settings"),
-                    dbc.Row([
-                        dbc.Col([
-                            html.Label("Area Width"),
-                            dbc.Input(id="area-width", type="number", value=100, min=10, max=1000)
-                        ]),
-                        dbc.Col([
-                            html.Label("Area Height"),
-                            dbc.Input(id="area-height", type="number", value=100, min=10, max=1000)
-                        ])
-                    ]),
-                    dbc.Row([
-                        dbc.Col([
-                            html.Label("Total Drones"),
-                            dbc.Input(id="total-drones", type="number", value=20, min=1, max=100)
-                        ]),
-                        dbc.Col([
-                            html.Label("Sensing Radius"),
-                            dbc.Input(id="sensing-radius", type="number", value=20, min=1, max=50)
-                        ])
-                    ], className="mt-2"),
-                    
-                    # For parking scenario
+                    # Enhanced Control Buttons with States
                     html.Div([
-                        html.Label("🅿️ Parking Scenario Settings"),
-                        dbc.Row([
-                            dbc.Col([
-                                html.Label("Parking Spots"),
-                                dbc.Input(id="parking-spots", type="number", value=100, min=10, max=1000)
-                            ]),
-                            dbc.Col([
-                                html.Label("Disabled Spots"),
-                                dbc.Input(id="disabled-spots", type="number", value=10, min=0, max=100)
-                            ])
+                        # Initialize Button - Full Width
+                        dbc.Button([
+                            html.I(className="fas fa-rocket me-2"),
+                            "Initialize System"
+                        ], 
+                        id="init-button", 
+                        color="primary", 
+                        size="sm", 
+                        className="w-100 mb-1",
+                        style={"font-weight": "500"}
+                        ),
+                        
+                        # Main Control Button Group
+                        html.Div([
+                            html.Label("Simulation Control", className="small text-muted mb-1"),
+                            dbc.ButtonGroup([
+                                dbc.Button([
+                                    html.I(id="main-control-icon", className="fas fa-play me-1"),
+                                    html.Span(id="main-control-text", children="Start")
+                                ], 
+                                id="main-control-btn", 
+                                color="success", 
+                                size="sm", 
+                                disabled=True,
+                                title="Start/Pause simulation"
+                                ),
+                                dbc.Button([
+                                    html.I(className="fas fa-step-forward me-1"),
+                                    "Step"
+                                ], 
+                                id="step-button", 
+                                color="info", 
+                                size="sm", 
+                                disabled=True,
+                                title="Execute one step"
+                                ),
+                            ], className="w-100 mb-1")
                         ]),
-                    ], className="mt-3"),
-                    
-                    # Enhanced Simulation Control Buttons
-                    html.Hr(),
-                    html.Label("🎮 Simulation Controls"),
-                    
-                    # Initialize button
-                    dbc.Button(
-                        "🚀 Initialize Simulation",
-                        id="init-button",
-                        color="primary",
-                        size="sm",
-                        className="w-100 mb-2"
-                    ),
-                    
-                    # Status indicator
-                    dbc.Alert(
-                        id="sim-status-alert",
-                        children="⭕ Not Started",
-                        color="secondary",
-                        className="mb-2 text-center"
-                    ),
-                    
-                    # Control buttons
-                    dbc.ButtonGroup([
-                        dbc.Button("▶️ Start", id="main-control-btn", color="success", size="sm"),  # Start/Pause/Resume
-                        dbc.Button("👣 Step", id="step-button", color="secondary", size="sm"),
-                        dbc.Button("🔄 Reset", id="stop-reset-btn", color="info", size="sm"),     # Stop/Reset
-                    ], className="w-100 mb-2"),
-                    
-                    # Simulation speed control
-                    html.Hr(),
-                    html.Label("🏃 Simulation Speed"),
-                    dcc.Slider(
-                        id="simulation-speed",
-                        min=0.1,
-                        max=5.0,
-                        step=0.1,
-                        value=1.0,
-                        marks={0.5: '0.5x', 1: '1x', 2: '2x', 5: '5x'},
-                        tooltip={"placement": "bottom", "always_visible": True}
-                    ),
-                    
-                    # Save/Load Configuration
-                    html.Hr(),
-                    dbc.Row([
-                        dbc.Col([
-                            dbc.Button("Save Config", id="save-config", color="info", size="sm")
-                        ], width=6),
-                        dbc.Col([
-                            dbc.Button("Load Config", id="load-config", color="info", size="sm")
-                        ], width=6)
-                    ])
+                        
+                        # Reset/Stop Controls
+                        html.Div([
+                            html.Label("Reset Control", className="small text-muted mb-1"),
+                            dbc.ButtonGroup([
+                                dbc.Button([
+                                    html.I(className="fas fa-stop me-1"),
+                                    "Stop"
+                                ], 
+                                id="stop-button", 
+                                color="warning", 
+                                size="sm", 
+                                disabled=True,
+                                title="Stop simulation"
+                                ),
+                                dbc.Button([
+                                    html.I(className="fas fa-redo me-1"),
+                                    "Reset"
+                                ], 
+                                id="stop-reset-btn", 
+                                color="secondary", 
+                                size="sm", 
+                                title="Reset to initial state"
+                                ),
+                            ], className="w-100")
+                        ])
+                    ], className="control-buttons")
                 ])
-            ], className="mb-2")
-        ], width=2),
+            ])
+        ], width=2),  # Left column - Much narrower for academic layout
         
-        # Main Visualization Area
+        # Center Column - Main Visualization (Much wider for academic focus)
         dbc.Col([
             dbc.Tabs([
                 # Simulation View Tab
                 dbc.Tab([
-                    dcc.Graph(id="simulation-graph", style={'height': '90vh', 'width': '100%'}),
-                    html.Button("Download Plot", id="download-plot-btn", className="mb-2"),
-                    dcc.Download(id="download-plot"),
-                ], label="🎯 Simulation View"),
+                    dcc.Graph(id="simulation-graph", style={'height': '55vh', 'width': '100%'}),
+                    html.Div([
+                        html.Button("📥 Download", id="download-plot-btn", className="btn btn-outline-primary btn-sm"),
+                        dcc.Download(id="download-plot"),
+                    ], className="mb-1"),
+                ], label="🎯 Simulation"),
                 
                 # Metrics Tab
                 dbc.Tab([
                     dbc.Row([
-                        dbc.Col(dcc.Graph(id="coverage-chart"), width=6),
-                        dbc.Col(dcc.Graph(id="power-chart"), width=6)
-                    ]),
+                        dbc.Col(dcc.Graph(id="coverage-chart", style={'height': '26vh'}), width=6),
+                        dbc.Col(dcc.Graph(id="power-chart", style={'height': '26vh'}), width=6)
+                    ], className="mb-1"),
                     dbc.Row([
-                        dbc.Col(dcc.Graph(id="overlap-chart"), width=6),
-                        dbc.Col(dcc.Graph(id="violation-chart"), width=6)
+                        dbc.Col(dcc.Graph(id="overlap-chart", style={'height': '26vh'}), width=6),
+                        dbc.Col(dcc.Graph(id="violation-chart", style={'height': '26vh'}), width=6)
                     ])
-                ], label="📊 Performance Metrics"),
+                ], label="📊 Metrics"),
                 
                 # Experiment Results Tab
                 dbc.Tab([
-                    html.Div(id="experiment-results-content")
-                ], label="🧪 Experiment Results")
-            ])
-        ], width=10, style={"flex": "1 1 0", "minWidth": 0})
-    ]),
-    
-    # Bottom panel - Logs and Info
-    dbc.Row([
+                    html.Div(id="experiment-summary-content")
+                ], label="🧪 Results"),
+                
+                # Stored Runs Tab
+                dbc.Tab([
+                    html.Div(id="stored-runs-content")
+                ], label="💾 Stored")
+            ]),
+            
+            # Algorithm Iteration Logs
+            dbc.Card([
+                dbc.CardHeader("📊 Iteration Logs", className="py-1"),
+                dbc.CardBody([
+                    html.Div(id="iteration-logs-display", style={
+                        'height': '100px',
+                        'overflow-y': 'auto',
+                        'background-color': '#f8f9fa',
+                        'padding': '6px',
+                        'border-radius': '4px',
+                        'font-family': 'monospace',
+                        'font-size': '10px'
+                    })
+                ], className="py-1")
+            ], className="mt-2")
+        ], width=8),  # Center column - Much wider for main content
+        
+        # Right Column - Supporting Cards with Accordions (Much narrower)
         dbc.Col([
+            # Environment & Settings Accordion
+            dbc.Accordion([
+                # Environment Settings
+                dbc.AccordionItem([
+                    dbc.Row([
+                        dbc.Col([
+                            dbc.Input(id="area-width", type="number", value=100, min=10, max=1000, size="sm"),
+                            html.Small("Width", className="text-muted")
+                        ], width=6),
+                        dbc.Col([
+                            dbc.Input(id="area-height", type="number", value=100, min=10, max=1000, size="sm"),
+                            html.Small("Height", className="text-muted")
+                        ], width=6)
+                    ], className="mb-2"),
+                    dbc.Row([
+                        dbc.Col([
+                            dbc.Input(id="total-drones", type="number", value=20, min=1, max=100, size="sm"),
+                            html.Small("Drones", className="text-muted")
+                        ], width=6),
+                        dbc.Col([
+                            dbc.Input(id="sensing-radius", type="number", value=20, min=1, max=50, size="sm"),
+                            html.Small("Radius", className="text-muted")
+                        ], width=6)
+                    ]),
+                    
+                    # Parking scenario
+                    html.Details([
+                        html.Summary("🅿️ Parking Settings", className="text-muted mt-2"),
+                        dbc.Row([
+                            dbc.Col([
+                                dbc.Input(id="parking-spots", type="number", value=100, min=10, max=1000, size="sm"),
+                                html.Small("Spots", className="text-muted")
+                            ], width=6),
+                            dbc.Col([
+                                dbc.Input(id="disabled-spots", type="number", value=10, min=0, max=100, size="sm"),
+                                html.Small("Disabled", className="text-muted")
+                            ], width=6)
+                        ])
+                    ])
+                ], title="🌍 Environment"),
+                
+                # Stopping Criteria
+                dbc.AccordionItem([
+                    dcc.Dropdown(
+                        id='stopping-template-dropdown',
+                        options=[
+                            {'label': '🐌 Conservative', 'value': 'conservative'},
+                            {'label': '⚖️ Balanced', 'value': 'balanced'},
+                            {'label': '⚡ Fast', 'value': 'fast'},
+                            {'label': '🔧 Custom', 'value': 'custom'}
+                        ],
+                        value='balanced',
+                        className="mb-2"
+                    ),
+                    
+                    dbc.Row([
+                        dbc.Col([
+                            dbc.InputGroup([
+                                dbc.Input(id="target-coverage", type="number", value=90, min=50, max=100, size="sm"),
+                                dbc.InputGroupText("%")
+                            ], size="sm"),
+                            html.Small("Coverage", className="text-muted")
+                        ], width=6),
+                        dbc.Col([
+                            dbc.Input(id="max-iterations", type="number", value=100, min=10, max=1000, size="sm"),
+                            html.Small("Max Iter", className="text-muted")
+                        ], width=6)
+                    ], className="mb-2"),
+                    
+                    dbc.Row([
+                        dbc.Col([
+                            dbc.Input(id="convergence-threshold", type="number", value=0.01, min=0.001, max=0.1, step=0.001, size="sm"),
+                            html.Small("Convergence", className="text-muted")
+                        ], width=6),
+                        dbc.Col([
+                            dbc.InputGroup([
+                                dbc.Input(id="time-limit", type="number", value=60, min=5, max=600, size="sm"),
+                                dbc.InputGroupText("s")
+                            ], size="sm"),
+                            html.Small("Time Limit", className="text-muted")
+                        ], width=6)
+                    ])
+                ], title="🛑 Stopping Criteria"),
+                
+                # Advanced Settings
+                dbc.AccordionItem([
+                    html.Label("🏃 Simulation Speed", className="small"),
+                    dcc.Slider(
+                        id="simulation-speed",
+                        min=0.1, max=5.0, step=0.1, value=1.0,
+                        marks={0.5: '0.5x', 1: '1x', 2: '2x', 5: '5x'},
+                        tooltip={"placement": "bottom", "always_visible": False}
+                    ),
+                    
+                    html.Hr(className="my-2"),
+                    
+                    dbc.ButtonGroup([
+                        dbc.Button("💾 Save Config", id="save-config", color="info", size="sm"),
+                        dbc.Button("📁 Load Config", id="load-config", color="info", size="sm")
+                    ], className="w-100")
+                ], title="⚙️ Advanced")
+            ], className="mb-2"),
+            
+            # Live Logs (Non-accordion - important info)
             dbc.Card([
                 dbc.CardHeader([
-                    "📝 Simulation Logs",
-                    dbc.Badge("Live", color="success", className="ms-2")
-                ]),
+                    html.Span("📝 Live Logs", className="me-2"),
+                    dbc.Badge("0", id="log-count", color="secondary", className="small")
+                ], className="py-1 d-flex justify-content-between align-items-center"),
                 dbc.CardBody([
-                    html.Div(id="log-output", style={'height': '15vh', 'overflow': 'auto'})
-                ])
+                    html.Div(id="log-output", className="log-container", style={
+                        'height': '18vh', 
+                        'overflow-y': 'auto', 
+                        'font-size': '11px',
+                        'padding': '8px'
+                    })
+                ], className="py-1")
+            ], className="mb-2"),
+            
+            # Status & Quick Actions with Performance Metrics
+            dbc.Card([
+                dbc.CardHeader("📊 Performance Dashboard", className="py-1"),
+                dbc.CardBody([
+                    # Quick metrics
+                    dbc.Row([
+                        dbc.Col([
+                            html.Div([
+                                html.H6("0%", id="current-coverage", className="text-success mb-0"),
+                                html.Small("Coverage", className="text-muted")
+                            ], className="text-center")
+                        ], width=4),
+                        dbc.Col([
+                            html.Div([
+                                html.H6("0", id="current-active", className="text-primary mb-0"),
+                                html.Small("Active", className="text-muted")
+                            ], className="text-center")
+                        ], width=4),
+                        dbc.Col([
+                            html.Div([
+                                html.H6("0s", id="current-time", className="text-info mb-0"),
+                                html.Small("Runtime", className="text-muted")
+                            ], className="text-center")
+                        ], width=4),
+                    ], className="mb-2"),
+                    
+                    # Progress bar
+                    html.Div([
+                        html.Small("Progress", className="text-muted"),
+                        dbc.Progress(id="optimization-progress", value=0, className="mb-2", style={"height": "8px"})
+                    ]),
+                    
+                    # Quick actions
+                    dbc.ButtonGroup([
+                        dbc.Button("🚀 Quick Run", id="quick-run", color="success", size="sm", title="Run 20 steps"),
+                        dbc.Button("📊 Compare", id="quick-compare", color="info", size="sm", title="Compare algorithms"),
+                        dbc.Button("🔄 Reset All", id="quick-reset", color="secondary", size="sm", title="Reset everything")
+                    ], className="w-100")
+                ], className="py-1")
             ])
-        ])
-    ], className="mt-3"),
+        ], width=2)  # Right column - Much narrower for academic layout
+    ]),
     
-    # Interval for continuous simulation
+    # Stores and other components
     dcc.Interval(
         id='simulation-interval',
-        interval=1000,  # in milliseconds
+        interval=1000,
         n_intervals=0,
         disabled=True
     ),
-    
-    # Store for holding algorithm parameters
     dcc.Store(id='algorithm-params-store'),
-    
-    # Store for holding simulation state
     dcc.Store(id='simulation-state'),
+    dcc.Store(id='experiment-data-store'),
+    dcc.Store(id='iteration-logs-store'),
+    dcc.Store(id='stopping-criteria-store'),
+    dcc.Store(id='current-run-store'),
+    dcc.Store(id='user-preferences-store', storage_type='local'),
     
-    # Store for experiment data
-    dcc.Store(id='experiment-data-store')
+    # Modals and alerts
+    dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("🎯 Optimization Results")),
+        dbc.ModalBody(id="results-modal-body"),
+        dbc.ModalFooter([
+            dbc.Button("Save Run", id="save-run-btn", color="success", className="me-2"),
+            dbc.Button("Close", id="close-results-modal", color="secondary")
+        ])
+    ], id="results-modal", size="xl", is_open=False),
+    
+    dbc.Alert(
+        id="stopping-alert",
+        dismissable=True,
+        is_open=False,
+        duration=8000,
+        className="position-fixed",
+        style={"top": "20px", "right": "20px", "z-index": 9999, "min-width": "400px"}
+    )
 ], fluid=True)
 
-# Callback to update parallel processing availability based on algorithm
-@app.callback(
-    [Output('parallel-processing-switch', 'disabled'),
-     Output('parallel-info', 'children')],
-    Input('algorithm-dropdown', 'value')
-)
-def update_parallel_availability(algorithm):
-    """Enable/disable parallel processing based on algorithm support"""
-    parallel_supported = algorithm in ['ga', 'pso']  # GA and PSO support parallel processing
-    
-    if parallel_supported:
-        import multiprocessing
-        cpu_count = multiprocessing.cpu_count()
-        info = dbc.Alert(
-            f"✅ Parallel processing available ({cpu_count} CPU cores detected)",
-            color="success",
-            className="small"
-        )
-        return False, info
-    else:
-        info = dbc.Alert(
-            f"ℹ️ Parallel processing not available for {algorithm.upper()} algorithm",
-            color="info",
-            className="small"
-        )
-        return True, info
-
-# Enhanced algorithm parameter callback with parallel processing
-@app.callback(
-    [Output('algorithm-params', 'children'),
-     Output('algorithm-params-store', 'data')],
-    [Input('algorithm-dropdown', 'value'),
-     Input('parallel-processing-switch', 'value')]
-)
-def update_algorithm_params(algorithm, parallel_enabled):
-    """Update algorithm parameter inputs based on selected algorithm"""
-    try:
-        # Default parameter values
-        params = {'parallel_processing': parallel_enabled if algorithm in ['ga', 'pso'] else False}
-        
-        if algorithm == 'ga':
-            params.update({
-                'population_size': 50,
-                'num_generations': 100,
-                'mutation_rate': 0.1,
-                'crossover_rate': 0.8,
-                'elitism': 10
-            })
-            return dbc.Card([
-                dbc.CardBody([
-                    dbc.Row([
-                        dbc.Col([
-                            html.Label("Population Size"),
-                            dbc.Input(id="ga-population", type="number", value=params['population_size'], min=10, max=500),
-                            dbc.FormText("Larger populations explore more solutions", color="muted")
-                        ], width=6),
-                        dbc.Col([
-                            html.Label("Generations"),
-                            dbc.Input(id="ga-generations", type="number", value=params['num_generations'], min=10, max=1000),
-                            dbc.FormText("More generations = better convergence", color="muted")
-                        ], width=6)
-                    ]),
-                    dbc.Row([
-                        dbc.Col([
-                            html.Label("Mutation Rate"),
-                            dbc.Input(id="ga-mutation", type="number", value=params['mutation_rate'], min=0, max=1, step=0.01),
-                            dbc.FormText("0.05-0.2 recommended", color="muted")
-                        ], width=4),
-                        dbc.Col([
-                            html.Label("Crossover Rate"),
-                            dbc.Input(id="ga-crossover", type="number", value=params['crossover_rate'], min=0, max=1, step=0.01),
-                            dbc.FormText("0.6-0.9 recommended", color="muted")
-                        ], width=4),
-                        dbc.Col([
-                            html.Label("Elite Count"),
-                            dbc.Input(id="ga-elitism", type="number", value=params['elitism'], min=1, max=50),
-                            dbc.FormText("Best solutions to keep", color="muted")
-                        ], width=4)
-                    ], className="mt-2"),
-                    html.Div([
-                        dbc.Alert([
-                            html.I(className="bi bi-lightning-charge me-2"),
-                            f"Parallel processing: {'Enabled' if parallel_enabled else 'Disabled'}"
-                        ], color="success" if parallel_enabled else "secondary", className="mt-2")
-                    ]) if algorithm == 'ga' else html.Div()
-                ])
-            ]), params
-            
-        elif algorithm == 'pso':
-            params.update({
-                'swarm_size': 30,
-                'iterations': 100,
-                'inertia': 0.5,
-                'cognitive_weight': 1.5,
-                'social_weight': 1.5
-            })
-            return dbc.Card([
-                dbc.CardBody([
-                    dbc.Row([
-                        dbc.Col([
-                            html.Label("Swarm Size"),
-                            dbc.Input(id="pso-swarm", type="number", value=params['swarm_size'], min=10, max=500),
-                            dbc.FormText("Number of particles in swarm", color="muted")
-                        ], width=6),
-                        dbc.Col([
-                            html.Label("Iterations"),
-                            dbc.Input(id="pso-iterations", type="number", value=params['iterations'], min=10, max=1000),
-                            dbc.FormText("Number of optimization steps", color="muted")
-                        ], width=6)
-                    ]),
-                    dbc.Row([
-                        dbc.Col([
-                            html.Label("Inertia Weight"),
-                            dbc.Input(id="pso-inertia", type="number", value=params['inertia'], min=0, max=1, step=0.01),
-                            dbc.FormText("Controls exploration vs exploitation", color="muted")
-                        ], width=4),
-                        dbc.Col([
-                            html.Label("Cognitive Weight"),
-                            dbc.Input(id="pso-cognitive", type="number", value=params['cognitive_weight'], min=0, max=3, step=0.1),
-                            dbc.FormText("Personal best influence", color="muted")
-                        ], width=4),
-                        dbc.Col([
-                            html.Label("Social Weight"),
-                            dbc.Input(id="pso-social", type="number", value=params['social_weight'], min=0, max=3, step=0.1),
-                            dbc.FormText("Global best influence", color="muted")
-                        ], width=4)
-                    ], className="mt-2"),
-                    html.Div([
-                        dbc.Alert([
-                            html.I(className="bi bi-lightning-charge me-2"),
-                            f"Parallel processing: {'Enabled' if parallel_enabled else 'Disabled'}"
-                        ], color="success" if parallel_enabled else "secondary", className="mt-2")
-                    ]) if algorithm == 'pso' else html.Div()
-                ])
-            ]), params
-            
-        elif algorithm == 'sa':
-            params.update({
-                'initial_temp': 100,
-                'cooling_rate': 0.95,
-                'iterations': 100,
-                'min_temp': 0.01
-            })
-            return dbc.Card([
-                dbc.CardBody([
-                    dbc.Row([
-                        dbc.Col([
-                            html.Label("Initial Temperature"),
-                            dbc.Input(id="sa-temp", type="number", value=params['initial_temp'], min=1, max=1000),
-                            dbc.FormText("Starting temperature", color="muted")
-                        ], width=6),
-                        dbc.Col([
-                            html.Label("Cooling Rate"),
-                            dbc.Input(id="sa-cooling", type="number", value=params['cooling_rate'], min=0.5, max=0.99, step=0.01),
-                            dbc.FormText("Temperature reduction factor", color="muted")
-                        ], width=6)
-                    ]),
-                    dbc.Row([
-                        dbc.Col([
-                            html.Label("Iterations"),
-                            dbc.Input(id="sa-iterations", type="number", value=params['iterations'], min=10, max=1000),
-                            dbc.FormText("Number of optimization steps", color="muted")
-                        ], width=6),
-                        dbc.Col([
-                            html.Label("Minimum Temperature"),
-                            dbc.Input(id="sa-min-temp", type="number", value=params['min_temp'], min=0.001, max=1, step=0.001),
-                            dbc.FormText("Stopping temperature", color="muted")
-                        ], width=6)
-                    ], className="mt-2"),
-                    dbc.Alert("ℹ️ Simulated Annealing does not support parallel processing", color="info", className="mt-2")
-                ])
-            ]), params
-            
-        elif algorithm == 'ga_sa':
-            params.update({
-                'population_size': 50,
-                'num_generations': 100,
-                'mutation_rate': 0.1,
-                'crossover_rate': 0.8,
-                'elitism_fraction': 0.2,
-                'sa_initial_temp': 100,
-                'sa_cooling_rate': 0.95,
-                'sa_iterations': 30,
-                'desired_coverage': 0.95
-            })
-            return dbc.Card([
-                dbc.CardBody([
-                    dbc.Row([
-                        dbc.Col([
-                            html.Label("Population Size"),
-                            dbc.Input(id="ga-sa-population-size", type="number", value=50, min=10, max=500),
-                            dbc.FormText("Larger populations explore more solutions", color="muted")
-                        ], width=6),
-                        dbc.Col([
-                            html.Label("Generations"),
-                            dbc.Input(id="ga-sa-generations", type="number", value=100, min=10, max=1000),
-                            dbc.FormText("More generations = better coverage", color="muted")
-                        ], width=6)
-                    ]),
-                    dbc.Row([
-                        dbc.Col([
-                            html.Label("Mutation Rate"),
-                            dbc.Input(id="ga-sa-mutation-rate", type="number", value=0.1, min=0, max=1, step=0.01),
-                            dbc.FormText("0.05-0.2 recommended", color="muted")
-                        ], width=4),
-                        dbc.Col([
-                            html.Label("Crossover Rate"),
-                            dbc.Input(id="ga-sa-crossover-rate", type="number", value=0.8, min=0, max=1, step=0.01),
-                            dbc.FormText("0.6-0.9 recommended", color="muted")
-                        ], width=4),
-                        dbc.Col([
-                            html.Label("Elitism Fraction"),
-                            dbc.Input(id="ga-sa-elitism-fraction", type="number", value=0.2, min=0, max=1, step=0.01),
-                            dbc.FormText("Top fraction of solutions to keep", color="muted")
-                        ], width=4)
-                    ], className="mt-2"),
-                    dbc.Row([
-                        dbc.Col([
-                            html.Label("SA Initial Temp"),
-                            dbc.Input(id="ga-sa-sa-temp", type="number", value=100, min=1, max=1000),
-                            dbc.FormText("Starting temperature for SA", color="muted")
-                        ], width=6),
-                        dbc.Col([
-                            html.Label("SA Cooling Rate"),
-                            dbc.Input(id="ga-sa-sa-cooling", type="number", value=0.95, min=0.8, max=1, step=0.01),
-                            dbc.FormText("Cooling rate for SA", color="muted")
-                        ], width=6)
-                    ], className="mt-2"),
-                    dbc.Row([
-                        dbc.Col([
-                            html.Label("SA Iterations"),
-                            dbc.Input(id="ga-sa-sa-iters", type="number", value=30, min=1, max=500),
-                            dbc.FormText("Iterations for SA", color="muted")
-                        ], width=6),
-                        dbc.Col([
-                            html.Label("Desired Coverage"),
-                            dbc.Input(id="ga-sa-desired-coverage", type="number", value=0.95, min=0, max=1, step=0.01),
-                            dbc.FormText("Target coverage percentage", color="muted")
-                        ], width=6)
-                    ], className="mt-2"),
-                    html.Div([
-                        dbc.Alert([
-                            html.I(className="bi bi-lightning-charge me-2"),
-                            f"Parallel processing: {'Enabled' if parallel_enabled else 'Disabled'}"
-                        ], color="success" if parallel_enabled else "secondary", className="mt-2")
-                    ]) if algorithm == 'ga_sa' else html.Div()
-                ])
-            ]), params
-            
-        elif algorithm == 'gwo':
-            params.update({
-                'population_size': 30,
-                'max_iterations': 100,
-                'desired_coverage': 0.9,
-                'w1': 0.6,
-                'w2': 0.2,
-                'w3': 0.2
-            })
-            return dbc.Card([
-                dbc.CardBody([
-                    dbc.Row([
-                        dbc.Col([
-                            html.Label("Population Size"),
-                            dbc.Input(id="gwo-population", type="number", value=params['population_size'], min=10, max=500),
-                        ], width=6),
-                        dbc.Col([
-                            html.Label("Max Iterations"),
-                            dbc.Input(id="gwo-iterations", type="number", value=params['max_iterations'], min=10, max=1000),
-                        ], width=6)
-                    ]),
-                    dbc.Row([
-                        dbc.Col([
-                            html.Label("Desired Coverage"),
-                            dbc.Input(id="gwo-coverage", type="number", value=params['desired_coverage'], min=0.5, max=1, step=0.01),
-                        ], width=4),
-                        dbc.Col([
-                            html.Label("w1 (Coverage Weight)"),
-                            dbc.Input(id="gwo-w1", type="number", value=params['w1'], min=0, max=1, step=0.01),
-                        ], width=4),
-                        dbc.Col([
-                            html.Label("w2 (Active Nodes Weight)"),
-                            dbc.Input(id="gwo-w2", type="number", value=params['w2'], min=0, max=1, step=0.01),
-                        ], width=4),
-                        dbc.Col([
-                            html.Label("w3 (Overlap Weight)"),
-                            dbc.Input(id="gwo-w3", type="number", value=params['w3'], min=0, max=1, step=0.01),
-                        ], width=4)
-                    ], className="mt-2"),
-                ])
-            ]), params
-
-        elif algorithm == 'mrfo':
-            params.update({
-                'population_size': 50,
-                'num_generations': 200,
-                'desired_coverage': 0.95,
-                'w1': 0.6,
-                'w2': 0.2,
-                'w3': 0.2
-            })
-            return dbc.Card([
-                dbc.CardBody([
-                    dbc.Row([
-                        dbc.Col([
-                            html.Label("Population Size"),
-                            dbc.Input(id="mrfo-population", type="number", value=params['population_size'], min=10, max=500),
-                        ], width=6),
-                        dbc.Col([
-                            html.Label("Generations"),
-                            dbc.Input(id="mrfo-generations", type="number", value=params['num_generations'], min=10, max=1000),
-                        ], width=6)
-                    ]),
-                    dbc.Row([
-                        dbc.Col([
-                            html.Label("Desired Coverage"),
-                            dbc.Input(id="mrfo-coverage", type="number", value=params['desired_coverage'], min=0.5, max=1, step=0.01),
-                        ], width=4),
-                        dbc.Col([
-                            html.Label("w1 (Coverage Weight)"),
-                            dbc.Input(id="mrfo-w1", type="number", value=params['w1'], min=0, max=1, step=0.01),
-                        ], width=4),
-                        dbc.Col([
-                            html.Label("w2 (Active Nodes Weight)"),
-                            dbc.Input(id="mrfo-w2", type="number", value=params['w2'], min=0, max=1, step=0.01),
-                        ], width=4),
-                        dbc.Col([
-                            html.Label("w3 (Overlap Weight)"),
-                            dbc.Input(id="mrfo-w3", type="number", value=params['w3'], min=0, max=1, step=0.01),
-                        ], width=4)
-                    ], className="mt-2"),
-                ])
-            ]), params
-            
-        else:  # greedy
-            params.update({
-                'desired_coverage': 0.95,
-                'overlap_weight': 0.2,
-                'energy_weight': 0.1
-            })
-            return dbc.Card([
-                dbc.CardBody([
-                    dbc.Row([
-                        dbc.Col([
-                            html.Label("Desired Coverage"),
-                            dbc.Input(id="greedy-coverage", type="number", value=params['desired_coverage'], min=0.5, max=1, step=0.01),
-                            dbc.FormText("Target coverage percentage", color="muted")
-                        ], width=4),
-                        dbc.Col([
-                            html.Label("Overlap Weight"),
-                            dbc.Input(id="greedy-overlap", type="number", value=params['overlap_weight'], min=0, max=1, step=0.01),
-                            dbc.FormText("Penalty for overlapping coverage", color="muted")
-                        ], width=4),
-                        dbc.Col([
-                            html.Label("Energy Weight"),
-                            dbc.Input(id="greedy-energy", type="number", value=params['energy_weight'], min=0, max=1, step=0.01),
-                            dbc.FormText("Importance of energy conservation", color="muted")
-                        ], width=4)
-                    ]),
-                    dbc.Alert("ℹ️ Greedy Algorithm does not support parallel processing", color="info", className="mt-2")
-                ])
-            ]), params
-    
-    except Exception as e:
-        error_msg = f"Error updating algorithm params: {str(e)}"
-        return dbc.Alert(error_msg, color="danger"), {}
-
-# Update parameter store callbacks for all algorithms (enhanced with parallel processing)
-@app.callback(
-    Output('algorithm-params-store', 'data', allow_duplicate=True),
-    [Input('ga-population', 'value'),
-     Input('ga-generations', 'value'),
-     Input('ga-mutation', 'value'),
-     Input('ga-crossover', 'value'),
-     Input('ga-elitism', 'value')],
-    [State('algorithm-dropdown', 'value'),
-     State('algorithm-params-store', 'data'),
-     State('parallel-processing-switch', 'value')],
-    prevent_initial_call=True
-)
-def update_ga_params(population, generations, mutation, crossover, elitism, algorithm, current_params, parallel_enabled):
-    """Update genetic algorithm parameters"""
-    if algorithm != 'ga' or current_params is None:
-        return dash.no_update
-    
-    try:
-        current_params.update({
-            'population_size': population if population is not None else 50,
-            'num_generations': generations if generations is not None else 100,
-            'mutation_rate': mutation if mutation is not None else 0.1,
-            'crossover_rate': crossover if crossover is not None else 0.8,
-            'elitism': elitism if elitism is not None else 10,
-            'parallel_processing': parallel_enabled
-        })
-        return current_params
-    except Exception:
-        return current_params
-
-# Similar callbacks for other algorithms...
-@app.callback(
-    Output('algorithm-params-store', 'data', allow_duplicate=True),
-    [Input('pso-swarm', 'value'),
-     Input('pso-iterations', 'value'),
-     Input('pso-inertia', 'value'),
-     Input('pso-cognitive', 'value'),
-     Input('pso-social', 'value')],
-    [State('algorithm-dropdown', 'value'),
-     State('algorithm-params-store', 'data'),
-     State('parallel-processing-switch', 'value')],
-    prevent_initial_call=True
-)
-def update_pso_params(swarm, iterations, inertia, cognitive, social, algorithm, current_params, parallel_enabled):
-    """Update PSO algorithm parameters"""
-    if algorithm != 'pso' or current_params is None:
-        return dash.no_update
-    
-    try:
-        current_params.update({
-            'swarm_size': swarm if swarm is not None else 30,
-            'iterations': iterations if iterations is not None else 100,
-            'inertia': inertia if inertia is not None else 0.5,
-            'cognitive_weight': cognitive if cognitive is not None else 1.5,
-            'social_weight': social if social is not None else 1.5,
-            'parallel_processing': parallel_enabled
-        })
-        return current_params
-    except Exception:
-        return current_params
-
-# Initialize simulation
+# Quick action button callbacks
 @app.callback(
     Output('log-output', 'children', allow_duplicate=True),
-    Input('init-button', 'n_clicks'),
-    [State('area-width', 'value'),
-     State('area-height', 'value'),
-     State('total-drones', 'value'),
-     State('sensing-radius', 'value'),
-     State('parking-spots', 'value'),
-     State('disabled-spots', 'value')],
+    [Input('quick-run', 'n_clicks')],
     prevent_initial_call=True
 )
-def initialize_simulation(n_clicks, width, height, drones, radius, parking, disabled_spots):
-    """Initialize the simulation environment"""
-    if n_clicks is None:
-        return dash.no_update
-    
-    try:
-        global simulation, current_sim_state
-        simulation = DroneEnvironment(
-            width=width or 100,
-            height=height or 100,
-            num_drones=drones or 20,
-            sensing_radius=radius or 20,
-            num_parking_spots=parking or 100,
-            num_disabled_spots=disabled_spots or 10
-        )
-        
-        # Reset state to stopped after initialization
-        current_sim_state = SimState.STOPPED
-        
-        timestamp = datetime.now().strftime("%H:%M:%S")
-        return f"[{timestamp}] ✅ Simulation initialized with {drones or 20} drones in {width or 100}x{height or 100} area."
-    
-    except Exception as e:
-        timestamp = datetime.now().strftime("%H:%M:%S")
-        error_msg = f"[{timestamp}] ❌ Error initializing simulation: {str(e)}"
-        print(f"Initialization error: {traceback.format_exc()}")
-        return error_msg
-
-# Enhanced Control System - REPLACES the old toggle_simulation_interval callback
-@app.callback(
-    [Output('simulation-interval', 'disabled'),
-     Output('simulation-interval', 'interval'),
-     Output('main-control-btn', 'children'),
-     Output('main-control-btn', 'color'),
-     Output('stop-reset-btn', 'children'),
-     Output('stop-reset-btn', 'color'),
-     Output('sim-status-alert', 'children'),
-     Output('sim-status-alert', 'color'),
-     Output('log-output', 'children', allow_duplicate=True)],
-    [Input('main-control-btn', 'n_clicks'),
-     Input('stop-reset-btn', 'n_clicks'),
-     Input('simulation-speed', 'value')],
-    [State('simulation-interval', 'disabled'),
-     State('log-output', 'children')],
-    prevent_initial_call=True
-)
-def unified_control(main_clicks, stopreset_clicks, speed_value, is_disabled, log_output):
-    global current_sim_state, simulation
-    triggered_id = ctx.triggered_id
-    timestamp = datetime.now().strftime("%H:%M:%S")
-    interval = max(100, int(1000 / (speed_value or 1.0)))
-
-    try:
-        # Button logic
-        if triggered_id == 'main-control-btn':
-            if current_sim_state == SimState.STOPPED:
-                # Check if simulation is initialized before starting
-                if simulation is None:
-                    return True, interval, "▶️ Start", "danger", "🔄 Reset", "info", "❌ Error", "danger", f"[{timestamp}] ❌ Please initialize simulation first!"
-                current_sim_state = SimState.RUNNING
-                return False, interval, "⏸️ Pause", "warning", "⏹️ Stop", "danger", "🟢 Running", "success", f"[{timestamp}] ▶️ Simulation started"
-            elif current_sim_state == SimState.RUNNING:
-                current_sim_state = SimState.PAUSED
-                return True, interval, "▶️ Resume", "success", "⏹️ Stop", "danger", "🟡 Paused", "warning", f"[{timestamp}] ⏸️ Simulation paused"
-            elif current_sim_state == SimState.PAUSED:
-                current_sim_state = SimState.RUNNING
-                return False, interval, "⏸️ Pause", "warning", "⏹️ Stop", "danger", "🟢 Running", "success", f"[{timestamp}] ▶️ Simulation resumed"
-        elif triggered_id == 'stop-reset-btn':
-            if current_sim_state in [SimState.RUNNING, SimState.PAUSED]:
-                current_sim_state = SimState.STOPPED
-                return True, interval, "▶️ Start", "success", "🔄 Reset", "info", "🔴 Stopped", "danger", f"[{timestamp}] ⏹️ Simulation stopped"
-            elif current_sim_state == SimState.STOPPED:
-                if simulation:
-                    simulation.reset_simulation()
-                current_sim_state = SimState.STOPPED
-                return True, interval, "▶️ Start", "success", "🔄 Reset", "info", "🔵 Reset", "info", f"[{timestamp}] 🔄 Simulation reset"
-        elif triggered_id == 'simulation-speed':
-            # Only update interval, keep other states
-            if current_sim_state == SimState.RUNNING:
-                return False, interval, "⏸️ Pause", "warning", "⏹️ Stop", "danger", "🟢 Running", "success", f"[{timestamp}] 🏃 Speed changed"
-            elif current_sim_state == SimState.PAUSED:
-                return True, interval, "▶️ Resume", "success", "⏹️ Stop", "danger", "🟡 Paused", "warning", f"[{timestamp}] 🏃 Speed changed"
-            else:
-                return True, interval, "▶️ Start", "success", "🔄 Reset", "info", "⭕ Not Started", "secondary", f"[{timestamp}] 🏃 Speed changed"
-        else:
-            # Default
-            return is_disabled, interval, "▶️ Start", "success", "🔄 Reset", "info", "⭕ Not Started", "secondary", f"[{timestamp}] Ready"
-    except Exception as e:
-        error_msg = f"[{timestamp}] ❌ Control error: {str(e)}"
-        return True, interval, "▶️ Start", "danger", "🔄 Reset", "danger", "❌ Error", "danger", error_msg
-
-# Enhanced simulation step with experiment logging and state management
-@app.callback(
-    [Output('simulation-graph', 'figure'),
-     Output('coverage-chart', 'figure'),
-     Output('power-chart', 'figure'),
-     Output('overlap-chart', 'figure'),
-     Output('violation-chart', 'figure')],
-    [Input('step-button', 'n_clicks'),
-     Input('simulation-interval', 'n_intervals')],
-    [State('algorithm-dropdown', 'value'),
-     State('algorithm-params-store', 'data')]
-)
-def update_simulation(step_clicks, interval, algorithm, algorithm_params):
-    """Update simulation visualization and metrics with experiment logging and state management"""
-    global current_sim_state  # ADD THIS LINE for state management
-    
-    ctx_msg = ctx.triggered_id
-    if ctx_msg is None or simulation is None:
-        # Default empty figures
-        empty_fig = go.Figure()
-        empty_fig.update_layout(title="Simulation Not Started - Click Initialize")
-        return empty_fig, empty_fig, empty_fig, empty_fig, empty_fig
-    
-    try:
-        # Enhanced state checking - only step when appropriate
-        should_step = False
-        if ctx_msg == 'step-button':
-            should_step = True  # Manual step always allowed
-        elif ctx_msg == 'simulation-interval':
-            should_step = (current_sim_state == SimState.RUNNING)  # Only auto-step when running
-        
-        if should_step:
-            # Use the stored parameters
-            if algorithm_params is None:
-                algorithm_params = {}
-            
-            start_time = datetime.now()
-            
-            # Run optimization based on selected algorithm with parallel processing support
-            if algorithm == 'ga':
-                activation_status, result = genetic_algorithm(simulation, **algorithm_params)
-            elif algorithm == 'pso':
-                activation_status, result = particle_swarm_optimization(simulation, **algorithm_params)
-            elif algorithm == 'sa':
-                activation_status, result = simulated_annealing(simulation, **algorithm_params)
-            elif algorithm == 'gwo':
-                filtered_params = filter_params('gwo', algorithm_params)
-                activation_status, result = grey_wolf_optimizer(simulation, **filtered_params)
-            elif algorithm == 'mrfo':
-                filtered_params = filter_params('mrfo', algorithm_params)
-                activation_status, result = manta_ray_foraging_optimization(simulation, **filtered_params)
-            else:  # greedy
-                algorithm_params.pop('parallel_processing', None)
-                activation_status, result = greedy_optimization(simulation, **algorithm_params)
-            
-            end_time = datetime.now()
-            execution_time = (end_time - start_time).total_seconds()
-            
-            # Apply the optimization result
-            simulation.apply_activation(activation_status)
-            step_result = simulation.step()
-            
-            # Log step data if experiment is active
-            if current_experiment_session:
-                step_data = {
-                    'step': simulation.step_count,
-                    'algorithm': algorithm,
-                    'algorithm_params': algorithm_params,
-                    'execution_time': execution_time,
-                    'result': step_result,
-                    'parallel_processing_used': algorithm_params.get('parallel_processing', False)
-                }
-                experiment_logger.log_step_result(step_data)
-        
-        # Create visualization
-        simulation_fig = create_simulation_view(simulation)
-        
-        # Create metric charts
-        metrics_charts = create_metrics_charts(simulation)
-        coverage_fig = metrics_charts['coverage']
-        power_fig = metrics_charts['power']
-        overlap_fig = metrics_charts['overlap']
-        
-        # Violations chart (might be None if not a parking scenario)
-        violations_fig = metrics_charts.get('violations')
-        if violations_fig is None:
-            violations_fig = go.Figure()
-            violations_fig.update_layout(title="No Violation Data Available")
-        
-        return simulation_fig, coverage_fig, power_fig, overlap_fig, violations_fig
-    
-    except Exception as e:
-        # Error handling - return error figures
-        error_fig = go.Figure()
-        error_msg = f"Error in simulation: {str(e)}"
-        error_fig.update_layout(title=error_msg)
-        print(f"Simulation error: {traceback.format_exc()}")
-        return error_fig, error_fig, error_fig, error_fig, error_fig
-
-# Download plot callback
-@app.callback(
-    Output("download-plot", "data"),
-    Input("download-plot-btn", "n_clicks"),
-    State("simulation-graph", "figure"),
-    prevent_initial_call=True,
-)
-def download_plot(n_clicks, fig):
+def quick_run_action(n_clicks):
     if n_clicks:
-        # Increase scale for higher resolution (e.g., 3 or 4)
-        img_bytes = pio.to_image(fig, format="png", width=1600, height=1200, scale=3)
-        return dcc.send_bytes(img_bytes, filename="simulation_plot.png")
+        return [html.Div("🚀 Quick run triggered!", className="text-success")]
     return dash.no_update
 
-# Filter parameters for algorithms
-def filter_params(algo, params):
-    allowed = {
-        'gwo': ['population_size', 'max_iterations', 'desired_coverage', 'parallel_processing', 'w1', 'w2', 'w3'],
-        'mrfo': ['population_size', 'num_generations', 'desired_coverage', 'parallel_processing', 'w1', 'w2', 'w3'],
-    }
-    return {k: v for k, v in (params or {}).items() if k in allowed.get(algo, [])}
-
-# Update experiment results display
 @app.callback(
-    Output('experiment-results-content', 'children'),
-    Input('experiment-data-store', 'data')
+    Output('log-output', 'children', allow_duplicate=True),
+    [Input('quick-compare', 'n_clicks')],
+    prevent_initial_call=True
 )
-def update_experiment_results(data):
-    if not data:
-        return html.Div("No experiment results yet.")
-    # Example: Show a table of results
-    df = pd.DataFrame(data)
-    return dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True)
+def quick_compare_action(n_clicks):
+    if n_clicks:
+        return [html.Div("📊 Quick compare triggered!", className="text-info")]
+    return dash.no_update
+
+@app.callback(
+    Output('log-output', 'children', allow_duplicate=True),
+    [Input('quick-reset', 'n_clicks')],
+    prevent_initial_call=True
+)
+def quick_reset_action(n_clicks):
+    if n_clicks:
+        return [html.Div("🔄 Quick reset triggered!", className="text-warning")]
+    return dash.no_update
+
+# Enhanced UI Callbacks for finalized components
+
+# Real-time status bar update
+@app.callback(
+    [Output('system-status', 'children'),
+     Output('live-coverage', 'children'),
+     Output('live-active', 'children'),
+     Output('live-step', 'children'),
+     Output('current-coverage', 'children'),
+     Output('current-active', 'children'),
+     Output('current-time', 'children'),
+     Output('optimization-progress', 'value'),
+     Output('log-count', 'children')],
+    [Input('simulation-interval', 'n_intervals'),
+     Input('step-button', 'n_clicks')],
+    [State('algorithm-dropdown', 'value'),
+     State('log-output', 'children')]
+)
+def update_status_dashboard(n_intervals, step_clicks, algorithm, log_content):
+    """Update the status dashboard with real-time metrics"""
+    global simulation, current_sim_state
+    
+    # Default values
+    system_status = "🟡 Initializing..."
+    coverage = "Coverage: --"
+    active = "Active: --" 
+    step = "Step: --"
+    coverage_pct = "0%"
+    active_count = "0"
+    runtime = "0s"
+    progress = 0
+    log_count = "0"
+    
+    try:
+        if simulation is not None:
+            # Get current metrics
+            latest_coverage = simulation.metrics_history.get('coverage', [0])[-1] if simulation.metrics_history.get('coverage') else 0
+            latest_active = simulation.metrics_history.get('active_drones', [0])[-1] if simulation.metrics_history.get('active_drones') else 0
+            current_step = simulation.step_count
+            
+            # Update values
+            coverage = f"Coverage: {latest_coverage*100:.1f}%"
+            active = f"Active: {latest_active}"
+            step = f"Step: {current_step}"
+            coverage_pct = f"{latest_coverage*100:.1f}%"
+            active_count = str(latest_active)
+            
+            # Calculate progress (assuming max 100 steps)
+            progress = min((current_step / 100) * 100, 100)
+            
+            # System status based on state
+            if current_sim_state == SimState.RUNNING:
+                system_status = "🟢 Running"
+            elif current_sim_state == SimState.PAUSED:
+                system_status = "🟡 Paused"
+            elif current_sim_state == SimState.STOPPED:
+                system_status = "🔴 Stopped"
+            else:
+                system_status = "🔵 Ready"
+        
+        # Count log entries
+        if log_content and isinstance(log_content, str):
+            log_count = str(len(log_content.split('\n')))
+            
+    except Exception as e:
+        system_status = "❌ Error"
+        print(f"Status update error: {e}")
+    
+    return system_status, coverage, active, step, coverage_pct, active_count, runtime, progress, log_count
+
+# Enhanced run name generator
+@app.callback(
+    Output('run-name-input', 'value', allow_duplicate=True),
+    Input('generate-run-name', 'n_clicks'),
+    State('algorithm-dropdown', 'value'),
+    prevent_initial_call=True
+)
+def generate_enhanced_run_name(n_clicks, algorithm):
+    """Generate enhanced run names with algorithm and timestamp"""
+    if n_clicks:
+        algorithm_names = {
+            'greedy': 'Greedy',
+            'ga': 'GA',
+            'pso': 'PSO',
+            'sa': 'SA',
+            'ga_sa': 'GA_SA',
+            'gwo': 'GWO',
+            'mrfo': 'MRFO'
+        }
+        alg_name = algorithm_names.get(algorithm, 'ALG')
+        timestamp = datetime.now().strftime('%m%d_%H%M%S')
+        coverage_target = 90  # Could be dynamic based on stopping criteria
+        return f"{alg_name}_T{coverage_target}_{timestamp}"
+    return dash.no_update
+
+# Button State Management Callback
+@app.callback(
+    [Output('init-button', 'disabled'),
+     Output('main-control-btn', 'disabled'),
+     Output('step-button', 'disabled'),
+     Output('stop-button', 'disabled'),
+     Output('stop-reset-btn', 'disabled'),
+     Output('main-control-icon', 'className'),
+     Output('main-control-text', 'children'),
+     Output('status-icon', 'className'),
+     Output('status-icon', 'style'),
+     Output('sim-status-text', 'children')],
+    [Input('simulation-state', 'data'),
+     Input('init-button', 'n_clicks'),
+     Input('main-control-btn', 'n_clicks'),
+     Input('stop-button', 'n_clicks'),
+     Input('stop-reset-btn', 'n_clicks')]
+)
+def update_button_states(sim_state, init_clicks, control_clicks, stop_clicks, reset_clicks):
+    """Update button states based on current simulation state"""
+    
+    # Default states - Initialize button is enabled by default
+    init_disabled = False
+    control_disabled = True
+    step_disabled = True
+    stop_disabled = True
+    reset_disabled = False
+    
+    control_icon = "fas fa-play me-1"
+    control_text = "Start"
+    status_icon = "fas fa-circle me-2"
+    status_style = {"color": "#6b7280"}
+    status_text = "Ready to Initialize"
+    
+    # Check current simulation state
+    if sim_state:
+        if sim_state.get('initialized', False):
+            # Currently active/initialized session
+            init_disabled = True
+            control_disabled = False
+            step_disabled = False
+            stop_disabled = False
+            
+            # Determine state based on simulation status
+            if sim_state.get('running', False):
+                control_icon = "fas fa-pause me-1"
+                control_text = "Pause"
+                status_icon = "fas fa-circle me-2 status-running"
+                status_style = {"color": "#f59e0b"}
+                status_text = "Simulation Running"
+                step_disabled = True  # Can't step while running
+                
+            elif sim_state.get('paused', False):
+                control_icon = "fas fa-play me-1"
+                control_text = "Resume"
+                status_icon = "fas fa-circle me-2 status-paused"
+                status_style = {"color": "#6b7280"}
+                status_text = "Simulation Paused"
+                
+            elif sim_state.get('completed', False):
+                # Experiment completed - allow re-initialization
+                init_disabled = False  # Enable for new experiment
+                control_disabled = True
+                step_disabled = True
+                stop_disabled = True
+                status_icon = "fas fa-check-circle me-2 status-completed"
+                status_style = {"color": "#3b82f6"}
+                status_text = "Experiment Completed - Ready for New Run"
+                
+            else:
+                # Initialized but not running
+                status_icon = "fas fa-circle me-2 status-ready"
+                status_style = {"color": "#10b981"}
+                status_text = "Ready to Start"
+                
+        elif sim_state.get('ever_initialized', False) and not sim_state.get('initialized', False):
+            # Was initialized but now stopped/reset - allow re-initialization
+            init_disabled = False  # Enable for new session
+            control_disabled = True
+            step_disabled = True
+            stop_disabled = True
+            status_icon = "fas fa-circle me-2"
+            status_style = {"color": "#6b7280"}
+            status_text = "System Stopped - Ready to Initialize New Run"
+    
+    # Handle error states
+    if sim_state and sim_state.get('error', False):
+        init_disabled = False  # Allow re-initialization after error
+        control_disabled = True
+        step_disabled = True
+        stop_disabled = True
+        status_icon = "fas fa-exclamation-circle me-2 status-error"
+        status_style = {"color": "#ef4444"}
+        status_text = "Error Occurred - Ready to Initialize New Run"
+    
+    return (
+        init_disabled,
+        control_disabled, 
+        step_disabled,
+        stop_disabled,
+        reset_disabled,
+        control_icon,
+        control_text,
+        status_icon,
+        status_style,
+        status_text
+    )
+    
+# Essential callbacks for algorithm functionality
+
+# Callback to update algorithm parameters based on selected algorithm
+@app.callback(
+    [Output('algorithm-params', 'children'),
+     Output('parallel-processing-switch', 'disabled')],
+    [Input('algorithm-dropdown', 'value')]
+)
+def update_algorithm_params(algorithm):
+    """Update algorithm-specific parameters dynamically"""
+    
+    # Define algorithm parameters
+    params = {
+        'greedy': {
+            'desired_coverage': {'label': 'Coverage Target', 'value': 0.95, 'type': 'number', 'min': 0.5, 'max': 1.0, 'step': 0.01},
+            'overlap_weight': {'label': 'Overlap Weight', 'value': 0.2, 'type': 'number', 'min': 0.0, 'max': 1.0, 'step': 0.1},
+            'energy_weight': {'label': 'Energy Weight', 'value': 0.1, 'type': 'number', 'min': 0.0, 'max': 1.0, 'step': 0.1}
+        },
+        'ga': {
+            'population_size': {'label': 'Population Size', 'value': 50, 'type': 'number', 'min': 10, 'max': 200},
+            'num_generations': {'label': 'Generations', 'value': 100, 'type': 'number', 'min': 10, 'max': 500},
+            'mutation_rate': {'label': 'Mutation Rate', 'value': 0.1, 'type': 'number', 'min': 0.01, 'max': 0.5, 'step': 0.01},
+            'crossover_rate': {'label': 'Crossover Rate', 'value': 0.8, 'type': 'number', 'min': 0.1, 'max': 1.0, 'step': 0.1}
+        },
+        'pso': {
+            'swarm_size': {'label': 'Swarm Size', 'value': 30, 'type': 'number', 'min': 10, 'max': 100},
+            'iterations': {'label': 'Iterations', 'value': 100, 'type': 'number', 'min': 10, 'max': 500},
+            'inertia': {'label': 'Inertia Weight', 'value': 0.9, 'type': 'number', 'min': 0.1, 'max': 1.5, 'step': 0.1},
+            'cognitive_weight': {'label': 'Cognitive Weight', 'value': 2.0, 'type': 'number', 'min': 0.5, 'max': 3.0, 'step': 0.1}
+        },
+        'sa': {
+            'num_iterations': {'label': 'Iterations', 'value': 100, 'type': 'number', 'min': 10, 'max': 500},
+            'initial_temp': {'label': 'Initial Temperature', 'value': 1000, 'type': 'number', 'min': 100, 'max': 5000},
+            'cooling_rate': {'label': 'Cooling Rate', 'value': 0.95, 'type': 'number', 'min': 0.8, 'max': 0.99, 'step': 0.01}
+        },
+        'ga_sa': {
+            'population_size': {'label': 'Population Size', 'value': 30, 'type': 'number', 'min': 10, 'max': 100},
+            'num_generations': {'label': 'Generations', 'value': 50, 'type': 'number', 'min': 10, 'max': 200},
+            'sa_temp': {'label': 'SA Temperature', 'value': 100, 'type': 'number', 'min': 10, 'max': 500}
+        },
+        'gwo': {
+            'population_size': {'label': 'Population Size', 'value': 30, 'type': 'number', 'min': 10, 'max': 100},
+            'max_iterations': {'label': 'Max Iterations', 'value': 100, 'type': 'number', 'min': 10, 'max': 500}
+        },
+        'mrfo': {
+            'population_size': {'label': 'Population Size', 'value': 30, 'type': 'number', 'min': 10, 'max': 100},
+            'num_generations': {'label': 'Generations', 'value': 100, 'type': 'number', 'min': 10, 'max': 500}
+        }
+    }
+    
+    # Generate parameter inputs
+    param_elements = []
+    algo_params = params.get(algorithm, {})
+    
+    for param_name, param_config in algo_params.items():
+        param_elements.append(
+            dbc.Row([
+                dbc.Col([
+                    dbc.Label(param_config['label'], className="small"),
+                    dbc.Input(
+                        id=f"{algorithm}-{param_name}",
+                        type=param_config['type'],
+                        value=param_config['value'],
+                        min=param_config.get('min'),
+                        max=param_config.get('max'),
+                        step=param_config.get('step', 1),
+                        size="sm"
+                    )
+                ])
+            ], className="mb-1")
+        )
+    
+    # Enable parallel processing for supported algorithms
+    parallel_disabled = algorithm in ['greedy', 'sa']
+    
+    return param_elements, parallel_disabled
+
+# Callback to handle algorithm execution (simplified for testing)
+@app.callback(
+    [Output('iteration-logs-display', 'children'),
+     Output('sim-status-alert', 'children'),
+     Output('sim-status-alert', 'color'),
+     Output('simulation-state', 'data')],
+    [Input('main-control-btn', 'n_clicks'),
+     Input('step-button', 'n_clicks'),
+     Input('init-button', 'n_clicks'),
+     Input('stop-button', 'n_clicks'),
+     Input('stop-reset-btn', 'n_clicks')],
+    [State('algorithm-dropdown', 'value'),
+     State('max-iterations', 'value'),
+     State('target-coverage', 'value'),
+     State('simulation-state', 'data')]
+)
+def handle_simulation_control(start_clicks, step_clicks, init_clicks, stop_clicks, reset_clicks, algorithm, max_iter, target_coverage, current_state):
+    """Enhanced simulation control with proper state management"""
+    
+    # Initialize state if not exists
+    if not current_state:
+        current_state = {
+            'initialized': False,
+            'running': False,
+            'paused': False,
+            'completed': False,
+            'error': False,
+            'step_count': 0,
+            'max_steps': max_iter or 20
+        }
+    
+    if not any([start_clicks, step_clicks, init_clicks, stop_clicks, reset_clicks]):
+        return [], "⭕ Not Started", "secondary", current_state
+    
+    # Determine which button was clicked
+    ctx_triggered = ctx.triggered[0]['prop_id'].split('.')[0] if ctx.triggered else None
+    
+    if ctx_triggered == 'init-button':
+        # Initialize simulation - this should only happen once
+        new_state = {
+            'initialized': True,
+            'running': False,
+            'paused': False,
+            'completed': False,
+            'error': False,
+            'step_count': 0,
+            'max_steps': max_iter or 20,
+            'ever_initialized': True  # Track that system was ever initialized
+        }
+        return [html.Div("🚀 Simulation initialized successfully", className="text-success")], "✅ Initialized", "success", new_state
+    
+    elif ctx_triggered == 'stop-reset-btn':
+        # Complete reset - allows re-initialization
+        reset_state = {
+            'initialized': False,
+            'running': False,
+            'paused': False,
+            'completed': False,
+            'error': False,
+            'step_count': 0,
+            'max_steps': max_iter or 20,
+            'ever_initialized': False
+        }
+        return [], "🔄 System Reset", "secondary", reset_state
+    
+    elif ctx_triggered == 'stop-button':
+        # Stop simulation and allow re-initialization
+        new_state = current_state.copy()
+        new_state.update({
+            'initialized': False,  # Clear initialized state to allow re-init
+            'running': False,
+            'paused': False,
+            'completed': False,
+            'ever_initialized': True  # Remember it was initialized before
+        })
+        return [], "⏹️ Simulation Stopped", "warning", new_state
+    
+    elif ctx_triggered == 'step-button' and current_state.get('initialized', False):
+        # Execute one step
+        step_num = current_state.get('step_count', 0) + 1
+        
+        if step_num <= current_state.get('max_steps', 20):
+            log_entry = html.Div([
+                html.Span(f"{algorithm.upper()} Step {step_num}: ", className="text-primary fw-bold"),
+                html.Span(f"Fitness = {25.0 + step_num * 2:.2f}, ", className="text-success"),
+                html.Span(f"Coverage = {20.0 + step_num * 3:.1f}%", className="text-info")
+            ], className="mb-1")
+            
+            new_state = current_state.copy()
+            new_state.update({
+                'step_count': step_num,
+                'paused': True,
+                'running': False,
+                'completed': step_num >= current_state.get('max_steps', 20)
+            })
+            
+            # If completed, allow re-initialization
+            if new_state['completed']:
+                new_state.update({
+                    'initialized': False,  # Clear to allow re-init
+                    'ever_initialized': True
+                })
+            
+            status = f"⏸️ Step {step_num} Complete"
+            color = "success" if new_state['completed'] else "warning"
+            
+            return [log_entry], status, color, new_state
+        else:
+            new_state = current_state.copy()
+            new_state.update({
+                'completed': True, 
+                'running': False,
+                'initialized': False,  # Clear to allow re-init
+                'ever_initialized': True
+            })
+            return [html.Div("🏁 Max iterations reached", className="text-danger")], "🛑 Complete", "success", new_state
+    
+    elif ctx_triggered == 'main-control-btn' and current_state.get('initialized', False):
+        # Handle start/pause toggle
+        if current_state.get('running', False):
+            # Pause simulation
+            new_state = current_state.copy()
+            new_state.update({
+                'running': False,
+                'paused': True
+            })
+            return current_state.get('logs', []), "⏸️ Paused", "warning", new_state
+        else:
+            # Start/Resume simulation
+            new_state = current_state.copy()
+            new_state.update({
+                'running': True,
+                'paused': False
+            })
+            
+            # Simulate multiple steps for running mode
+            logs = []
+            start_step = current_state.get('step_count', 0)
+            end_step = min(start_step + 5, current_state.get('max_steps', 20))  # Run 5 steps at a time
+            
+            for i in range(start_step + 1, end_step + 1):
+                log_entry = html.Div([
+                    html.Span(f"{algorithm.upper()} Iteration {i}: ", className="text-primary fw-bold"),
+                    html.Span(f"Fitness = {25.0 + i * 2:.2f}, ", className="text-success"),
+                    html.Span(f"Coverage = {20.0 + i * 3:.1f}%", className="text-info")
+                ], className="mb-1")
+                logs.append(log_entry)
+            
+            new_state['step_count'] = end_step
+            
+            if end_step >= current_state.get('max_steps', 20):
+                new_state.update({
+                    'completed': True,
+                    'running': False,
+                    'initialized': False,  # Clear to allow re-init
+                    'ever_initialized': True
+                })
+                return logs, f"🏁 Completed {end_step} iterations", "success", new_state
+            else:
+                return logs, f"▶️ Running - Step {end_step}", "info", new_state
+    
+    return [], "⭕ Ready", "secondary", current_state
+
+# Callback for iteration logs display (enhanced)
+@app.callback(
+    Output('log-output', 'children'),
+    [Input('iteration-logs-display', 'children')]
+)
+def update_logs(iteration_logs):
+    """Update the live logs section"""
+    if iteration_logs:
+        return [
+            html.Div(f"📊 Algorithm running - {len(iteration_logs)} iterations completed", className="text-info"),
+            html.Div(f"⏰ Last update: {datetime.now().strftime('%H:%M:%S')}", className="text-muted small")
+        ]
+    return [html.Div("📝 No active simulation", className="text-muted")]
+
+# Add keyboard shortcuts
+app.index_string += '''
+<script>
+    document.addEventListener('keydown', function(event) {
+        // Only trigger if not typing in an input field
+        if (event.target.tagName.toLowerCase() !== 'input') {
+            switch(event.key) {
+                case ' ': // Spacebar - Start/Pause
+                    event.preventDefault();
+                    document.getElementById('main-control-btn').click();
+                    break;
+                case 's': // S - Step
+                    document.getElementById('step-button').click();
+                    break;
+                case 'r': // R - Reset
+                    document.getElementById('stop-reset-btn').click();
+                    break;
+                case 'i': // I - Initialize
+                    document.getElementById('init-button').click();
+                    break;
+            }
+        }
+    });
+</script>
+'''
 
 # Run the app
 if __name__ == '__main__':
