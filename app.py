@@ -1187,7 +1187,7 @@ def control_simulation_state(start_pause_clicks, stop_clicks, reset_clicks, sim_
     triggered_id = ctx.triggered_id
     
     if triggered_id == 'main-control-btn':
-        if sim_state['status'] == 'running':
+        if sim_state.get('status') == 'running':
             sim_state['status'] = 'paused'
             current_sim_state = SimState.PAUSED
             return sim_state, True # Disable interval
@@ -1231,32 +1231,22 @@ def update_simulation(n_intervals, step_clicks, sim_state, algorithm, algo_param
     is_step = triggered_id == 'step-button'
     
     # Do nothing if not running, or if stepping but not in a valid state
-    if not sim_state or sim_state['status'] not in ['running', 'paused', 'initialized']:
-        return dash.no_update
+    if not sim_state or sim_state.get('status') not in ['running', 'paused', 'initialized']:
+        return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
 
-    if sim_state['status'] == 'running' and is_step:
-        return dash.no_update # Don't step while auto-running
+    if sim_state.get('status') == 'running' and is_step:
+        return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update # Don't step while auto-running
 
-    if sim_state['status'] in ['paused', 'initialized'] and not is_step:
-        return dash.no_update # Don't auto-run if paused
+    if sim_state.get('status') in ['paused', 'initialized'] and not is_step:
+        return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update # Don't auto-run if paused
 
     # --- Parameter Gathering and Filtering ---
-    # This part is crucial and was missing.
-    # A proper implementation would use pattern-matching on all param inputs.
-    # For now, we'll assume they are collected into `algorithm-params-store`.
-    # Since that store isn't populated yet, we'll use the robust defaults.
-    
-    # The `filter_params` function is now available globally in this file.
-    # A truly robust solution would gather all `State` from the UI here.
-    # Let's simulate that for now.
     algo_params = filter_params(algorithm, {}) # Using defaults for stability
 
     # --- Termination Condition Check ---
     stop_reason = None
-    if sim_state['iteration'] >= sim_state.get('max_iterations', 500):
+    if sim_state.get('iteration', 0) >= sim_state.get('max_iterations', 500):
         stop_reason = f"Maximum iterations ({sim_state['max_iterations']}) reached."
-    
-    # Add other checks for coverage, time, etc. here
     
     if stop_reason:
         sim_state['status'] = 'stopped'
@@ -1266,11 +1256,7 @@ def update_simulation(n_intervals, step_clicks, sim_state, algorithm, algo_param
 
     # --- Execute one simulation step ---
     try:
-        # This is where the selected algorithm is called
-        # For this example, we use a placeholder step function
-        
         # Placeholder for actual algorithm call
-        # e.g., best_placements, metrics = greedy_optimization(simulation, **algo_params)
         simulation.drones = np.random.rand(simulation.num_drones, 2) * 100
         simulation.update_metrics()
         
@@ -1312,7 +1298,7 @@ def update_simulation(n_intervals, step_clicks, sim_state, algorithm, algo_param
      Output('main-control-btn', 'disabled'),
      Output('step-button', 'disabled'),
      Output('stop-button', 'disabled'),
-     Output('main-control-icon', 'className'),
+     Output('main-control-icon', 'className),
      Output('main-control-text', 'children'),
      Output('sim-status-text', 'children')],
     [Input('simulation-state', 'data')]
@@ -1337,20 +1323,39 @@ def update_button_states(sim_state):
     # Default case (e.g., after reset)
     return False, True, True, True, "fas fa-play", "Start", "Ready to Initialize"
 
-
-# Callback for iteration logs display (enhanced)
+# Algorithm parameter display and filtering
 @app.callback(
-    Output('log-output', 'children'),
-    [Input('iteration-logs-display', 'children')]
+    [Output('algorithm-params', 'children'),
+     Output('parallel-processing-switch', 'disabled')],
+    [Input('algorithm-dropdown', 'value')],
+    prevent_initial_call=True
 )
-def update_logs(iteration_logs):
-    """Update the live logs section"""
-    if iteration_logs:
-        return [
-            html.Div(f"📊 Algorithm running - {len(iteration_logs)} iterations completed", className="text-info"),
-            html.Div(f"⏰ Last update: {datetime.now().strftime('%H:%M:%S')}", className="text-muted small")
-        ]
-    return [html.Div("📝 No active simulation", className="text-muted")]
+def update_algorithm_params_display(selected_algorithm):
+    """Update the algorithm parameters display based on the selected algorithm."""
+    if not selected_algorithm:
+        return "", True # Disable parallel processing by default
+
+    # Retrieve and format the parameters for the selected algorithm
+    params = filter_params(selected_algorithm, {})
+    param_elements = [
+        html.Div([
+            html.Label(f"{key.replace('_', ' ').title()}", className="form-label"),
+            dbc.Input(
+                id={"type": "param-input", "index": key},
+                value=params[key],
+                type="number",
+                step=0.01,
+                className="form-control form-control-sm"
+            ),
+            html.Small("Default: " + str(ALGORITHM_DEFAULT_PARAMS[selected_algorithm][key]), className="text-muted")
+        ], className="mb-2")
+        for key in params
+    ]
+    
+    # Enable parallel processing for supported algorithms
+    parallel_disabled = algorithm in ['greedy', 'sa']
+    
+    return param_elements, parallel_disabled
 
 # Add keyboard shortcuts
 app.index_string += '''
