@@ -8,9 +8,9 @@ Author: Drone Optimization System
 """
 
 # Version information
-__version__ = "2.1.0"
+__version__ = "2.2.0"
 __author__ = "Drone Optimization System"
-__last_updated__ = "2025-07-30"
+__last_updated__ = "2025-07-31"
 __description__ = "Enhanced Drone Optimization Simulation System with Multi-Algorithm Support"
 
 import dash
@@ -26,6 +26,7 @@ import os
 import logging
 import base64
 import io
+import time
 try:
     import openpyxl
     import xlsxwriter
@@ -45,7 +46,6 @@ ALGORITHM_CONFIGS = {
         'complexity': 'O(n²)',
         'recommended_for': 'Quick results, small to medium problems',
         'params': {
-            'max_iterations': {'default': 500, 'min': 50, 'max': 2000, 'step': 50},
             'coverage_target': {'default': 0.95, 'min': 0.5, 'max': 1.0, 'step': 0.01},
             'overlap_penalty': {'default': 0.3, 'min': 0.0, 'max': 1.0, 'step': 0.05}
         }
@@ -69,7 +69,6 @@ ALGORITHM_CONFIGS = {
         'recommended_for': 'Continuous optimization, fast convergence',
         'params': {
             'swarm_size': {'default': 40, 'min': 20, 'max': 100, 'step': 10},
-            'max_iterations': {'default': 150, 'min': 50, 'max': 500, 'step': 10},
             'inertia': {'default': 0.7, 'min': 0.1, 'max': 1.0, 'step': 0.05},
             'cognitive': {'default': 1.5, 'min': 0.5, 'max': 3.0, 'step': 0.1},
             'social': {'default': 1.5, 'min': 0.5, 'max': 3.0, 'step': 0.1}
@@ -83,8 +82,7 @@ ALGORITHM_CONFIGS = {
         'params': {
             'initial_temp': {'default': 1000, 'min': 100, 'max': 5000, 'step': 100},
             'cooling_rate': {'default': 0.95, 'min': 0.8, 'max': 0.99, 'step': 0.01},
-            'min_temp': {'default': 1, 'min': 0.1, 'max': 10, 'step': 0.1},
-            'max_iterations': {'default': 200, 'min': 50, 'max': 1000, 'step': 50}
+            'min_temp': {'default': 1, 'min': 0.1, 'max': 10, 'step': 0.1}
         }
     },
     'ga_sa': {
@@ -106,7 +104,6 @@ ALGORITHM_CONFIGS = {
         'recommended_for': 'Multi-modal optimization, exploration',
         'params': {
             'pack_size': {'default': 35, 'min': 20, 'max': 80, 'step': 5},
-            'max_iterations': {'default': 120, 'min': 50, 'max': 400, 'step': 10},
             'a_decay': {'default': 2, 'min': 1, 'max': 4, 'step': 0.1},
             'leadership_factor': {'default': 0.8, 'min': 0.5, 'max': 1.0, 'step': 0.05}
         }
@@ -118,7 +115,6 @@ ALGORITHM_CONFIGS = {
         'recommended_for': 'Global optimization, balanced search',
         'params': {
             'population_size': {'default': 45, 'min': 25, 'max': 90, 'step': 5},
-            'max_iterations': {'default': 140, 'min': 60, 'max': 350, 'step': 10},
             'beta': {'default': 2, 'min': 1, 'max': 5, 'step': 0.1},
             'somersault_factor': {'default': 0.5, 'min': 0.1, 'max': 1.0, 'step': 0.05}
         }
@@ -193,8 +189,7 @@ app.layout = dbc.Container([
                             ],
                             value='greedy',
                             className="mb-3"
-                        ),
-                        html.Div(id='algorithm-info', className="mb-3")
+                        )
                     ]),
                     
                     # Environment Settings
@@ -260,7 +255,7 @@ app.layout = dbc.Container([
                                 dbc.Input(
                                     id="max-iterations",
                                     type="number",
-                                    value=100,
+                                    value=500,
                                     min=20, max=5000, step=10,
                                     placeholder="Max Iterations"
                                 ),
@@ -292,8 +287,8 @@ app.layout = dbc.Container([
                                 dbc.Input(
                                     id="stagnation-limit",
                                     type="number",
-                                    value=15,
-                                    min=5, max=50, step=1,
+                                    value=50,
+                                    min=5, max=100, step=1,
                                     placeholder="Stagnation Limit"
                                 ),
                                 html.Small("Stagnation Limit", className="text-muted small")
@@ -438,31 +433,6 @@ app.layout = dbc.Container([
     
 ], fluid=True, className="py-3")
 
-# Algorithm Info Callback
-@app.callback(
-    Output('algorithm-info', 'children'),
-    Input('algorithm-dropdown', 'value')
-)
-def update_algorithm_info(selected_algorithm):
-    if not selected_algorithm:
-        return ""
-    
-    config = ALGORITHM_CONFIGS[selected_algorithm]
-    
-    return dbc.Alert([
-        html.Strong(config['name']),
-        html.Br(),
-        config['description'],
-        html.Br(),
-        html.Small([
-            html.Strong("Complexity: "),
-            config['complexity'],
-            html.Br(),
-            html.Strong("Best for: "),
-            config['recommended_for']
-        ])
-    ], color="info")
-
 # Algorithm Parameters Callback
 @app.callback(
     [Output('algorithm-params', 'children'),
@@ -474,20 +444,20 @@ def update_algorithm_info(selected_algorithm):
 )
 def update_algorithm_params(selected_algorithm):
     if not selected_algorithm:
-        return "", 100, 85.0, 0.5, 15
+        return "", 500, 85.0, 0.5, 50
     
     config = ALGORITHM_CONFIGS[selected_algorithm]
     params = config.get('params', {})
     
     # Default stopping criteria for each algorithm
     stopping_defaults = {
-        'greedy': {'max_iter': 100, 'target': 90.0, 'threshold': 0.5, 'stagnation': 10},
-        'ga': {'max_iter': 150, 'target': 85.0, 'threshold': 0.3, 'stagnation': 15},
-        'pso': {'max_iter': 80, 'target': 88.0, 'threshold': 0.4, 'stagnation': 12},
-        'sa': {'max_iter': 120, 'target': 82.0, 'threshold': 0.6, 'stagnation': 20},
-        'ga_sa': {'max_iter': 100, 'target': 89.0, 'threshold': 0.25, 'stagnation': 12},
-        'gwo': {'max_iter': 90, 'target': 86.0, 'threshold': 0.35, 'stagnation': 14},
-        'mrfo': {'max_iter': 75, 'target': 87.0, 'threshold': 0.3, 'stagnation': 10}
+        'greedy': {'max_iter': 500, 'target': 90.0, 'threshold': 0.5, 'stagnation': 50},
+        'ga': {'max_iter': 500, 'target': 85.0, 'threshold': 0.3, 'stagnation': 50},
+        'pso': {'max_iter': 500, 'target': 88.0, 'threshold': 0.4, 'stagnation': 50},
+        'sa': {'max_iter': 500, 'target': 82.0, 'threshold': 0.6, 'stagnation': 50},
+        'ga_sa': {'max_iter': 500, 'target': 89.0, 'threshold': 0.25, 'stagnation': 50},
+        'gwo': {'max_iter': 500, 'target': 86.0, 'threshold': 0.35, 'stagnation': 50},
+        'mrfo': {'max_iter': 500, 'target': 87.0, 'threshold': 0.3, 'stagnation': 50}
     }
     
     defaults = stopping_defaults.get(selected_algorithm, stopping_defaults['greedy'])
@@ -639,7 +609,7 @@ def control_simulation(run_clicks, stop_clicks, reset_clicks,
             convergence_data = []
             
             # Use user-defined stopping criteria - IMPORTANT: Use user input directly
-            max_iter = max_iterations or 100
+            max_iter = max_iterations or 500
             logger.info(f"✅ Algorithm will run for maximum {max_iter} iterations")
             
             # Algorithm-specific simulation parameters with user-defined stopping criteria
@@ -649,7 +619,7 @@ def control_simulation(run_clicks, stop_clicks, reset_clicks,
                     'max_iterations': max_iter, 
                     'convergence_threshold': convergence_threshold or 0.5, 
                     'min_improvement': 0.1,
-                    'stagnation_limit': stagnation_limit or 10, 
+                    'stagnation_limit': stagnation_limit or 50, 
                     'target_coverage': target_coverage or 90.0
                 },
                 'ga': {
@@ -657,7 +627,7 @@ def control_simulation(run_clicks, stop_clicks, reset_clicks,
                     'max_iterations': max_iter, 
                     'convergence_threshold': convergence_threshold or 0.3, 
                     'min_improvement': 0.15,
-                    'stagnation_limit': stagnation_limit or 15, 
+                    'stagnation_limit': stagnation_limit or 50, 
                     'target_coverage': target_coverage or 85.0
                 },
                 'pso': {
@@ -665,7 +635,7 @@ def control_simulation(run_clicks, stop_clicks, reset_clicks,
                     'max_iterations': max_iter, 
                     'convergence_threshold': convergence_threshold or 0.4, 
                     'min_improvement': 0.2,
-                    'stagnation_limit': stagnation_limit or 12, 
+                    'stagnation_limit': stagnation_limit or 50, 
                     'target_coverage': target_coverage or 88.0
                 },
                 'sa': {
@@ -673,7 +643,7 @@ def control_simulation(run_clicks, stop_clicks, reset_clicks,
                     'max_iterations': max_iter, 
                     'convergence_threshold': convergence_threshold or 0.6, 
                     'min_improvement': 0.08,
-                    'stagnation_limit': stagnation_limit or 20, 
+                    'stagnation_limit': stagnation_limit or 50, 
                     'target_coverage': target_coverage or 82.0
                 },
                 'ga_sa': {
@@ -681,7 +651,7 @@ def control_simulation(run_clicks, stop_clicks, reset_clicks,
                     'max_iterations': max_iter, 
                     'convergence_threshold': convergence_threshold or 0.25, 
                     'min_improvement': 0.12,
-                    'stagnation_limit': stagnation_limit or 12, 
+                    'stagnation_limit': stagnation_limit or 50, 
                     'target_coverage': target_coverage or 89.0
                 },
                 'gwo': {
@@ -689,7 +659,7 @@ def control_simulation(run_clicks, stop_clicks, reset_clicks,
                     'max_iterations': max_iter, 
                     'convergence_threshold': convergence_threshold or 0.35, 
                     'min_improvement': 0.1,
-                    'stagnation_limit': stagnation_limit or 14, 
+                    'stagnation_limit': stagnation_limit or 50, 
                     'target_coverage': target_coverage or 86.0
                 },
                 'mrfo': {
@@ -697,7 +667,7 @@ def control_simulation(run_clicks, stop_clicks, reset_clicks,
                     'max_iterations': max_iter, 
                     'convergence_threshold': convergence_threshold or 0.3, 
                     'min_improvement': 0.15,
-                    'stagnation_limit': stagnation_limit or 10, 
+                    'stagnation_limit': stagnation_limit or 50, 
                     'target_coverage': target_coverage or 87.0
                 }
             }
