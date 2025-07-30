@@ -1,8 +1,40 @@
+"""
+DRONE OPTIMIZATION ALGORITHMS - ENHANCED VERSION
+Multi-algorithm optimization suite for drone coverage optimization
+Version: 2.1.0
+Last Updated: 2025-07-30
+Author: Drone Optimization System
+"""
+
 import numpy as np
 import random
 from multiprocessing import Pool, cpu_count
 import concurrent.futures
 import time
+
+# Version information
+__version__ = "2.1.0"
+__author__ = "Drone Optimization System"
+__last_updated__ = "2025-07-30"
+__description__ = "Multi-algorithm optimization suite for drone coverage optimization"
+
+def get_version_info():
+    """Returns version information as a dictionary"""
+    return {
+        'version': __version__,
+        'author': __author__,
+        'last_updated': __last_updated__,
+        'description': __description__,
+        'algorithms': [
+            'GreedyAlgorithm',
+            'GeneticAlgorithm',
+            'ParticleSwarmOptimization', 
+            'SimulatedAnnealing',
+            'HybridGASA',
+            'GreyWolfOptimizer',
+            'MantaRayForaging'
+        ]
+    }
 
 class AlgorithmResult:
     """Class to store algorithm results and metadata"""

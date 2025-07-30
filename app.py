@@ -2,7 +2,16 @@
 """
 DRONE OPTIMIZATION SIMULATION SYSTEM - ENHANCED VERSION
 Full-featured version with comprehensive results, charts, tables, and Excel export
+Version: 2.1.0
+Last Updated: 2025-07-30
+Author: Drone Optimization System
 """
+
+# Version information
+__version__ = "2.1.0"
+__author__ = "Drone Optimization System"
+__last_updated__ = "2025-07-30"
+__description__ = "Enhanced Drone Optimization Simulation System with Multi-Algorithm Support"
 
 import dash
 from dash import dcc, html, Input, Output, State, ctx, dash_table
@@ -130,10 +139,14 @@ app = dash.Dash(
 # Import core modules
 try:
     from algorithms import *
+    # Import version info from algorithms module
+    from algorithms import __version__ as algo_version, __last_updated__ as algo_updated
     from environment import *
     from helpers import *
     logger.info("✅ Core modules imported successfully")
 except ImportError as e:
+    algo_version = "Unknown"
+    algo_updated = "Unknown"
     logger.warning(f"⚠️ Some modules not available: {e}")
 
 # Main App Layout - Simple and Clean
@@ -146,8 +159,13 @@ app.layout = dbc.Container([
                     html.I(className="fas fa-drone me-3 text-primary"),
                     "Drone Optimization System"
                 ], className="text-center mb-2 fw-bold"),
-                html.P("Multi-Algorithm Optimization Platform", 
-                      className="text-center text-muted mb-4 fs-5")
+                html.P([
+                    "Multi-Algorithm Optimization Platform ",
+                    html.Span([
+                        html.I(className="fas fa-code-branch me-1 text-muted"),
+                        f"v{__version__}"
+                    ], className="badge bg-light text-dark ms-2 fs-6")
+                ], className="text-center text-muted mb-4 fs-5")
             ], className="py-3")
         ])
     ]),
@@ -382,11 +400,32 @@ app.layout = dbc.Container([
                 dbc.CardHeader([
                     html.H6([
                         html.I(className="fas fa-info-circle me-2"),
-                        "Status"
+                        "System Status & Information"
                     ], className="mb-0 fw-bold")
                 ]),
                 dbc.CardBody([
-                    html.Div(id='status-display')
+                    html.Div(id='status-display', className="mb-3"),
+                    html.Hr(),
+                    html.Div([
+                        html.H6([
+                            html.I(className="fas fa-code me-2"),
+                            "Version Information"
+                        ], className="mb-2 fw-bold fs-6"),
+                        html.Div([
+                            html.Small([
+                                html.Strong("App Version: "),
+                                f"{__version__} ({__last_updated__})"
+                            ], className="d-block text-muted"),
+                            html.Small([
+                                html.Strong("Algorithm Suite: "),
+                                html.Span(id='algorithm-version', children="Loading...")
+                            ], className="d-block text-muted"),
+                            html.Small([
+                                html.Strong("Author: "),
+                                __author__
+                            ], className="d-block text-muted")
+                        ])
+                    ])
                 ])
             ])
         ], width=8)
@@ -794,6 +833,13 @@ def control_simulation(run_clicks, stop_clicks, reset_clicks,
                     'convergence_speed': actual_iterations / max_iter * 100,  # Percentage of max iterations used
                     'success_rate': min(100, (coverage_history[-1] / params['target_coverage']) * 100)  # How close to target
                 },
+                'version_info': {
+                    'app_version': __version__,
+                    'algorithm_version': algo_version,
+                    'app_last_updated': __last_updated__,
+                    'algorithm_last_updated': algo_updated,
+                    'author': __author__
+                },
                 'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             }
             
@@ -1057,11 +1103,13 @@ def export_excel(n_clicks, simulation_data):
     
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         # Sheet 1: Results Summary
+        version_info = simulation_data.get('version_info', {})
         summary_data = {
             'Metric': ['Algorithm', 'Final Coverage (%)', 'Best Coverage (%)', 'Execution Time (s)', 
                       'Total Iterations', 'Max Iterations', 'Mean Coverage (%)', 'Std Coverage (%)', 
                       'Efficiency Score', 'Stopping Reason', 'Target Coverage (%)', 'Convergence Threshold',
-                      'Convergence Achieved', 'Grid Width', 'Grid Height', 'Number of Drones', 'Coverage Radius'],
+                      'Convergence Achieved', 'Grid Width', 'Grid Height', 'Number of Drones', 'Coverage Radius',
+                      'App Version', 'Algorithm Version', 'App Last Updated', 'Algorithm Last Updated', 'Author'],
             'Value': [
                 simulation_data.get('algorithm_name', 'Unknown'),
                 round(simulation_data.get('final_coverage', 0), 2),
@@ -1079,7 +1127,12 @@ def export_excel(n_clicks, simulation_data):
                 simulation_data.get('environment', {}).get('width', 0),
                 simulation_data.get('environment', {}).get('height', 0),
                 simulation_data.get('environment', {}).get('num_drones', 0),
-                simulation_data.get('environment', {}).get('radius', 0)
+                simulation_data.get('environment', {}).get('radius', 0),
+                version_info.get('app_version', 'Unknown'),
+                version_info.get('algorithm_version', 'Unknown'),
+                version_info.get('app_last_updated', 'Unknown'),
+                version_info.get('algorithm_last_updated', 'Unknown'),
+                version_info.get('author', 'Unknown')
             ]
         }
         summary_df = pd.DataFrame(summary_data)
@@ -1177,40 +1230,46 @@ def export_charts(n_clicks, figure, simulation_data):
 
 # Status Display Callback
 @app.callback(
-    Output('status-display', 'children'),
+    [Output('status-display', 'children'),
+     Output('algorithm-version', 'children')],
     Input('current-state', 'data')
 )
 def update_status(current_state):
     if not current_state:
-        return html.P("System ready", className="text-success")
+        status_display = html.P("System ready", className="text-success")
+    else:
+        status = current_state.get('status', 'ready')
+        
+        status_colors = {
+            'ready': 'success',
+            'running': 'primary',
+            'completed': 'success',
+            'stopped': 'warning',
+            'error': 'danger'
+        }
+        
+        status_icons = {
+            'ready': 'fas fa-check-circle',
+            'running': 'fas fa-play-circle',
+            'completed': 'fas fa-flag-checkered',
+            'stopped': 'fas fa-stop-circle',
+            'error': 'fas fa-exclamation-triangle'
+        }
+        
+        color = status_colors.get(status, 'secondary')
+        icon = status_icons.get(status, 'fas fa-question-circle')
+        
+        message = current_state.get('message', status.title())
+        
+        status_display = dbc.Alert([
+            html.I(className=f"{icon} me-2"),
+            f"Status: {message}"
+        ], color=color, className="mb-0")
     
-    status = current_state.get('status', 'ready')
+    # Algorithm version info
+    algorithm_version_info = f"{algo_version} ({algo_updated})"
     
-    status_colors = {
-        'ready': 'success',
-        'running': 'primary',
-        'completed': 'success',
-        'stopped': 'warning',
-        'error': 'danger'
-    }
-    
-    status_icons = {
-        'ready': 'fas fa-check-circle',
-        'running': 'fas fa-play-circle',
-        'completed': 'fas fa-flag-checkered',
-        'stopped': 'fas fa-stop-circle',
-        'error': 'fas fa-exclamation-triangle'
-    }
-    
-    color = status_colors.get(status, 'secondary')
-    icon = status_icons.get(status, 'fas fa-question-circle')
-    
-    message = current_state.get('message', status.title())
-    
-    return dbc.Alert([
-        html.I(className=f"{icon} me-2"),
-        f"Status: {message}"
-    ], color=color, className="mb-0")
+    return status_display, algorithm_version_info
 
 if __name__ == '__main__':
     logger.info("🚀 Starting Drone Optimization System - Enhanced Version with Full Results")
