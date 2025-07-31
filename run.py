@@ -6,10 +6,11 @@ import os
 from datetime import datetime
 from pathlib import Path
 
-# Setup enhanced logging
+# Setup enhanced logging with compact format
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    datefmt='%H:%M:%S',
     handlers=[
         logging.StreamHandler(sys.stdout)
     ]
@@ -24,10 +25,10 @@ def check_dependencies():
     }
     missing = [pip_name for package, pip_name in required_packages.items() if importlib.util.find_spec(package) is None]
     if missing:
-        logger.error(f"🚨 Missing dependencies: {', '.join(missing)}")
-        logger.error(f"📦 Please install them using: pip install {' '.join(missing)}")
+        logger.error(f"Missing dependencies: {', '.join(missing)}")
+        logger.error(f"Install with: pip install {' '.join(missing)}")
         return False
-    logger.info("✅ All dependencies satisfied.")
+    logger.info("Dependencies OK")
     return True
 
 def parse_arguments():
@@ -49,21 +50,22 @@ def main():
         # The app object is imported from app.py, which now contains all logic
         from app import app
         
-        logger.info("="*60)
-        logger.info("🚁 DRONE OPTIMIZATION SIMULATION SYSTEM")
-        logger.info("="*60)
-        logger.info(f"🚀 Starting server at http://{args.host}:{args.port}")
-        logger.info(f"🐛 Debug mode: {'enabled' if args.debug else 'disabled'}")
+        logger.info("=" * 45)
+        logger.info("DRONE OPTIMIZATION SYSTEM")
+        logger.info("=" * 45)
+        logger.info(f"Server: http://{args.host}:{args.port}")
+        logger.info(f"Debug: {'ON' if args.debug else 'OFF'}")
+        logger.info("Ready to start...")
         
         # The server is run with the configuration from command-line arguments
         app.run_server(debug=args.debug, port=args.port, host=args.host)
         
     except ImportError as e:
-        logger.error(f"❌ Error importing application: {e}")
-        logger.error("Ensure app.py and other required files are in the same directory.")
+        logger.error(f"Import error: {e}")
+        logger.error("Check that app.py exists in current directory")
         sys.exit(1)
     except Exception as e:
-        logger.error(f"💥 Fatal error during application startup: {e}")
+        logger.error(f"Startup error: {e}")
         sys.exit(1) 
 
 if __name__ == '__main__':

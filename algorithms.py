@@ -1,8 +1,8 @@
 """
-DRONE OPTIMIZATION ALGORITHMS - ENHANCED VERSION
+DRONE OPTIMIZATION ALGORITHMS - ENHANCED VERSION WITH PARALLEL PROCESSING
 Multi-algorithm optimization suite for drone coverage optimization
-Version: 2.1.0
-Last Updated: 2025-07-30
+Version: 2.3.0
+Last Updated: 2025-07-31
 Author: Drone Optimization System
 """
 
@@ -11,12 +11,14 @@ import random
 from multiprocessing import Pool, cpu_count
 import concurrent.futures
 import time
+import threading
+from functools import partial
 
 # Version information
-__version__ = "2.1.0"
+__version__ = "2.3.0"
 __author__ = "Drone Optimization System"
-__last_updated__ = "2025-07-30"
-__description__ = "Multi-algorithm optimization suite for drone coverage optimization"
+__last_updated__ = "2025-07-31"
+__description__ = "Multi-algorithm optimization suite with parallel processing support"
 
 def get_version_info():
     """Returns version information as a dictionary"""
@@ -25,16 +27,45 @@ def get_version_info():
         'author': __author__,
         'last_updated': __last_updated__,
         'description': __description__,
+        'parallel_support': True,
+        'max_workers': cpu_count(),
         'algorithms': [
-            'GreedyAlgorithm',
-            'GeneticAlgorithm',
-            'ParticleSwarmOptimization', 
-            'SimulatedAnnealing',
-            'HybridGASA',
-            'GreyWolfOptimizer',
-            'MantaRayForaging'
+            'GreedyAlgorithm (Sequential)',
+            'GeneticAlgorithm (Parallel)',
+            'ParticleSwarmOptimization (Parallel)', 
+            'SimulatedAnnealing (Sequential)',
+            'HybridGASA (Parallel)',
+            'GreyWolfOptimizer (Parallel)',
+            'MantaRayForaging (Parallel)'
         ]
     }
+
+def get_parallel_support():
+    """Returns information about parallel processing capabilities"""
+    return {
+        'cpu_count': cpu_count(),
+        'recommended_workers': min(cpu_count(), 8),  # Optimal for most systems
+        'parallel_algorithms': ['ga', 'pso', 'ga_sa', 'gwo', 'mrfo'],
+        'sequential_algorithms': ['greedy', 'sa']
+    }
+
+def parallel_fitness_evaluation(population, fitness_func, max_workers=None):
+    """Parallel fitness evaluation for population-based algorithms"""
+    if max_workers is None:
+        max_workers = min(cpu_count(), len(population))
+    
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        fitness_scores = list(executor.map(fitness_func, population))
+    return fitness_scores
+
+def parallel_population_operations(population, operation_func, max_workers=None):
+    """Parallel operations on population (mutations, crossovers, etc.)"""
+    if max_workers is None:
+        max_workers = min(cpu_count(), len(population))
+    
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        results = list(executor.map(operation_func, population))
+    return results
 
 class AlgorithmResult:
     """Class to store algorithm results and metadata"""
@@ -181,10 +212,22 @@ def genetic_algorithm(simulation,
                      crossover_rate=0.8,
                      elitism=10,
                      desired_coverage=0.90,
-                     parallel_processing=False,
+                     parallel_processing=True,  # Enable by default
+                     max_workers=None,
                      w1=0.6, w2=0.2, w3=0.2):
-    """Genetic Algorithm for drone optimization"""
+    """Genetic Algorithm for drone optimization with parallel processing support"""
     start_time = time.time()
+    AreaWidth, AreaHeight = simulation.width, simulation.height
+    SensingRange = simulation.sensing_radius
+    NumNodes = len(simulation.drones)
+    GridPoints = simulation.grid_points
+    NumGridPoints = len(GridPoints)
+    
+    # Auto-determine optimal worker count
+    if max_workers is None:
+        max_workers = min(cpu_count(), population_size // 4, 8)
+    
+    print(f"🔄 GA initialized: Population={population_size}, Parallel={'ON' if parallel_processing else 'OFF'}, Workers={max_workers if parallel_processing else 'N/A'}")
     AreaWidth, AreaHeight = simulation.width, simulation.height
     SensingRange = simulation.sensing_radius
     NumNodes = len(simulation.drones)
@@ -250,8 +293,9 @@ def genetic_algorithm(simulation,
     stop_reason = None
 
     for iteration in range(num_generations):
-        if parallel_processing:
-            fitness_scores = parallel_fitness_evaluation(population, fitness)
+        # Parallel or sequential fitness evaluation
+        if parallel_processing and len(population) > 4:  # Use parallel only if worthwhile
+            fitness_scores = parallel_fitness_evaluation(population, fitness, max_workers)
         else:
             fitness_scores = [fitness(p) for p in population]
         
@@ -337,14 +381,21 @@ def particle_swarm_optimization(simulation,
                                social_weight=1.5,
                                w1=0.7, w2=0.15, w3=0.15,
                                desired_coverage=0.90,
-                               parallel_processing=False):
-    """Particle Swarm Optimization for drone coverage"""
+                               parallel_processing=True,  # Enable by default
+                               max_workers=None):
+    """Particle Swarm Optimization for drone coverage with parallel processing"""
     start_time = time.time()
     AreaWidth, AreaHeight = simulation.width, simulation.height
     SensingRange = simulation.sensing_radius
     NumNodes = len(simulation.drones)
     GridPoints = simulation.grid_points
     NumGridPoints = len(GridPoints)
+    
+    # Auto-determine optimal worker count
+    if max_workers is None:
+        max_workers = min(cpu_count(), swarm_size // 4, 8)
+    
+    print(f"🔄 PSO initialized: Swarm={swarm_size}, Parallel={'ON' if parallel_processing else 'OFF'}, Workers={max_workers if parallel_processing else 'N/A'}")
     
     def calculate_coverage(particle):
         covered = np.zeros(len(GridPoints), dtype=bool)
