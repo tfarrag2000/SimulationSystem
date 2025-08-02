@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """
-DRONE OPTIMIZATION SIMULATION SYSTEM - RESTORED FULL VERSION
-Full-featured version with comprehensive results, charts, tables, and Excel export
-Version: 2.3.2 - Technical fixes applied while preserving original UI
+DRONE OPTIMIZATION SIMULATION SYSTEM - ENHANCED VERSION
+Full-featured version with optional stopping criteria and algorithm fixes
+Version: 2.4.0 - Major algorithm behavior improvements and user control enhancements
 Last Updated: 2025-08-02
 Author: Drone Optimization System
 """
 
 # Version information
-__version__ = "2.3.2"
+__version__ = "2.4.0"
 __author__ = "Drone Optimization System"
 __last_updated__ = "2025-08-02"
-__description__ = "Enhanced Drone Optimization Simulation System with Parallel Processing Support - Fixed Version"
+__description__ = "Enhanced Drone Optimization Simulation System with Optional Stopping Criteria and Algorithm Fixes"
 
 import dash
 from dash import dcc, html, Input, Output, State, ctx, dash_table
@@ -153,7 +153,7 @@ app = dash.Dash(
 # Import core modules - with error handling
 try:
     # Fallback algorithm versions for display
-    algo_version = "2.3.2"
+    algo_version = "2.4.0"
     algo_updated = "2025-08-02"
     logger.info("✅ Core modules imported successfully")
 except ImportError as e:
@@ -285,6 +285,19 @@ app.layout = dbc.Container([
                         html.Label("Stopping Criteria:", className="form-label fw-bold fs-6"),
                         dbc.Row([
                             dbc.Col([
+                                dbc.Switch(
+                                    id="enable-stopping-criteria",
+                                    label="Enable Early Stopping",
+                                    value=True,
+                                    persistence=True,
+                                    persistence_type='memory'
+                                ),
+                                html.Small("Uncheck to run full iterations", className="text-muted small")
+                            ], width=12)
+                        ], className="mb-2"),
+                        html.Div(id="stopping-criteria-controls", children=[
+                        dbc.Row([
+                            dbc.Col([
                                 dbc.Input(
                                     id="max-iterations",
                                     type="number",
@@ -326,15 +339,16 @@ app.layout = dbc.Container([
                                 dbc.Input(
                                     id="stagnation-limit",
                                     type="number",
-                                    value=50,
-                                    min=5, max=100, step=1,
+                                    value=100,
+                                    min=5, max=500, step=5,
                                     placeholder="Stagnation Limit",
                                     persistence=True,
                                     persistence_type='memory'
                                 ),
-                                html.Small("Stagnation Limit", className="text-muted small")
+                                html.Small("Stagnation Limit (iterations)", className="text-muted small")
                             ], width=6)
                         ], className="mb-3")
+                        ]) # Close stopping-criteria-controls div
                     ]),
                     
                     # Controls
@@ -576,6 +590,18 @@ def update_algorithm_params(selected_algorithm):
 def sync_parallel_components(enable_visible, workers_visible):
     return enable_visible if enable_visible is not None else False, workers_visible if workers_visible is not None else 1
 
+# Stopping Criteria Controls Visibility
+@app.callback(
+    Output('stopping-criteria-controls', 'style'),
+    Input('enable-stopping-criteria', 'value'),
+    prevent_initial_call=True
+)
+def toggle_stopping_criteria_controls(enable_stopping):
+    if enable_stopping:
+        return {'display': 'block'}
+    else:
+        return {'display': 'none'}
+
 # Main Graph Callback
 @app.callback(
     Output('main-graph', 'figure'),
@@ -653,7 +679,7 @@ def update_graph(selected_algorithm, simulation_data):
     
     return fig
 
-# Run Algorithm Callback - FIXED VERSION
+# Run Algorithm Callback - UPDATED WITH OPTIONAL STOPPING CRITERIA
 @app.callback(
     [Output('simulation-data', 'data'),
      Output('current-state', 'data'),
@@ -670,6 +696,7 @@ def update_graph(selected_algorithm, simulation_data):
      State('target-coverage', 'value'),
      State('convergence-threshold', 'value'),
      State('stagnation-limit', 'value'),
+     State('enable-stopping-criteria', 'value'),
      State('enable-parallel', 'value'),
      State('max-workers', 'value'),
      State('current-state', 'data')]
@@ -677,7 +704,7 @@ def update_graph(selected_algorithm, simulation_data):
 def control_simulation(run_clicks, stop_clicks, reset_clicks, 
                       algorithm, width, height, num_drones, radius,
                       max_iterations, target_coverage, convergence_threshold, stagnation_limit,
-                      enable_parallel, max_workers, current_state):
+                      enable_stopping, enable_parallel, max_workers, current_state):
     
     ctx_triggered = ctx.triggered[0]['prop_id'].split('.')[0] if ctx.triggered else None
     
@@ -707,13 +734,28 @@ def control_simulation(run_clicks, stop_clicks, reset_clicks,
             np.random.seed(random_seed)
             logger.info(f"Using random seed: {random_seed}")
             
-            # Use user-defined stopping criteria
+            # Use user-defined stopping criteria with improved defaults
             max_iter = int(max_iterations) if max_iterations else 500
             target_cov = float(target_coverage) if target_coverage else 85.0
-            conv_threshold = float(convergence_threshold) if convergence_threshold else 0.5
-            stag_limit = int(stagnation_limit) if stagnation_limit else 50
+            conv_threshold = float(convergence_threshold) if convergence_threshold else 1.0  # More lenient default
+            stag_limit = int(stagnation_limit) if stagnation_limit else 100  # Increased default
+            early_stopping_enabled = enable_stopping if enable_stopping is not None else True
+            
+            # Algorithm-specific minimum iterations to prevent premature stopping
+            min_iterations = {
+                'greedy': 50,
+                'ga': 100,
+                'pso': 75,
+                'sa': 80,
+                'ga_sa': 120,
+                'gwo': 90,
+                'mrfo': 85
+            }.get(algorithm, 75)
             
             logger.info(f"Running for maximum {max_iter} iterations, target {target_cov}% coverage")
+            logger.info(f"Early stopping: {'Enabled' if early_stopping_enabled else 'Disabled'}")
+            if early_stopping_enabled:
+                logger.info(f"Minimum iterations: {min_iterations}, stagnation limit: {stag_limit}")
             
             # Simulate comprehensive algorithm execution
             coverage_history = []
@@ -769,25 +811,40 @@ def control_simulation(run_clicks, stop_clicks, reset_clicks,
                 fitness = coverage * (1 + 0.1 * np.sin(normalized_progress * np.pi * 2))
                 fitness_history.append(fitness)
                 
-                # Check stopping criteria
-                if coverage >= target_cov:
-                    stopping_reason = f"Target coverage achieved: {coverage:.1f}% >= {target_cov}%"
-                    break
-                
-                if i > 5:
-                    recent_improvement = np.mean(coverage_history[-3:]) - np.mean(coverage_history[-6:-3]) if i > 6 else coverage_history[-1] - coverage_history[0]
-                    convergence_data.append(abs(recent_improvement))
-                    
-                    if abs(recent_improvement) < conv_threshold:
-                        stagnation_count += 1
-                    else:
-                        stagnation_count = 0
-                    
-                    if stagnation_count >= stag_limit:
-                        stopping_reason = f"Algorithm converged after {stagnation_count} iterations without significant improvement"
+                # Check stopping criteria only if early stopping is enabled
+                if early_stopping_enabled:
+                    # Target coverage check
+                    if coverage >= target_cov:
+                        stopping_reason = f"Target coverage achieved: {coverage:.1f}% >= {target_cov}%"
                         break
+                    
+                    # Only check convergence after minimum iterations
+                    if i >= min_iterations:
+                        if i > 10:  # Need enough history for meaningful comparison
+                            # Use longer window for more stable convergence detection
+                            window_size = min(20, i // 4)  # Adaptive window size
+                            recent_improvement = np.mean(coverage_history[-window_size//2:]) - np.mean(coverage_history[-window_size:-window_size//2]) if i > window_size else coverage_history[-1] - coverage_history[0]
+                            convergence_data.append(abs(recent_improvement))
+                            
+                            if abs(recent_improvement) < conv_threshold:
+                                stagnation_count += 1
+                            else:
+                                stagnation_count = 0
+                            
+                            if stagnation_count >= stag_limit:
+                                stopping_reason = f"Algorithm converged after {stagnation_count} iterations without significant improvement (>{conv_threshold}%)"
+                                break
+                        else:
+                            convergence_data.append(5.0)
+                    else:
+                        convergence_data.append(5.0)  # High value during minimum runtime
                 else:
-                    convergence_data.append(5.0)
+                    # When early stopping is disabled, still track convergence for display but don't stop
+                    if i > 5:
+                        recent_improvement = coverage_history[-1] - coverage_history[-min(6, i)]
+                        convergence_data.append(abs(recent_improvement))
+                    else:
+                        convergence_data.append(5.0)
             
             execution_time = time.time() - start_time
             actual_iterations = len(coverage_history)
@@ -809,9 +866,11 @@ def control_simulation(run_clicks, stop_clicks, reset_clicks,
                 'execution_time': execution_time,
                 'stopping_reason': stopping_reason,
                 'stopping_criteria': {
+                    'early_stopping_enabled': early_stopping_enabled,
                     'target_coverage': target_cov,
                     'convergence_threshold': conv_threshold,
                     'stagnation_limit': stag_limit,
+                    'minimum_iterations': min_iterations,
                     'stagnation_count': stagnation_count,
                     'convergence_achieved': stagnation_count >= stag_limit or "Target coverage achieved" in stopping_reason
                 },
@@ -904,11 +963,27 @@ def update_results_summary(simulation_data):
     ]
     
     stopping_reason = simulation_data.get('stopping_reason', 'Unknown stopping condition')
+    early_stopping_enabled = stopping_info.get('early_stopping_enabled', True)
+    
+    stopping_alert_color = "info"
+    stopping_icon = "fas fa-info-circle"
+    
+    if not early_stopping_enabled:
+        stopping_alert_color = "success"
+        stopping_icon = "fas fa-clock"
+        stopping_reason = f"Completed full run ({simulation_data['iterations']} iterations) - Early stopping was disabled"
+    elif "Target coverage achieved" in stopping_reason:
+        stopping_alert_color = "success"
+        stopping_icon = "fas fa-trophy"
+    elif "converged" in stopping_reason.lower():
+        stopping_alert_color = "warning"
+        stopping_icon = "fas fa-chart-line"
+    
     stopping_alert = dbc.Alert([
-        html.I(className="fas fa-info-circle me-2"),
+        html.I(className=f"{stopping_icon} me-2"),
         html.Strong("Stopping Reason: "),
         stopping_reason
-    ], color="info", className="mt-3")
+    ], color=stopping_alert_color, className="mt-3")
     
     return html.Div([
         dbc.Row(cards),
@@ -1167,5 +1242,5 @@ def update_status(current_state):
     return status_display, algorithm_version_info
 
 if __name__ == '__main__':
-    logger.info("🚀 Starting Drone Optimization System - Restored Full Version with Technical Fixes")
+    logger.info("🚀 Starting Drone Optimization System v2.4.0 - Enhanced Version with Optional Stopping Criteria")
     app.run_server(debug=True, host='127.0.0.1', port=8050)
