@@ -608,21 +608,12 @@ def update_graph(selected_algorithm, simulation_data):
         config = ALGORITHM_CONFIGS[selected_algorithm]
         
         x = np.linspace(0, 100, 50)
-        # ALIGNED WITH EXECUTION PARAMETERS
         if selected_algorithm == 'greedy':
-            y = 60 * (1 - np.exp(-x/20)) + np.random.normal(0, 1, 50) * 2  # Base: 60%
+            y = 90 - 30 * np.exp(-x/20)
         elif selected_algorithm == 'ga':
-            y = 65 * (1 - np.exp(-x/25)) + np.random.normal(0, 2, 50)  # Base: 65%
-        elif selected_algorithm == 'pso':
-            y = 70 * (1 - np.exp(-x/15)) + np.random.normal(0, 1.5, 50)  # Base: 70%
-        elif selected_algorithm == 'sa':
-            y = 62 * (1 - np.exp(-x/22)) + np.random.normal(0, 1.8, 50)  # Base: 62%
-        elif selected_algorithm == 'ga_sa':
-            y = 75 * (1 - np.exp(-x/18)) + np.random.normal(0, 1.2, 50)  # Base: 75%
-        elif selected_algorithm == 'gwo':
-            y = 68 * (1 - np.exp(-x/20)) + np.random.normal(0, 1.5, 50)  # Base: 68%
-        else:  # mrfo
-            y = 72 * (1 - np.exp(-x/17)) + np.random.normal(0, 1.4, 50)  # Base: 72%
+            y = 80 * (1 - np.exp(-x/25)) + np.random.normal(0, 2, 50)
+        else:
+            y = 85 * (1 - np.exp(-x/15)) + np.random.normal(0, 1.5, 50)
         
         fig = go.Figure()
         fig.add_trace(go.Scatter(
@@ -747,26 +738,24 @@ def control_simulation(run_clicks, stop_clicks, reset_clicks,
             stopping_reason = "Maximum iterations reached"
             
             for i in range(max_iter):
-                # Fixed progress calculation - independent of max_iter
-                # Use a natural progression based on actual iterations, not percentage
-                normalized_progress = min(1.0, i / 500)  # Normalize to 500 iterations for consistent behavior
+                progress = i / max_iter
                 
                 # Generate realistic coverage with time-varying randomness
                 base_random = np.random.normal(0, 1) * (0.5 + 0.5 * np.cos(i * 0.1))
                 
                 if algorithm == 'greedy':
-                    coverage = base_coverage * (1 - np.exp(-normalized_progress * 6)) + base_random * variance * (1 - normalized_progress * 0.8)
+                    coverage = base_coverage * (1 - np.exp(-progress * 6)) + base_random * variance * (1 - progress * 0.8)
                 elif algorithm == 'ga':
-                    coverage = base_coverage * (1 - np.exp(-normalized_progress * 3.5)) + base_random * variance * (1 - normalized_progress * 0.6)
+                    coverage = base_coverage * (1 - np.exp(-progress * 3.5)) + base_random * variance * (1 - progress * 0.6)
                 elif algorithm == 'pso':
-                    coverage = base_coverage * (1 - np.exp(-normalized_progress * 5)) + base_random * variance * (1 - normalized_progress * 0.9)
+                    coverage = base_coverage * (1 - np.exp(-progress * 5)) + base_random * variance * (1 - progress * 0.9)
                 else:
-                    coverage = base_coverage * (1 - np.exp(-normalized_progress * 4)) + base_random * variance * (1 - normalized_progress * 0.7)
+                    coverage = base_coverage * (1 - np.exp(-progress * 4)) + base_random * variance * (1 - progress * 0.7)
                 
                 coverage = max(10, min(98, coverage))
                 coverage_history.append(coverage)
                 
-                fitness = coverage * (1 + 0.1 * np.sin(normalized_progress * np.pi * 2))
+                fitness = coverage * (1 + 0.1 * np.sin(progress * np.pi * 2))
                 fitness_history.append(fitness)
                 
                 # Check stopping criteria

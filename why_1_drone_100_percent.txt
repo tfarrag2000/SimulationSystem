@@ -1,0 +1,36 @@
+🔍 WHY YOU SEE "1 DRONE AND 100%" RESULT
+============================================
+
+📊 YOUR SETTINGS:
+   Grid: 50×50 = 2,500 units
+   Drones: 5  
+   Radius: 100
+
+📈 THE CALCULATIONS:
+   • Coverage per drone: 31,416 units
+   • Your 1 drone covers: 12.6× the entire grid!
+   • 5 drones would cover: 62.8× the grid!
+
+🤯 WHAT HAPPENS:
+   1. System calculates: "1 drone = 1,256% coverage"
+   2. System caps it: "1 drone = 100% coverage" 
+   3. Algorithm thinks: "Why use 5 drones when 1 gives 100%?"
+   4. Result shows: "1 drone, 100% coverage"
+
+💡 THE ALGORITHM LOGIC:
+   Since your radius is SO big:
+   • 1 drone alone covers the ENTIRE grid 12× over
+   • Algorithm optimizes to use minimal drones
+   • Why waste 4 extra drones when 1 does the job?
+
+✅ SOLUTION:
+   Change radius from 100 → 10
+   
+   With radius 10:
+   • Each drone covers 314 units (reasonable)
+   • 5 drones = ~60% coverage (perfect!)
+   • Algorithm will use all 5 drones properly
+
+🎯 SUMMARY:
+   Your radius is too big → Algorithm uses fewer drones
+   Fix radius → Algorithm uses proper number of drones

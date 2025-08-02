@@ -1,0 +1,41 @@
+🔍 WHY RADIUS 100 IS TOO BIG FOR 50×50 GRID
+============================================================
+
+📊 YOUR GRID:
+   Size: 50 × 50 = 2,500 total units
+   Think of it like a small room (50 feet × 50 feet)
+
+📡 YOUR DRONE WITH RADIUS 100:
+   Coverage area: π × 100² = 31,416 units
+   This is like a circle with 100-unit radius
+
+🤯 THE PROBLEM:
+   • Grid total area: 2,500 units
+   • Each drone covers: 31,416 units  
+   • Your drone covers 12.6× the ENTIRE GRID!
+
+🏠 REAL-WORLD ANALOGY:
+   • Your 50×50 grid = A small bedroom (50ft × 50ft)
+   • Your drone radius 100 = Coverage like a football stadium!
+   • You're trying to cover a bedroom with stadium-sized coverage!
+
+📐 VISUAL COMPARISON:
+   Grid diagonal (corner to corner): ~71 units
+   Your drone radius: 100 units
+   → Your radius is 1.4× larger than the entire grid diagonal!
+
+💭 IMAGINE THIS:
+   If your grid is a small table (50cm × 50cm):
+   • Table area = 2,500 cm²
+   • Your drone covers 31,416 cm² (bigger than a large room!)
+   • It's like using a huge umbrella to cover a tiny coin!
+
+💡 WHAT SHOULD THE RADIUS BE?
+   • For 5 drones to reasonably cover 50×50 grid: ~13 units
+   • Recommended range: 8-15 units  
+   • Your radius (100) is 8× too big!
+
+✅ QUICK FIX:
+   Change radius from 100 → 10
+   Result: Each drone covers 314 units (reasonable!)
+   5 drones would cover ~60% of grid (perfect!)
