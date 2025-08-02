@@ -460,7 +460,15 @@ app.layout = dbc.Container([
     # Data Storage
     dcc.Store(id='simulation-data'),
     dcc.Store(id='current-state', data={'status': 'ready'}),
-    dcc.Interval(id='interval-component', interval=1000, n_intervals=0, disabled=True)
+    dcc.Interval(id='interval-component', interval=1000, n_intervals=0, disabled=True),
+    
+    # Hidden fallback components for callbacks
+    html.Div([
+        dbc.Switch(id="enable-parallel", value=False, style={'display': 'none'}),
+        dbc.Input(id="max-workers", type="number", value=1, style={'display': 'none'}),
+        dbc.Switch(id="enable-parallel-visible", value=False, style={'display': 'none'}),
+        dbc.Input(id="max-workers-visible", type="number", value=1, style={'display': 'none'})
+    ], style={'display': 'none'})
     
 ], fluid=True, className="py-3")
 
@@ -487,7 +495,7 @@ def update_algorithm_params(selected_algorithm):
         parallel_config = dbc.Row([
             dbc.Col([
                 dbc.Switch(
-                    id="enable-parallel",
+                    id="enable-parallel-visible",
                     label="Enable Parallel Processing",
                     value=True,
                     className="mb-2"
@@ -496,7 +504,7 @@ def update_algorithm_params(selected_algorithm):
             dbc.Col([
                 html.Label("Max Workers:", className="form-label fs-6"),
                 dbc.Input(
-                    id="max-workers",
+                    id="max-workers-visible",
                     type="number",
                     value=min(CPU_COUNT, 8),
                     min=1, max=CPU_COUNT, step=1,
@@ -567,6 +575,18 @@ def update_algorithm_params(selected_algorithm):
             defaults['target'], 
             defaults['threshold'], 
             defaults['stagnation'])
+
+# Sync visible parallel components with hidden ones (to avoid callback errors)
+@app.callback(
+    [Output('enable-parallel', 'value'),
+     Output('max-workers', 'value')],
+    [Input('enable-parallel-visible', 'value'),
+     Input('max-workers-visible', 'value')],
+    prevent_initial_call=True
+)
+def sync_parallel_components(enable_visible, workers_visible):
+    """Sync visible parallel components with hidden ones for callback consistency"""
+    return enable_visible if enable_visible is not None else False, workers_visible if workers_visible is not None else 1
 
 # Main Graph Callback
 @app.callback(
