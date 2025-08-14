@@ -1,0 +1,8 @@
+Algorithm,Avg Coverage (%),Avg Energy Savings (%),Avg Execution Time (s),Avg Coverage Efficiency,Avg Time Efficiency,Avg Performance Score,Avg Fault Tolerance,Scenarios Tested,Best Coverage,Best Energy Savings,Performance Rank
+Manta Ray,95.00,25.23,45.42,8.32,3.267,5.52,45.23,6,96.23%,26.67%,1
+Grey Wolf,95.70,24.75,42.91,8.39,3.495,5.51,44.76,6,97.48%,26.67%,2
+GA SA Hybrid,93.19,25.90,62.20,8.16,2.602,5.50,45.90,6,95.99%,28.00%,3
+Genetic Algorithm,95.64,21.67,39.69,8.05,4.007,5.30,41.67,6,97.89%,25.00%,4
+PSO,94.99,21.67,28.04,8.02,5.740,5.28,41.67,6,98.06%,25.00%,5
+Simulated Annealing,95.55,21.19,53.59,8.12,2.952,5.26,41.19,6,98.49%,25.00%,6
+Greedy,95.67,18.30,3.41,7.90,41.122,5.08,38.30,6,99.50%,25.00%,7

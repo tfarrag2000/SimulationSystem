@@ -1,0 +1,13 @@
+Scenario,Algorithm,Coverage (%),Energy Efficiency,Time Efficiency,Stability Score,Scalability Index,Grid Efficiency,Convergence Iterations,Overlap Penalty,Area Coverage Ratio
+Small Dense,Greedy,95.72,114.87,51.69,10,207.24,0.957,17,2.5,15.32
+Small Dense,Genetic Algorithm,94.68,126.23,5.49,10,204.98,1.052,42,1.25,15.15
+Standard Grid,Greedy,94.77,111.5,24.92,10,117.73,0.398,15,3.22,34.12
+Standard Grid,Genetic Algorithm,97.3,121.63,2.61,10,120.88,0.434,84,2.44,35.03
+Extended Grid,Greedy,93.89,111.77,20.78,10,97.8,0.373,20,0.5,45.07
+Extended Grid,Genetic Algorithm,97.89,122.37,1.86,10,101.97,0.408,118,0.0,46.99
+Dense Coverage,Greedy,95.37,119.21,34.52,10,147.75,0.497,13,5.36,23.84
+Dense Coverage,Genetic Algorithm,92.31,115.39,3.39,10,143.01,0.481,63,5.36,23.08
+Large Scale,Greedy,94.79,114.4,14.47,10,70.1,0.218,25,0.88,75.83
+Large Scale,Genetic Algorithm,97.69,122.11,1.04,10,72.24,0.233,196,0.5,78.15
+Minimal Grid,Greedy,99.5,132.67,100.35,10,312.7,1.382,6,6.0,8.96
+Minimal Grid,Genetic Algorithm,93.95,125.27,9.65,10,295.26,1.305,28,6.0,8.46

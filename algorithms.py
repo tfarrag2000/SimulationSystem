@@ -1,8 +1,8 @@
 """
-DRONE OPTIMIZATION ALGORITHMS - ENHANCED VERSION WITH PARALLEL PROCESSING
-Multi-algorithm optimization suite for drone coverage optimization
-Version: 2.3.0
-Last Updated: 2025-07-31
+DRONE OPTIMIZATION ALGORITHMS - ENHANCED VERSION WITH ACTIVE/SLEEP MANAGEMENT
+Multi-algorithm optimization suite for energy-efficient drone coverage optimization
+Version: 3.0.0 - Major upgrade with Active/Sleep node system and energy efficiency
+Last Updated: 2025-08-09
 Author: Drone Optimization System
 """
 
@@ -15,10 +15,10 @@ import threading
 from functools import partial
 
 # Version information
-__version__ = "2.3.0"
+__version__ = "3.0.0"
 __author__ = "Drone Optimization System"
-__last_updated__ = "2025-07-31"
-__description__ = "Multi-algorithm optimization suite with parallel processing support"
+__last_updated__ = "2025-08-09"
+__description__ = "Energy-efficient drone optimization with Active/Sleep management and multi-objective optimization"
 
 def get_version_info():
     """Returns version information as a dictionary"""
@@ -98,11 +98,234 @@ def convert_to_binary_activation(particle_solution, simulation):
         particle_solution = particle_solution.reshape((len(simulation.drones), 3))
 
     for i, particle in enumerate(particle_solution):
-        if i < len(simulation.drones):
-            simulation.drones.loc[i, 'x'] = np.clip(particle[0], 0, simulation.width)
-            simulation.drones.loc[i, 'y'] = np.clip(particle[1], 0, simulation.height)
-            activation[i] = int(particle[2]) if particle[2] > 0.5 else 0
+        activation[i] = 1 if particle[2] >= 0.5 else 0
     return activation
+
+# ===== ACTIVE/SLEEP DRONE MANAGEMENT SYSTEM =====
+
+def calculate_energy_efficiency_fitness(solution, simulation, target_coverage=0.95, 
+                                       w_coverage=100, w_energy=50, w_overlap=10):
+    """
+    Enhanced fitness function for Active/Sleep drone management
+    Objectives: Achieve target coverage with minimum active drones (energy efficiency)
+    
+    Args:
+        solution: Drone positions and activation states
+        simulation: Simulation environment
+        target_coverage: Desired coverage percentage (default 95%)
+        w_coverage: Weight for coverage component
+        w_energy: Weight for energy efficiency (fewer active drones)
+        w_overlap: Weight for overlap penalty
+    
+    Returns:
+        fitness: Higher values indicate better solutions
+    """
+    # Calculate coverage
+    coverage = calculate_coverage_with_solution(solution, simulation)
+    
+    # Calculate active drones ratio
+    if hasattr(solution, 'ndim') and solution.ndim == 2:
+        active_count = np.sum(solution[:, 2] >= 0.5)
+    else:
+        # Handle 1D binary activation arrays
+        active_count = np.sum(solution >= 0.5)
+    
+    total_drones = len(simulation.drones)
+    energy_efficiency = 1 - (active_count / total_drones)  # Higher when fewer drones active
+    
+    # Calculate overlap penalty
+    overlap = calculate_overlap_penalty(solution, simulation)
+    
+    # Multi-objective fitness calculation
+    # Priority 1: Meet coverage target
+    coverage_score = coverage * w_coverage
+    if coverage < target_coverage:
+        # Penalty for not meeting target coverage
+        coverage_penalty = (target_coverage - coverage) * w_coverage * 2
+        coverage_score -= coverage_penalty
+    
+    # Priority 2: Minimize active drones (maximize energy efficiency)
+    energy_score = energy_efficiency * w_energy
+    
+    # Priority 3: Minimize overlap
+    overlap_penalty = overlap * w_overlap
+    
+    fitness = coverage_score + energy_score - overlap_penalty
+    return fitness
+
+def calculate_coverage_with_solution(solution, simulation):
+    """Calculate coverage percentage for a given solution"""
+    if hasattr(solution, 'ndim') and solution.ndim == 2:
+        # Position-based solution (x, y, activation)
+        active_positions = []
+        for i, drone_state in enumerate(solution):
+            if drone_state[2] >= 0.5:  # Active
+                active_positions.append([drone_state[0], drone_state[1]])
+        active_positions = np.array(active_positions)
+    else:
+        # Binary activation array
+        active_indices = np.where(solution >= 0.5)[0]
+        active_positions = np.array([[simulation.drones[i].x, simulation.drones[i].y] 
+                                   for i in active_indices])
+    
+    if len(active_positions) == 0:
+        return 0.0
+    
+    # Calculate coverage using grid-based approach
+    grid_size = 50  # 50x50 grid for coverage calculation
+    x_points = np.linspace(0, simulation.area_width, grid_size)
+    y_points = np.linspace(0, simulation.area_height, grid_size)
+    
+    covered_points = 0
+    total_points = grid_size * grid_size
+    
+    for x in x_points:
+        for y in y_points:
+            point = np.array([x, y])
+            # Check if point is covered by any active drone
+            for drone_pos in active_positions:
+                distance = np.linalg.norm(point - drone_pos)
+                if distance <= simulation.sensing_range:
+                    covered_points += 1
+                    break
+    
+    return covered_points / total_points
+
+def calculate_overlap_penalty(solution, simulation):
+    """Calculate overlap penalty between active drones"""
+    if hasattr(solution, 'ndim') and solution.ndim == 2:
+        # Position-based solution
+        active_positions = []
+        for drone_state in solution:
+            if drone_state[2] >= 0.5:  # Active
+                active_positions.append([drone_state[0], drone_state[1]])
+        active_positions = np.array(active_positions)
+    else:
+        # Binary activation array
+        active_indices = np.where(solution >= 0.5)[0]
+        active_positions = np.array([[simulation.drones[i].x, simulation.drones[i].y] 
+                                   for i in active_indices])
+    
+    if len(active_positions) <= 1:
+        return 0.0
+    
+    overlap_penalty = 0.0
+    sensing_range = simulation.sensing_range
+    
+    for i in range(len(active_positions)):
+        for j in range(i + 1, len(active_positions)):
+            distance = np.linalg.norm(active_positions[i] - active_positions[j])
+            if distance < 2 * sensing_range:
+                # Overlap penalty proportional to overlap amount
+                overlap_penalty += 1 - (distance / (2 * sensing_range))
+    
+    return overlap_penalty
+
+def optimize_active_sleep_greedy(simulation, target_coverage=0.95, max_attempts=1000):
+    """
+    Greedy algorithm optimized for Active/Sleep management
+    Prioritizes achieving target coverage with minimum active drones
+    """
+    start_time = time.time()
+    
+    total_drones = len(simulation.drones)
+    best_solution = np.zeros(total_drones)
+    best_coverage = 0.0
+    best_active_count = total_drones
+    
+    # Track iteration history
+    coverage_history = []
+    active_history = []
+    fitness_history = []
+    
+    # Greedy selection: start with most strategic drones
+    drone_scores = []
+    for i, drone in enumerate(simulation.drones):
+        # Score drones based on strategic position (center is better)
+        center_x, center_y = simulation.area_width/2, simulation.area_height/2
+        distance_to_center = np.sqrt((drone.x - center_x)**2 + (drone.y - center_y)**2)
+        max_distance = np.sqrt(center_x**2 + center_y**2)
+        centrality_score = 1 - (distance_to_center / max_distance)
+        drone_scores.append((i, centrality_score))
+    
+    # Sort drones by strategic value
+    drone_scores.sort(key=lambda x: x[1], reverse=True)
+    
+    # Iteratively add drones until target coverage is achieved
+    current_solution = np.zeros(total_drones)
+    
+    for attempt in range(min(max_attempts, total_drones)):
+        # Try adding the next best drone
+        drone_idx = drone_scores[attempt % len(drone_scores)][0]
+        if current_solution[drone_idx] == 0:
+            current_solution[drone_idx] = 1
+            
+            # Calculate coverage with current solution
+            coverage = calculate_coverage_with_solution(current_solution, simulation)
+            active_count = np.sum(current_solution)
+            
+            # Calculate fitness
+            fitness = calculate_energy_efficiency_fitness(current_solution, simulation, target_coverage)
+            
+            # Track progress
+            coverage_history.append(coverage)
+            active_history.append(active_count)
+            fitness_history.append(fitness)
+            
+            # Update best solution if coverage target is met with fewer drones
+            if coverage >= target_coverage:
+                if active_count < best_active_count or (active_count == best_active_count and coverage > best_coverage):
+                    best_solution = current_solution.copy()
+                    best_coverage = coverage
+                    best_active_count = active_count
+                    break
+            elif coverage > best_coverage:
+                best_solution = current_solution.copy()
+                best_coverage = coverage
+                best_active_count = active_count
+    
+    execution_time = time.time() - start_time
+    
+    return AlgorithmResult(
+        best_solution=best_solution,
+        fitness_history=fitness_history,
+        coverage=best_coverage,
+        active_nodes=best_active_count,
+        overlap=calculate_overlap_penalty(best_solution, simulation),
+        execution_time=execution_time,
+        algorithm_name="Active/Sleep Greedy",
+        parameters={'target_coverage': target_coverage, 'max_attempts': max_attempts},
+        coverage_history=coverage_history,
+        active_nodes_history=active_history
+    )
+
+def get_active_sleep_statistics(solution, simulation):
+    """Get detailed statistics for Active/Sleep drone deployment"""
+    if hasattr(solution, 'ndim') and solution.ndim == 2:
+        active_count = np.sum(solution[:, 2] >= 0.5)
+    else:
+        active_count = np.sum(solution >= 0.5)
+    
+    total_drones = len(simulation.drones)
+    sleep_count = total_drones - active_count
+    
+    coverage = calculate_coverage_with_solution(solution, simulation)
+    overlap = calculate_overlap_penalty(solution, simulation)
+    
+    # Energy efficiency metrics
+    energy_saved = (sleep_count / total_drones) * 100  # Percentage of energy saved
+    coverage_per_drone = coverage / active_count if active_count > 0 else 0
+    
+    return {
+        'total_drones': total_drones,
+        'active_drones': active_count,
+        'sleeping_drones': sleep_count,
+        'coverage_percentage': coverage * 100,
+        'overlap_penalty': overlap,
+        'energy_saved_percentage': energy_saved,
+        'coverage_per_active_drone': coverage_per_drone,
+        'energy_efficiency_ratio': coverage / (active_count / total_drones) if active_count > 0 else 0
+    }
 
 def parallel_fitness_evaluation(particles, fitness_func, num_processes=None):
     """Evaluate fitness of multiple particles in parallel"""
@@ -211,11 +434,11 @@ def genetic_algorithm(simulation,
                      mutation_rate=0.1,
                      crossover_rate=0.8,
                      elitism=10,
-                     desired_coverage=0.90,
+                     target_coverage=0.95,  # Active/Sleep target coverage
                      parallel_processing=True,  # Enable by default
                      max_workers=None,
-                     w1=0.6, w2=0.2, w3=0.2):
-    """Genetic Algorithm for drone optimization with parallel processing support"""
+                     energy_efficiency_mode=True):  # Enable Active/Sleep optimization
+    """Enhanced Genetic Algorithm with Active/Sleep drone management"""
     start_time = time.time()
     AreaWidth, AreaHeight = simulation.width, simulation.height
     SensingRange = simulation.sensing_radius
@@ -227,36 +450,18 @@ def genetic_algorithm(simulation,
     if max_workers is None:
         max_workers = min(cpu_count(), population_size // 4, 8)
     
-    print(f"🔄 GA initialized: Population={population_size}, Parallel={'ON' if parallel_processing else 'OFF'}, Workers={max_workers if parallel_processing else 'N/A'}")
-    AreaWidth, AreaHeight = simulation.width, simulation.height
-    SensingRange = simulation.sensing_radius
-    NumNodes = len(simulation.drones)
-    GridPoints = simulation.grid_points
-    NumGridPoints = len(GridPoints)
+    print(f"🔄 Enhanced GA initialized: Population={population_size}, Target Coverage={target_coverage*100}%, Energy Efficient={'ON' if energy_efficiency_mode else 'OFF'}")
     
-    def calculate_coverage(particle):
-        covered = np.zeros(len(GridPoints), dtype=bool)
-        for sensor in particle:
-            if sensor[2] >= 0.5:
-                distances = np.linalg.norm(GridPoints - sensor[:2], axis=1)
-                covered |= distances <= SensingRange
-        return (np.sum(covered) / NumGridPoints) * 100
-
-    def calculate_overlap(particle):
-        overlap_penalty = 0
-        active_nodes = particle[particle[:, 2] >= 0.5]
-        for i in range(len(active_nodes)):
-            for j in range(i + 1, len(active_nodes)):
-                d = np.linalg.norm(active_nodes[i, :2] - active_nodes[j, :2])
-                if d < 2 * SensingRange:
-                    overlap_penalty += 1 - (d / (2 * SensingRange))
-        return overlap_penalty
-
     def fitness(particle):
-        coverage = calculate_coverage(particle)
-        active_nodes = np.sum(particle[:, 2] >= 0.5)
-        overlap = calculate_overlap(particle)
-        return w1 * coverage - w2 * (active_nodes / NumNodes) * 100 - w3 * overlap
+        if energy_efficiency_mode:
+            # Use Active/Sleep energy efficiency fitness
+            return calculate_energy_efficiency_fitness(particle, simulation, target_coverage)
+        else:
+            # Legacy fitness function for compatibility
+            coverage = calculate_coverage_with_solution(particle, simulation)
+            active_nodes = np.sum(particle[:, 2] >= 0.5)
+            overlap = calculate_overlap_penalty(particle, simulation)
+            return 0.6 * coverage * 100 - 0.2 * (active_nodes / NumNodes) * 100 - 0.2 * overlap
 
     # Initialize Population
     population = []
@@ -308,8 +513,10 @@ def genetic_algorithm(simulation,
             best_particle = population[0].copy()
 
         fitness_history.append(best_fitness)
-        coverage_history.append(calculate_coverage(best_particle))
-        overlap_history.append(calculate_overlap(best_particle))
+        current_coverage = calculate_coverage_with_solution(best_particle, simulation)
+        current_overlap = calculate_overlap_penalty(best_particle, simulation)
+        coverage_history.append(current_coverage * 100)  # Convert to percentage
+        overlap_history.append(current_overlap)
         active_nodes_history.append(int(np.sum(best_particle[:, 2] >= 0.5)))
         
         # Add iteration log entry
@@ -317,7 +524,7 @@ def genetic_algorithm(simulation,
             'iteration': iteration + 1,
             'fitness': best_fitness,
             'coverage': coverage_history[-1],
-            'algorithm': 'GA'
+            'algorithm': 'Enhanced GA'
         })
         
         new_population = population[:elitism]
@@ -330,37 +537,44 @@ def genetic_algorithm(simulation,
         population = new_population[:population_size]
         
         if iteration % 10 == 0:
-            print(f"GA Iteration {iteration + 1}: Best Fitness = {best_fitness:.2f}, "
-                  f"Coverage = {coverage_history[-1]:.2f}%")
+            print(f"Enhanced GA Iteration {iteration + 1}: Best Fitness = {best_fitness:.2f}, "
+                  f"Coverage = {coverage_history[-1]:.2f}%, Active Drones = {active_nodes_history[-1]}")
                   
-        if coverage_history[-1] >= desired_coverage * 100:
-            print(f"Stopping early: Desired coverage reached.")
+        if coverage_history[-1] >= target_coverage * 100:
+            print(f"🎯 Target coverage {target_coverage*100}% achieved with {active_nodes_history[-1]} active drones!")
             early_stop = True
-            stop_reason = "Desired coverage reached."
+            stop_reason = "Target coverage reached with optimal energy efficiency."
             break
             
     execution_time = time.time() - start_time
     
+    # Post-processing: Optimize active drone selection
     best_particle = post_prune(
         best_particle, 
         GridPoints, 
         SensingRange, 
-        threshold=desired_coverage*100
+        threshold=target_coverage*100
     )
+    
+    # Calculate final metrics using Active/Sleep functions
+    final_coverage = calculate_coverage_with_solution(best_particle, simulation)
+    final_overlap = calculate_overlap_penalty(best_particle, simulation)
     
     result = AlgorithmResult(
         best_solution=best_particle,
         fitness_history=fitness_history,
-        coverage=calculate_coverage(best_particle),
+        coverage=final_coverage,
         active_nodes=int(np.sum(best_particle[:, 2] >= 0.5)),
-        overlap=calculate_overlap(best_particle),
+        overlap=final_overlap,
         execution_time=execution_time,
-        algorithm_name="Genetic Algorithm",
+        algorithm_name="Enhanced Genetic Algorithm (Active/Sleep)",
         parameters={
             'population_size': population_size,
             'num_generations': num_generations,
             'mutation_rate': mutation_rate,
             'crossover_rate': crossover_rate,
+            'target_coverage': target_coverage,
+            'energy_efficiency_mode': energy_efficiency_mode,
             'parallel_processing': parallel_processing
         },
         coverage_history=coverage_history,
