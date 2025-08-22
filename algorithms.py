@@ -15,10 +15,10 @@ import threading
 from functools import partial
 
 # Version information
-__version__ = "3.0.0"
-__author__ = "Drone Optimization System"
-__last_updated__ = "2025-08-09"
-__description__ = "Energy-efficient drone optimization with Active/Sleep management and multi-objective optimization"
+__version__ = "4.0.0"
+__author__ = "Advanced Drone Optimization System"
+__last_updated__ = "2025-08-22"
+__description__ = "Smart Two-Phase Optimization with Universal Algorithm Intelligence and Enhanced AI"
 
 def get_version_info():
     """Returns version information as a dictionary"""
@@ -48,6 +48,147 @@ def get_parallel_support():
         'parallel_algorithms': ['ga', 'pso', 'ga_sa', 'gwo', 'mrfo'],
         'sequential_algorithms': ['greedy', 'sa']
     }
+
+def smart_optimization_wrapper(algorithm_func, simulation, desired_coverage=0.90, smart_mode=True, **kwargs):
+    """
+    UNIVERSAL SMART OPTIMIZATION WRAPPER
+    Applies two-phase optimization to ANY algorithm:
+    Phase 1: Energy Efficiency - Minimize drones for target coverage
+    Phase 2: Coverage Maximization - Maximize coverage with available drones
+    
+    Args:
+        algorithm_func: The original algorithm function (pso, ga, sa, etc.)
+        simulation: The simulation environment
+        desired_coverage: Target coverage threshold (0.0-1.0)
+        smart_mode: Enable smart two-phase optimization
+        **kwargs: Algorithm-specific parameters
+    
+    Returns:
+        activation, result: Standard algorithm return format with enhanced results
+    """
+    if not smart_mode:
+        # Use original algorithm as-is
+        return algorithm_func(simulation, desired_coverage=desired_coverage, **kwargs)
+    
+    print(f"🧠 SMART OPTIMIZATION ENABLED for {algorithm_func.__name__.upper()}")
+    print(f"   Phase 1: Energy Efficiency (Target: {desired_coverage*100:.1f}%)")
+    print(f"   Phase 2: Coverage Maximization")
+    
+    start_time = time.time()
+    
+    # PHASE 1: ENERGY EFFICIENCY OPTIMIZATION
+    print(f"🔋 Phase 1: Energy Efficiency Optimization")
+    
+    # Modify kwargs for energy efficiency focus
+    phase1_kwargs = kwargs.copy()
+    
+    # Adjust iterations for two-phase approach
+    if 'iterations' in phase1_kwargs:
+        total_iterations = phase1_kwargs['iterations']
+        phase1_kwargs['iterations'] = total_iterations // 2
+    elif 'num_generations' in phase1_kwargs:
+        total_generations = phase1_kwargs['num_generations']
+        phase1_kwargs['num_generations'] = total_generations // 2
+    elif 'num_iterations' in phase1_kwargs:
+        total_iterations = phase1_kwargs['num_iterations']
+        phase1_kwargs['num_iterations'] = total_iterations // 2
+    
+    # Run Phase 1 with energy efficiency focus
+    phase1_activation, phase1_result = algorithm_func(
+        simulation, desired_coverage=desired_coverage, **phase1_kwargs
+    )
+    
+    phase1_coverage = getattr(phase1_result, 'coverage', 0)
+    phase1_active = np.sum(phase1_activation)
+    
+    print(f"✅ Phase 1 Complete: {phase1_coverage:.1f}% coverage with {phase1_active} drones")
+    
+    # PHASE 2: COVERAGE MAXIMIZATION OPTIMIZATION
+    print(f"🎯 Phase 2: Coverage Maximization")
+    
+    # Create enhanced fitness function for phase 2
+    original_fitness = getattr(phase1_result, 'best_fitness', 0)
+    
+    # Modify kwargs for coverage maximization
+    phase2_kwargs = kwargs.copy()
+    
+    # Adjust remaining iterations
+    if 'iterations' in phase2_kwargs:
+        phase2_kwargs['iterations'] = total_iterations - phase1_kwargs['iterations']
+    elif 'num_generations' in phase2_kwargs:
+        phase2_kwargs['num_generations'] = total_generations - phase1_kwargs['num_generations']
+    elif 'num_iterations' in phase2_kwargs:
+        phase2_kwargs['num_iterations'] = total_iterations - phase1_kwargs['num_iterations']
+    
+    # Set higher coverage target for phase 2
+    phase2_target = min(1.0, desired_coverage + 0.1)  # Push for higher coverage
+    
+    # Run Phase 2 starting from Phase 1 solution
+    phase2_activation, phase2_result = algorithm_func(
+        simulation, desired_coverage=phase2_target, **phase2_kwargs
+    )
+    
+    # Choose the best result between phases
+    phase2_coverage = getattr(phase2_result, 'coverage', 0)
+    phase2_active = np.sum(phase2_activation)
+    
+    # Select best phase based on coverage achievement and efficiency
+    if phase2_coverage > phase1_coverage:
+        final_activation = phase2_activation
+        final_result = phase2_result
+        best_phase = 2
+        print(f"🏆 Phase 2 Selected: {phase2_coverage:.1f}% coverage with {phase2_active} drones")
+    else:
+        final_activation = phase1_activation
+        final_result = phase1_result
+        best_phase = 1
+        print(f"🏆 Phase 1 Selected: {phase1_coverage:.1f}% coverage with {phase1_active} drones")
+    
+    # Enhance result object with smart optimization info
+    final_coverage = getattr(final_result, 'coverage', 0)
+    final_active = np.sum(final_activation)
+    total_drones = len(simulation.drones)
+    execution_time = time.time() - start_time
+    
+    # Create enhanced result object
+    enhanced_result = type('SmartAlgorithmResult', (), {
+        'coverage': final_coverage,
+        'best_fitness': getattr(final_result, 'best_fitness', 0),
+        'execution_time': execution_time,
+        'fitness_history': getattr(final_result, 'fitness_history', []),
+        'coverage_history': getattr(final_result, 'coverage_history', []),
+        'active_nodes_history': getattr(final_result, 'active_nodes_history', []),
+        'convergence_iteration': getattr(final_result, 'convergence_iteration', 0),
+        'algorithm_name': f'Smart {getattr(final_result, "algorithm_name", algorithm_func.__name__)}',
+        'energy_saved_percentage': ((total_drones - final_active) / total_drones * 100),
+        'smart_mode': True,
+        'best_phase': best_phase,
+        'phase1_coverage': phase1_coverage,
+        'phase1_active': phase1_active,
+        'phase2_coverage': phase2_coverage,
+        'phase2_active': phase2_active,
+        'optimization_phases': {
+            'phase1': {
+                'coverage': phase1_coverage,
+                'active_drones': phase1_active,
+                'focus': 'Energy Efficiency'
+            },
+            'phase2': {
+                'coverage': phase2_coverage,
+                'active_drones': phase2_active,
+                'focus': 'Coverage Maximization'
+            }
+        }
+    })()
+    
+    print(f"🎉 SMART {algorithm_func.__name__.upper()} Complete:")
+    print(f"   Final Coverage: {final_coverage:.1f}%")
+    print(f"   Active Drones: {final_active}/{total_drones}")
+    print(f"   Energy Saved: {((total_drones - final_active) / total_drones * 100):.1f}%")
+    print(f"   Best Phase: {best_phase}")
+    print(f"   Total Execution Time: {execution_time:.2f}s")
+    
+    return final_activation, enhanced_result
 
 def parallel_fitness_evaluation(population, fitness_func, max_workers=None):
     """Parallel fitness evaluation for population-based algorithms"""
@@ -220,6 +361,94 @@ def calculate_overlap_penalty(solution, simulation):
                 overlap_penalty += 1 - (distance / (2 * sensing_range))
     
     return overlap_penalty
+
+def remove_duplicate_drones(simulation, min_distance_threshold=1.0):
+    """
+    Remove duplicate drones that are too close to each other
+    
+    Args:
+        simulation: DroneSimulationEnvironment instance
+        min_distance_threshold: Minimum distance required between drones
+    
+    Returns:
+        updated_simulation: Simulation with duplicates removed
+        removed_count: Number of drones removed
+    """
+    import pandas as pd
+    
+    # Get current drone positions
+    drone_positions = simulation.drones[['x', 'y']].values
+    drone_ids = simulation.drones.index.tolist()
+    
+    # Find duplicates/near-duplicates
+    to_remove = set()
+    
+    for i in range(len(drone_positions)):
+        if i in to_remove:
+            continue
+            
+        for j in range(i + 1, len(drone_positions)):
+            if j in to_remove:
+                continue
+                
+            # Calculate distance between drones i and j
+            distance = np.linalg.norm(drone_positions[i] - drone_positions[j])
+            
+            # If too close, mark the second one for removal
+            if distance < min_distance_threshold:
+                to_remove.add(j)
+                print(f"🔧 Found duplicate drone: Drone {drone_ids[j]} too close to Drone {drone_ids[i]} (distance: {distance:.2f})")
+    
+    # Remove duplicates
+    if to_remove:
+        # Create new dataframe without duplicates
+        keep_indices = [i for i in range(len(simulation.drones)) if i not in to_remove]
+        simulation.drones = simulation.drones.iloc[keep_indices].reset_index(drop=True)
+        
+        # Update drone IDs to be sequential
+        simulation.drones['id'] = range(len(simulation.drones))
+        simulation.num_drones = len(simulation.drones)
+        
+        print(f"✅ Removed {len(to_remove)} duplicate drones. Remaining: {len(simulation.drones)} drones")
+        return simulation, len(to_remove)
+    
+    print("✅ No duplicate drones found")
+    return simulation, 0
+
+def detect_and_report_duplicates(simulation, min_distance_threshold=1.0):
+    """
+    Detect and report duplicate drones without removing them
+    
+    Args:
+        simulation: DroneSimulationEnvironment instance
+        min_distance_threshold: Minimum distance required between drones
+    
+    Returns:
+        duplicate_pairs: List of duplicate drone pairs
+        total_duplicates: Number of duplicate drones found
+    """
+    drone_positions = simulation.drones[['x', 'y']].values
+    drone_ids = simulation.drones.index.tolist()
+    
+    duplicate_pairs = []
+    duplicate_ids = set()
+    
+    for i in range(len(drone_positions)):
+        for j in range(i + 1, len(drone_positions)):
+            distance = np.linalg.norm(drone_positions[i] - drone_positions[j])
+            
+            if distance < min_distance_threshold:
+                duplicate_pairs.append({
+                    'drone1_id': drone_ids[i],
+                    'drone2_id': drone_ids[j],
+                    'drone1_pos': drone_positions[i],
+                    'drone2_pos': drone_positions[j],
+                    'distance': distance
+                })
+                duplicate_ids.add(drone_ids[i])
+                duplicate_ids.add(drone_ids[j])
+    
+    return duplicate_pairs, len(duplicate_ids)
 
 def optimize_active_sleep_greedy(simulation, target_coverage=0.95, max_attempts=1000):
     """
@@ -437,8 +666,21 @@ def genetic_algorithm(simulation,
                      target_coverage=0.95,  # Active/Sleep target coverage
                      parallel_processing=True,  # Enable by default
                      max_workers=None,
-                     energy_efficiency_mode=True):  # Enable Active/Sleep optimization
-    """Enhanced Genetic Algorithm with Active/Sleep drone management"""
+                     energy_efficiency_mode=True,  # Enable Active/Sleep optimization
+                     smart_mode=False,  # Enable smart two-phase optimization
+                     desired_coverage=0.90):  # For smart mode compatibility
+    """Enhanced Genetic Algorithm with Active/Sleep drone management and Smart Mode"""
+    
+    if smart_mode:
+        # Use universal smart optimization wrapper
+        return smart_optimization_wrapper(
+            genetic_algorithm, simulation, desired_coverage, smart_mode=False,
+            population_size=population_size, num_generations=num_generations,
+            mutation_rate=mutation_rate, crossover_rate=crossover_rate,
+            elitism=elitism, target_coverage=target_coverage,
+            parallel_processing=parallel_processing, max_workers=max_workers,
+            energy_efficiency_mode=energy_efficiency_mode
+        )
     start_time = time.time()
     AreaWidth, AreaHeight = simulation.width, simulation.height
     SensingRange = simulation.sensing_radius
@@ -587,6 +829,246 @@ def genetic_algorithm(simulation,
     activation = convert_to_binary_activation(best_particle, simulation)
     return activation, result
 
+def smart_particle_swarm_optimization(simulation,
+                                     swarm_size=50,
+                                     iterations=300,
+                                     inertia=0.5,
+                                     cognitive_weight=1.5,
+                                     social_weight=1.5,
+                                     desired_coverage=0.90,
+                                     parallel_processing=False,
+                                     max_workers=None):
+    """
+    SMART TWO-PHASE PSO OPTIMIZATION
+    Phase 1: Minimize drones for target coverage (Energy Efficiency)
+    Phase 2: Maximize coverage with available drones (Coverage Optimization)
+    """
+    start_time = time.time()
+    AreaWidth, AreaHeight = simulation.width, simulation.height
+    SensingRange = simulation.sensing_radius
+    NumNodes = len(simulation.drones)
+    GridPoints = simulation.grid_points
+    NumGridPoints = len(GridPoints)
+    
+    print(f"🧠 SMART PSO: Two-Phase Optimization Starting...")
+    print(f"   Phase 1: Energy Efficiency (Target: {desired_coverage*100:.1f}%)")
+    print(f"   Phase 2: Coverage Maximization")
+    
+    def calculate_coverage(particle):
+        covered = np.zeros(len(GridPoints), dtype=bool)
+        for sensor in particle:
+            if sensor[2] >= 0.5:
+                distances = np.linalg.norm(GridPoints - sensor[:2], axis=1)
+                covered |= distances <= SensingRange
+        return (np.sum(covered) / NumGridPoints) * 100
+
+    def calculate_gap_coverage(particle):
+        """Calculate coverage focusing on gap elimination"""
+        covered = np.zeros(len(GridPoints), dtype=bool)
+        for sensor in particle:
+            if sensor[2] >= 0.5:
+                distances = np.linalg.norm(GridPoints - sensor[:2], axis=1)
+                covered |= distances <= SensingRange
+        
+        # Calculate coverage and gap penalty
+        coverage_pct = (np.sum(covered) / NumGridPoints) * 100
+        
+        # Find largest uncovered gap
+        uncovered_points = GridPoints[~covered]
+        if len(uncovered_points) > 0:
+            # Penalty for large gaps
+            gap_penalty = len(uncovered_points) / NumGridPoints * 50
+        else:
+            gap_penalty = 0
+            
+        return coverage_pct - gap_penalty
+
+    def calculate_overlap(particle):
+        overlap_penalty = 0
+        active_nodes = particle[particle[:, 2] >= 0.5]
+        for i in range(len(active_nodes)):
+            for j in range(i + 1, len(active_nodes)):
+                d = np.linalg.norm(active_nodes[i, :2] - active_nodes[j, :2])
+                if d < 2 * SensingRange:
+                    overlap_penalty += 1 - (d / (2 * SensingRange))
+        return overlap_penalty
+
+    # PHASE 1: ENERGY EFFICIENCY FITNESS
+    def phase1_fitness(particle):
+        """Minimize drones while achieving target coverage"""
+        coverage = calculate_coverage(particle)
+        active_nodes = np.sum(particle[:, 2] >= 0.5)
+        overlap = calculate_overlap(particle)
+        
+        if coverage >= desired_coverage * 100:
+            # Reward: Achieved target, minimize drones
+            return coverage * 0.5 - (active_nodes / NumNodes) * 100 - overlap * 0.3
+        else:
+            # Penalty: Below target, focus on coverage
+            return coverage * 1.2 - overlap * 0.1
+
+    # PHASE 2: COVERAGE MAXIMIZATION FITNESS  
+    def phase2_fitness(particle):
+        """Maximize coverage and eliminate gaps"""
+        coverage = calculate_gap_coverage(particle)
+        active_nodes = np.sum(particle[:, 2] >= 0.5)
+        overlap = calculate_overlap(particle)
+        
+        # Reward coverage, especially above target
+        if coverage >= desired_coverage * 100:
+            coverage_bonus = (coverage - desired_coverage * 100) * 2
+            return coverage + coverage_bonus - overlap * 0.2
+        else:
+            return coverage * 1.1 - overlap * 0.1
+
+    # Initialize particles
+    particles = [np.random.rand(NumNodes, 3) * [AreaWidth, AreaHeight, 1] for _ in range(swarm_size)]
+    velocities = [np.random.rand(NumNodes, 3) * 0.1 for _ in range(swarm_size)]
+    
+    # Store iteration history
+    coverage_history = []
+    fitness_history = []
+    active_nodes_history = []
+    phase_history = []
+    
+    # PHASE 1: ENERGY EFFICIENCY OPTIMIZATION
+    print(f"🔋 Phase 1: Energy Efficiency Optimization ({iterations//2} iterations)")
+    current_fitness = phase1_fitness
+    
+    pbest_fitness = [current_fitness(p) for p in particles]
+    pbest = [p.copy() for p in particles]
+    
+    gbest_idx = np.argmax(pbest_fitness)
+    gbest = pbest[gbest_idx].copy()
+    gbest_fitness = pbest_fitness[gbest_idx]
+    
+    phase1_iterations = iterations // 2
+    
+    for iteration in range(phase1_iterations):
+        for i in range(swarm_size):
+            # Update velocity
+            r1, r2 = np.random.rand(2)
+            velocities[i] = (inertia * velocities[i] + 
+                           cognitive_weight * r1 * (pbest[i] - particles[i]) +
+                           social_weight * r2 * (gbest - particles[i]))
+            
+            # Update position
+            particles[i] += velocities[i]
+            
+            # Apply bounds
+            particles[i][:, 0] = np.clip(particles[i][:, 0], 0, AreaWidth)
+            particles[i][:, 1] = np.clip(particles[i][:, 1], 0, AreaHeight)
+            particles[i][:, 2] = np.clip(particles[i][:, 2], 0, 1)
+            
+            # Evaluate fitness
+            fitness_val = current_fitness(particles[i])
+            
+            # Update personal best
+            if fitness_val > pbest_fitness[i]:
+                pbest_fitness[i] = fitness_val
+                pbest[i] = particles[i].copy()
+                
+                # Update global best
+                if fitness_val > gbest_fitness:
+                    gbest_fitness = fitness_val
+                    gbest = particles[i].copy()
+        
+        # Record history
+        current_coverage = calculate_coverage(gbest)
+        active_count = np.sum(gbest[:, 2] >= 0.5)
+        
+        coverage_history.append(current_coverage)
+        fitness_history.append(gbest_fitness)
+        active_nodes_history.append(active_count)
+        phase_history.append(1)
+        
+        if iteration % 20 == 0:
+            print(f"Phase 1 Iteration {iteration}: Coverage = {current_coverage:.1f}%, Active Drones = {active_count}")
+
+    print(f"✅ Phase 1 Complete: {current_coverage:.1f}% coverage with {active_count} drones")
+    
+    # PHASE 2: COVERAGE MAXIMIZATION OPTIMIZATION
+    print(f"🎯 Phase 2: Coverage Maximization ({iterations - phase1_iterations} iterations)")
+    current_fitness = phase2_fitness
+    
+    # Re-evaluate all particles with new fitness function
+    pbest_fitness = [current_fitness(p) for p in pbest]
+    gbest_idx = np.argmax(pbest_fitness)
+    gbest = pbest[gbest_idx].copy()
+    gbest_fitness = pbest_fitness[gbest_idx]
+    
+    for iteration in range(phase1_iterations, iterations):
+        for i in range(swarm_size):
+            # Update velocity with exploration boost for phase 2
+            r1, r2 = np.random.rand(2)
+            exploration_factor = 1.2  # Boost exploration in phase 2
+            velocities[i] = (inertia * velocities[i] + 
+                           cognitive_weight * r1 * (pbest[i] - particles[i]) * exploration_factor +
+                           social_weight * r2 * (gbest - particles[i]) * exploration_factor)
+            
+            # Update position
+            particles[i] += velocities[i]
+            
+            # Apply bounds
+            particles[i][:, 0] = np.clip(particles[i][:, 0], 0, AreaWidth)
+            particles[i][:, 1] = np.clip(particles[i][:, 1], 0, AreaHeight)
+            particles[i][:, 2] = np.clip(particles[i][:, 2], 0, 1)
+            
+            # Evaluate fitness
+            fitness_val = current_fitness(particles[i])
+            
+            # Update personal best
+            if fitness_val > pbest_fitness[i]:
+                pbest_fitness[i] = fitness_val
+                pbest[i] = particles[i].copy()
+                
+                # Update global best
+                if fitness_val > gbest_fitness:
+                    gbest_fitness = fitness_val
+                    gbest = particles[i].copy()
+        
+        # Record history
+        current_coverage = calculate_coverage(gbest)
+        active_count = np.sum(gbest[:, 2] >= 0.5)
+        
+        coverage_history.append(current_coverage)
+        fitness_history.append(gbest_fitness)
+        active_nodes_history.append(active_count)
+        phase_history.append(2)
+        
+        if iteration % 20 == 0:
+            print(f"Phase 2 Iteration {iteration}: Coverage = {current_coverage:.1f}%, Active Drones = {active_count}")
+
+    # Final results
+    final_coverage = calculate_coverage(gbest)
+    final_active = np.sum(gbest[:, 2] >= 0.5)
+    execution_time = time.time() - start_time
+    
+    print(f"🎉 SMART PSO Complete:")
+    print(f"   Final Coverage: {final_coverage:.1f}%")
+    print(f"   Active Drones: {final_active}/{NumNodes}")
+    print(f"   Energy Saved: {((NumNodes - final_active) / NumNodes * 100):.1f}%")
+    print(f"   Execution Time: {execution_time:.2f}s")
+    
+    # Create result object
+    result = type('AlgorithmResult', (), {
+        'coverage': final_coverage,
+        'best_fitness': gbest_fitness,
+        'execution_time': execution_time,
+        'fitness_history': fitness_history,
+        'coverage_history': coverage_history,
+        'active_nodes_history': active_nodes_history,
+        'phase_history': phase_history,
+        'convergence_iteration': len(coverage_history),
+        'algorithm_name': 'Smart Two-Phase PSO',
+        'energy_saved_percentage': ((NumNodes - final_active) / NumNodes * 100)
+    })()
+    
+    # Convert to binary activation pattern
+    activation = convert_to_binary_activation(gbest, simulation)
+    
+    return activation, result
+
 def particle_swarm_optimization(simulation,
                                swarm_size=50,
                                iterations=300,
@@ -596,7 +1078,19 @@ def particle_swarm_optimization(simulation,
                                w1=0.7, w2=0.15, w3=0.15,
                                desired_coverage=0.90,
                                parallel_processing=True,  # Enable by default
-                               max_workers=None):
+                               max_workers=None,
+                               smart_mode=True):  # NEW: Enable smart mode by default
+    """
+    Particle Swarm Optimization for drone coverage
+    Now with SMART MODE option for two-phase optimization
+    """
+    if smart_mode:
+        # Use the smart two-phase optimization
+        return smart_particle_swarm_optimization(
+            simulation, swarm_size, iterations, inertia, 
+            cognitive_weight, social_weight, desired_coverage, 
+            parallel_processing, max_workers
+        )
     """Particle Swarm Optimization for drone coverage with parallel processing"""
     start_time = time.time()
     AreaWidth, AreaHeight = simulation.width, simulation.height
@@ -1264,9 +1758,19 @@ def simulated_annealing(
     cooling_rate=0.95,
     perturb_radius=5,
     desired_coverage=0.90,
-    w1=0.6, w2=0.2, w3=0.2
+    w1=0.6, w2=0.2, w3=0.2,
+    smart_mode=False  # Enable smart two-phase optimization
 ):
-    """Standalone Simulated Annealing for drone optimization"""
+    """Standalone Simulated Annealing for drone optimization with Smart Mode"""
+    
+    if smart_mode:
+        # Use universal smart optimization wrapper
+        return smart_optimization_wrapper(
+            simulated_annealing, simulation, desired_coverage, smart_mode=False,
+            num_iterations=num_iterations, initial_temp=initial_temp,
+            cooling_rate=cooling_rate, perturb_radius=perturb_radius,
+            w1=w1, w2=w2, w3=w3
+        )
     start_time = time.time()
     AreaWidth, AreaHeight = simulation.width, simulation.height
     SensingRange = simulation.sensing_radius

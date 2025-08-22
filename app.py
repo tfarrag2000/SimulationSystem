@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
-DRONE OPTIMIZATION SIMULATION SYSTEM - ENHANCED VERSION WITH ACTIVE/SLEEP MANAGEMENT
-Full-featured version with Active/Sleep drone management and energy efficiency optimization
-Version: 3.0.0 - Major upgrade with Active/Sleep node system and energy efficiency
-Last Updated: 2025-08-09
-Author: Drone Optimization System
+DRONE OPTIMIZATION SIMULATION SYSTEM - SMART OPTIMIZATION VERSION
+Full-featured version with Smart Two-Phase Optimization for ALL algorithms
+Version: 4.0.0 - Major upgrade with Universal Smart Optimization and enhanced AI intelligence
+Last Updated: 2025-08-22
+Author: Advanced Drone Optimization System
+Features: Smart Mode, Active/Sleep Management, Parallel Processing, Multi-Algorithm Support
 """
 
 # Fix matplotlib backend for threading issues
@@ -14,10 +15,10 @@ import matplotlib.pyplot as plt
 plt.ioff()  # Turn off interactive mode
 
 # Version information
-__version__ = "3.0.0"
-__author__ = "Drone Optimization System"
-__last_updated__ = "2025-08-09"
-__description__ = "Enhanced Drone Optimization System with Active/Sleep Management and Energy Efficiency"
+__version__ = "4.0.0"
+__author__ = "Advanced Drone Optimization System"
+__last_updated__ = "2025-08-22"
+__description__ = "Smart Two-Phase Optimization with Universal Algorithm Intelligence"
 
 import dash
 from dash import dcc, html, Input, Output, State, ctx, dash_table
@@ -459,6 +460,9 @@ class DroneSimulationEnvironment:
         # Initialize drone positions
         self.drones = self._initialize_drones()
         
+        # Remove any duplicate drones (safety check)
+        self._remove_duplicate_drones()
+        
     def _initialize_drones(self):
         """Initialize drone positions with energy and status"""
         drones_data = []
@@ -475,6 +479,39 @@ class DroneSimulationEnvironment:
             drones_data.append(drone)
         
         return pd.DataFrame(drones_data)
+    
+    def _remove_duplicate_drones(self, min_distance_threshold=2.0):
+        """Remove drones that are too close to each other (duplicates)"""
+        if len(self.drones) <= 1:
+            return
+        
+        # Get drone positions
+        positions = self.drones[['x', 'y']].values
+        to_remove = set()
+        
+        # Find duplicates
+        for i in range(len(positions)):
+            if i in to_remove:
+                continue
+            for j in range(i + 1, len(positions)):
+                if j in to_remove:
+                    continue
+                
+                distance = np.linalg.norm(positions[i] - positions[j])
+                if distance < min_distance_threshold:
+                    to_remove.add(j)
+                    logger.info(f"🔧 Removing duplicate drone {j} (distance {distance:.2f} from drone {i})")
+        
+        # Remove duplicates
+        if to_remove:
+            keep_indices = [i for i in range(len(self.drones)) if i not in to_remove]
+            self.drones = self.drones.iloc[keep_indices].reset_index(drop=True)
+            
+            # Update drone IDs and count
+            self.drones['id'] = range(len(self.drones))
+            self.num_drones = len(self.drones)
+            
+            logger.info(f"✅ Removed {len(to_remove)} duplicate drones. Remaining: {self.num_drones} drones")
     
     def get_drone_positions(self):
         """Get current drone positions as numpy array"""
@@ -557,7 +594,7 @@ except ImportError as e:
 
 # RESTORED COMPREHENSIVE UI LAYOUT
 app.layout = dbc.Container([
-    # Header
+    # Clean, Simple Header
     dbc.Row([
         dbc.Col([
             html.Div([
@@ -570,7 +607,7 @@ app.layout = dbc.Container([
                     html.Span([
                         html.I(className="fas fa-code-branch me-1 text-muted"),
                         f"v{__version__}"
-                    ], className="badge bg-light text-dark ms-2 fs-6")
+                    ], className="badge bg-primary text-white ms-2 fs-6")
                 ], className="text-center text-muted mb-4 fs-5")
             ], className="py-3")
         ])
@@ -858,7 +895,21 @@ app.layout = dbc.Container([
                                 html.I(className="fas fa-redo me-2"),
                                 "Reset"
                             ], id="reset-btn", color="secondary")
-                        ], className="w-100")
+                        ], className="w-100"),
+                        
+                        # Progress Indicator
+                        html.Div(id="progress-container", children=[
+                            html.Div(id="progress-indicator", children=[], style={'display': 'none'}),
+                            dbc.Progress(
+                                id="optimization-progress",
+                                value=0,
+                                striped=True,
+                                animated=True,
+                                color="info",
+                                style={'display': 'none'},
+                                className="mt-3"
+                            )
+                        ])
                     ])
                 ])
             ])
@@ -1006,16 +1057,16 @@ app.layout = dbc.Container([
                     html.Hr(),
                     html.Div([
                         html.H6([
-                            html.I(className="fas fa-code me-2"),
-                            "Version Information"
+                            html.I(className="fas fa-info-circle me-2"),
+                            "System Information"
                         ], className="mb-2 fw-bold fs-6"),
                         html.Div([
                             html.Small([
-                                html.Strong("App Version: "),
+                                html.Strong("Version: "),
                                 f"{__version__} ({__last_updated__})"
                             ], className="d-block text-muted"),
                             html.Small([
-                                html.Strong("Algorithm Suite: "),
+                                html.Strong("Algorithms: "),
                                 html.Span(id='algorithm-version', children="Loading...")
                             ], className="d-block text-muted"),
                             html.Small([
@@ -1190,6 +1241,75 @@ def toggle_stopping_criteria_controls(enable_stopping):
         return {'display': 'block'}
     else:
         return {'display': 'none'}
+
+# Progress Indicator and Button States
+@app.callback(
+    [Output('progress-indicator', 'children'),
+     Output('progress-indicator', 'style'),
+     Output('optimization-progress', 'style'),
+     Output('optimization-progress', 'value'),
+     Output('run-btn', 'disabled'),
+     Output('stop-btn', 'disabled')],
+    [Input('interval-component', 'n_intervals'),
+     Input('run-btn', 'n_clicks'),
+     Input('stop-btn', 'n_clicks')],
+    [State('current-state', 'data'),
+     State('algorithm-dropdown', 'value')],
+    prevent_initial_call=True
+)
+def update_progress_indicator(n_intervals, run_clicks, stop_clicks, current_state, algorithm):
+    """Update progress indicator and button states during optimization"""
+    ctx_triggered = ctx.triggered[0]['prop_id'].split('.')[0] if ctx.triggered else None
+    
+    # Default states
+    progress_children = []
+    progress_style = {'display': 'none'}
+    progress_bar_style = {'display': 'none'}
+    progress_value = 0
+    run_disabled = False
+    stop_disabled = True
+    
+    if current_state and current_state.get('status') == 'running':
+        # Algorithm is running - show progress
+        run_disabled = True
+        stop_disabled = False
+        
+        progress_style = {'display': 'block'}
+        progress_bar_style = {'display': 'block', 'margin-top': '10px'}
+        
+        # Get progress information
+        algorithm_name = current_state.get('algorithm', algorithm or 'Algorithm').upper()
+        iteration = current_state.get('current_iteration', 0)
+        max_iterations = current_state.get('max_iterations', 100)
+        
+        # Calculate progress percentage
+        if max_iterations > 0:
+            progress_value = min((iteration / max_iterations) * 100, 100)
+        
+        progress_children = [
+            html.Div([
+                html.I(className="fas fa-cog fa-spin me-2 text-info"),
+                html.Strong(f"Running {algorithm_name} Optimization...", className="text-info"),
+            ], className="d-flex align-items-center mb-2"),
+            html.Small([
+                f"Iteration {iteration}/{max_iterations} ({progress_value:.1f}%)"
+            ], className="text-muted")
+        ]
+        
+    elif ctx_triggered == 'stop-btn':
+        # User clicked stop
+        progress_children = [
+            html.Div([
+                html.I(className="fas fa-stop me-2 text-warning"),
+                html.Strong("Stopping optimization...", className="text-warning"),
+            ], className="d-flex align-items-center")
+        ]
+        progress_style = {'display': 'block'}
+        run_disabled = True
+        stop_disabled = True
+    
+    return (progress_children, progress_style, progress_bar_style, 
+            progress_value, run_disabled, stop_disabled)
 
 # Main Graph Callback
 @app.callback(
@@ -2196,8 +2316,26 @@ def enhanced_control_simulation(run_clicks, stop_clicks, reset_clicks,
     
     ctx_triggered = ctx.triggered[0]['prop_id'].split('.')[0] if ctx.triggered else None
     
+    # Handle Stop Button
+    if ctx_triggered == 'stop-btn' and stop_clicks:
+        logger.info("🛑 User requested optimization stop")
+        return {}, {
+            'status': 'stopped',
+            'message': 'Optimization stopped by user',
+            'timestamp': datetime.now().isoformat()
+        }, True
+    
+    # Handle Reset Button  
+    if ctx_triggered == 'reset-btn' and reset_clicks:
+        logger.info("🔄 User requested system reset")
+        return {}, {
+            'status': 'reset',
+            'message': 'System reset',
+            'timestamp': datetime.now().isoformat()
+        }, True
+    
     if ctx_triggered == 'run-btn' and run_clicks:
-        logger.info(f"� Validating experiment settings...")
+        logger.info(f"🚀 Validating experiment settings...")
         
         # Comprehensive validation
         validation_result = validate_experiment_settings(
@@ -2220,6 +2358,16 @@ def enhanced_control_simulation(run_clicks, stop_clicks, reset_clicks,
             logger.warning(f"⚠️ Validation warnings: {validation_result['warnings']}")
         
         logger.info(f"✅ Validation passed. Starting Enhanced {algorithm} optimization...")
+        
+        # Set initial running state
+        initial_state = {
+            'status': 'running',
+            'algorithm': algorithm,
+            'current_iteration': 0,
+            'max_iterations': max_iterations or 150,
+            'message': f'Starting {algorithm.upper()} optimization...',
+            'timestamp': datetime.now().isoformat()
+        }
         
         try:
             # Create simulation environment
@@ -2272,24 +2420,66 @@ def enhanced_control_simulation(run_clicks, stop_clicks, reset_clicks,
                 # Import the required algorithm functions
                 from algorithms import particle_swarm_optimization, genetic_algorithm, simulated_annealing
                 
+                # Create progress callback function
+                def progress_callback(iteration, max_iters, fitness, coverage=None):
+                    progress_pct = (iteration / max_iters) * 100
+                    message = f"Running {algorithm.upper()}: Iteration {iteration}/{max_iters} ({progress_pct:.1f}%)"
+                    if coverage is not None:
+                        message += f" - Coverage: {coverage:.1f}%"
+                    
+                    progress_data = {
+                        'status': 'running',
+                        'algorithm': algorithm.upper(),
+                        'current_iteration': iteration,
+                        'max_iterations': max_iters,
+                        'progress_percentage': progress_pct,
+                        'current_fitness': fitness,
+                        'current_coverage': coverage,
+                        'message': message,
+                        'timestamp': datetime.now().isoformat()
+                    }
+                    
+                    # Note: In production, this would trigger real-time updates
+                    logger.info(f"📊 Progress: {message}")
+                
                 # Run the actual algorithm with correct parameter names and OPTIMAL CONFIGURATIONS
                 if algorithm == 'pso':
-                    # Use PSO_Balanced configuration (optimal for dashboard)
-                    logger.info("🎯 Using PSO_Balanced configuration for optimal results")
+                    # Use PSO with automatic intelligent optimization
+                    logger.info("🎯 Running Intelligent PSO with automatic optimization")
+                    
                     activation, result = particle_swarm_optimization(
                         env,  # Pass env as simulation parameter 
                         swarm_size=50,
-                        iterations=150,
+                        iterations=max_iterations or 150,
                         inertia=0.7,
                         cognitive_weight=1.5,
                         social_weight=1.5,
                         parallel_processing=False,  # Critical: disable to avoid pickle errors
-                        desired_coverage=target_cov
+                        desired_coverage=target_cov,
+                        smart_mode=True,  # Always enable intelligent optimization
+                        progress_callback=progress_callback
                     )
                 elif algorithm == 'ga':
-                    activation, result = genetic_algorithm(env, num_generations=max_iterations or 150, target_coverage=target_cov)
+                    logger.info("🧬 Running Intelligent Genetic Algorithm")
+                    
+                    activation, result = genetic_algorithm(
+                        env, 
+                        num_generations=max_iterations or 150, 
+                        target_coverage=target_cov,
+                        smart_mode=True,  # Always enable intelligent optimization
+                        desired_coverage=target_cov,
+                        progress_callback=progress_callback
+                    )
                 elif algorithm == 'sa':
-                    activation, result = simulated_annealing(env, num_iterations=max_iterations or 150, desired_coverage=target_cov)
+                    logger.info("🔥 Running Intelligent Simulated Annealing")
+                    
+                    activation, result = simulated_annealing(
+                        env, 
+                        num_iterations=max_iterations or 150, 
+                        desired_coverage=target_cov,
+                        smart_mode=True,  # Always enable intelligent optimization
+                        progress_callback=progress_callback
+                    )
                 
                 # Calculate coverage - use result.coverage if available, otherwise calculate from activation
                 if hasattr(result, 'coverage') and result.coverage is not None:
@@ -2384,7 +2574,16 @@ def enhanced_control_simulation(run_clicks, stop_clicks, reset_clicks,
                     'timestamp': datetime.now().isoformat()
                 }
             
-            return simulation_data, {'status': 'completed', 'message': 'Optimization completed successfully'}, True
+            # Final completion message
+            completion_state = {
+                'status': 'completed',
+                'message': f'{algorithm.upper()} optimization completed successfully! Final coverage: {simulation_data.get("final_coverage", 0):.1f}%',
+                'algorithm': algorithm.upper(),
+                'final_results': True,
+                'timestamp': datetime.now().isoformat()
+            }
+            
+            return simulation_data, completion_state, True
             
         except Exception as e:
             logger.error(f"Error in enhanced simulation: {e}")
