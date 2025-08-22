@@ -7,6 +7,12 @@ Last Updated: 2025-08-09
 Author: Drone Optimization System
 """
 
+# Fix matplotlib backend for threading issues
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend
+import matplotlib.pyplot as plt
+plt.ioff()  # Turn off interactive mode
+
 # Version information
 __version__ = "3.0.0"
 __author__ = "Drone Optimization System"
@@ -36,7 +42,114 @@ except ImportError:
 
 # Import system modules
 from algorithms import *
-# from drone_visualization import create_2d_drone_visualization, create_energy_efficiency_dashboard, create_drone_status_table
+
+# Define visualization functions inline to avoid import issues
+def create_2d_drone_visualization(drones_data, coverage_data, simulation_params):
+    """Create 2D drone visualization using Plotly - INLINE VERSION"""
+    import plotly.graph_objs as go
+    
+    try:
+        # Get parameters
+        width = simulation_params.get('width', 60)
+        height = simulation_params.get('height', 60)
+        sensing_range = simulation_params.get('sensing_range', 15)
+        
+        fig = go.Figure()
+        
+        # Draw area boundary
+        fig.add_shape(
+            type="rect",
+            x0=0, y0=0, x1=width, y1=height,
+            line=dict(color="black", width=2),
+            fillcolor="lightgray",
+            opacity=0.3
+        )
+        
+        # Separate active and sleeping drones
+        active_drones = [d for d in drones_data if d.get('status') == 'active']
+        sleeping_drones = [d for d in drones_data if d.get('status') != 'active']
+        
+        # Add active drones
+        if active_drones:
+            active_x = [d['position'][0] for d in active_drones]
+            active_y = [d['position'][1] for d in active_drones]
+            fig.add_trace(go.Scatter(
+                x=active_x, y=active_y,
+                mode='markers',
+                marker=dict(size=12, color='green', symbol='circle'),
+                name='Active Drones'
+            ))
+        
+        # Add sleeping drones
+        if sleeping_drones:
+            sleeping_x = [d['position'][0] for d in sleeping_drones]
+            sleeping_y = [d['position'][1] for d in sleeping_drones]
+            fig.add_trace(go.Scatter(
+                x=sleeping_x, y=sleeping_y,
+                mode='markers',
+                marker=dict(size=10, color='gray', symbol='circle', opacity=0.7),
+                name='Sleeping Drones'
+            ))
+        
+        # Update layout
+        fig.update_layout(
+            title="Drone Deployment Visualization",
+            xaxis=dict(title="X Position", range=[0, width], showgrid=True),
+            yaxis=dict(title="Y Position", range=[0, height], showgrid=True),
+            showlegend=True,
+            template="plotly_white"
+        )
+        
+        return fig
+    
+    except Exception as e:
+        # Return error visualization
+        fig = go.Figure()
+        fig.add_annotation(
+            text=f"Error: {str(e)}",
+            x=0.5, y=0.5, xref="paper", yref="paper",
+            showarrow=False, font=dict(size=16, color="red")
+        )
+        return fig
+
+# REMOVED: create_2d_drone_visualization function - was causing scope issues
+# All visualizations now handled directly in callbacks
+
+def create_energy_efficiency_dashboard(data):
+    """Create energy efficiency dashboard using Plotly"""
+    import plotly.graph_objs as go
+    
+    fig = go.Figure()
+    fig.add_annotation(
+        text="Energy Efficiency Dashboard\n(Placeholder)",
+        x=0.5, y=0.5,
+        xref="paper", yref="paper",
+        showarrow=False,
+        font=dict(size=16)
+    )
+    fig.update_layout(
+        title="Energy Efficiency Dashboard",
+        template="plotly_white"
+    )
+    return fig
+
+def create_drone_status_table(data):
+    """Create drone status table using Plotly"""
+    import plotly.graph_objs as go
+    
+    fig = go.Figure()
+    fig.add_annotation(
+        text="Drone Status Table\n(Placeholder)",
+        x=0.5, y=0.5,
+        xref="paper", yref="paper",
+        showarrow=False,
+        font=dict(size=16)
+    )
+    fig.update_layout(
+        title="Drone Status Table",
+        template="plotly_white"
+    )
+    return fig
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -154,6 +267,175 @@ app = dash.Dash(
     title="Drone Optimization System"
 )
 
+# ===== EXPERIMENT VALIDATION SYSTEM =====
+
+def validate_experiment_settings(width, height, total_drones, radius, target_coverage=None, algorithm=None):
+    """
+    Comprehensive validation of experiment settings with detailed error explanations
+    Returns: dict with 'is_valid', 'errors', 'warnings', 'recommendations'
+    """
+    validation_result = {
+        'is_valid': True,
+        'errors': [],
+        'warnings': [],
+        'recommendations': []
+    }
+    
+    # Critical validation errors (prevent experiment from running)
+    if not algorithm:
+        validation_result['errors'].append("❌ No algorithm selected. Please choose an optimization algorithm from the dropdown.")
+        validation_result['is_valid'] = False
+    
+    # Parameter presence check
+    missing_params = []
+    if not width or width <= 0:
+        missing_params.append("Grid Width")
+    if not height or height <= 0:
+        missing_params.append("Grid Height") 
+    if not total_drones or total_drones <= 0:
+        missing_params.append("Number of Drones")
+    if not radius or radius <= 0:
+        missing_params.append("Coverage Radius")
+        
+    if missing_params:
+        validation_result['errors'].append(f"❌ Missing or invalid parameters: {', '.join(missing_params)}. All values must be positive numbers.")
+        validation_result['is_valid'] = False
+        return validation_result
+    
+    # Advanced validation (only if basic params are valid)
+    total_area = width * height
+    
+    # Area size validation
+    if total_area > 100000:
+        validation_result['errors'].append(
+            f"❌ Grid too large: {width}×{height} = {total_area:,} units. "
+            f"Maximum recommended: 100,000 units (e.g., 316×316). "
+            f"Large grids cause memory issues and slow performance."
+        )
+        validation_result['is_valid'] = False
+    
+    # Drone count validation
+    if total_drones > 100:
+        validation_result['errors'].append(
+            f"❌ Too many drones: {total_drones}. Maximum recommended: 100 drones. "
+            f"Excessive drones cause computational issues."
+        )
+        validation_result['is_valid'] = False
+    
+    # Radius validation relative to grid
+    max_dimension = max(width, height)
+    if radius > max_dimension:
+        validation_result['errors'].append(
+            f"❌ Coverage radius ({radius}) is larger than grid dimensions ({width}×{height}). "
+            f"Radius cannot exceed the largest grid dimension."
+        )
+        validation_result['is_valid'] = False
+    
+    # Performance and logic warnings (allow experiment but warn user)
+    if validation_result['is_valid']:
+        # Area size warnings
+        if total_area > 50000:
+            validation_result['warnings'].append(
+                f"⚠️ Large area ({total_area:,} units) may cause slow performance. "
+                f"Consider reducing to ≤50,000 units for faster results."
+            )
+        
+        # Drone density analysis
+        drone_density = total_drones / total_area * 1000
+        if drone_density < 0.1:
+            validation_result['warnings'].append(
+                f"⚠️ Very low drone density ({drone_density:.2f} drones per 1000 units²). "
+                f"Coverage will likely be poor. Consider increasing drone count or reducing area."
+            )
+        elif drone_density > 10.0:
+            validation_result['warnings'].append(
+                f"⚠️ Very high drone density ({drone_density:.1f} drones per 1000 units²). "
+                f"Excessive overlap and wasted resources. Consider reducing drones or increasing area."
+            )
+        
+        # Coverage feasibility check
+        max_coverage_area = total_drones * np.pi * radius**2
+        theoretical_max_coverage = min(100, (max_coverage_area / total_area) * 100)
+        
+        if theoretical_max_coverage < 30:
+            validation_result['warnings'].append(
+                f"⚠️ Very low theoretical maximum coverage ({theoretical_max_coverage:.1f}%). "
+                f"Consider increasing radius ({radius}) or drone count ({total_drones})."
+            )
+        
+        # Target coverage validation
+        if target_coverage and target_coverage > theoretical_max_coverage * 0.9:
+            validation_result['warnings'].append(
+                f"⚠️ Target coverage ({target_coverage}%) may be unrealistic. "
+                f"Theoretical maximum is {theoretical_max_coverage:.1f}%. "
+                f"Consider reducing target to {theoretical_max_coverage * 0.8:.0f}%."
+            )
+        
+        # Radius optimization suggestions
+        radius_ratio = radius / min(width, height)
+        if radius_ratio > 0.8:
+            validation_result['warnings'].append(
+                f"⚠️ Coverage radius ({radius}) is very large relative to grid size. "
+                f"This may cause excessive overlap and computational overhead."
+            )
+        elif radius_ratio < 0.05:
+            validation_result['recommendations'].append(
+                f"💡 Small coverage radius ({radius}) relative to grid size. "
+                f"Consider increasing radius to {min(width, height) * 0.1:.0f}-{min(width, height) * 0.2:.0f} for better coverage."
+            )
+        
+        # Algorithm-specific recommendations
+        if algorithm and 'genetic' in algorithm.lower() and total_drones > 50:
+            validation_result['recommendations'].append(
+                f"💡 Genetic algorithms with {total_drones} drones may be slow. "
+                f"Consider using PSO or SA for faster results with many drones."
+            )
+        
+        # Performance recommendations
+        if total_area < 1000 and total_drones > 20:
+            validation_result['recommendations'].append(
+                f"💡 Small area ({total_area} units) with many drones ({total_drones}). "
+                f"Consider reducing drones or increasing area for more realistic scenarios."
+            )
+    
+    return validation_result
+
+def format_validation_message(validation_result):
+    """Format validation results into user-friendly message"""
+    messages = []
+    
+    if validation_result['errors']:
+        messages.append("🚫 EXPERIMENT CANNOT START - Critical Issues:")
+        for error in validation_result['errors']:
+            messages.append(f"   {error}")
+        messages.append("")
+    
+    if validation_result['warnings']:
+        messages.append("⚠️ WARNINGS - Experiment can run but may have issues:")
+        for warning in validation_result['warnings']:
+            messages.append(f"   {warning}")
+        messages.append("")
+    
+    if validation_result['recommendations']:
+        messages.append("💡 RECOMMENDATIONS for better results:")
+        for rec in validation_result['recommendations']:
+            messages.append(f"   {rec}")
+        messages.append("")
+    
+    if not validation_result['errors'] and not validation_result['warnings']:
+        messages.append("✅ All settings look good! Experiment ready to run.")
+    
+    # Add general guidelines
+    messages.extend([
+        "📋 GENERAL GUIDELINES:",
+        "   • Grid size: 20×20 to 316×316 (up to 100,000 units)",
+        "   • Drones: 5-50 for optimal performance", 
+        "   • Radius: 10-30% of smallest grid dimension",
+        "   • Density: 0.5-5 drones per 1000 units² for balanced coverage"
+    ])
+    
+    return "\n".join(messages)
+
 # ===== ACTIVE/SLEEP DRONE SIMULATION ENVIRONMENT =====
 
 class DroneSimulationEnvironment:
@@ -201,6 +483,9 @@ class DroneSimulationEnvironment:
     def set_active_drones(self, activation_pattern):
         """Set which drones are active based on activation pattern"""
         if len(activation_pattern) != len(self.drones):
+            print(f"DEBUG: Environment has {len(self.drones)} drones but activation pattern has {len(activation_pattern)} elements")
+            print(f"DEBUG: num_drones parameter was: {self.num_drones}")
+            print(f"DEBUG: Actual drones created: {len(self.drones)}")
             raise ValueError(f"Activation pattern length {len(activation_pattern)} doesn't match number of drones {len(self.drones)}")
         
         for i, active in enumerate(activation_pattern):
@@ -225,7 +510,7 @@ class DroneSimulationEnvironment:
         for point in self.grid_points:
             covered = False
             for _, drone in active_drones.iterrows():
-                distance = np.linalg.norm(point - [drone['x'], drone['y']])
+                distance = np.linalg.norm(point - [drone.x, drone.y])
                 if distance <= self.sensing_radius:
                     covered = True
                     break
@@ -330,7 +615,7 @@ app.layout = dbc.Container([
                                 {'label': config['name'], 'value': key}
                                 for key, config in ALGORITHM_CONFIGS.items()
                             ],
-                            value='greedy',
+                            value='pso',
                             className="mb-3"
                         )
                     ]),
@@ -379,7 +664,7 @@ app.layout = dbc.Container([
                                 dbc.Input(
                                     id="coverage-radius",
                                     type="number",
-                                    value=14,
+                                    value=15,
                                     min=3, max=20, step=1,
                                     placeholder="Radius"
                                 ),
@@ -420,7 +705,7 @@ app.layout = dbc.Container([
                                         dbc.Input(
                                             id="total-available-drones",
                                             type="number",
-                                            value=20,
+                                            value=25,
                                             min=10, max=100, step=1,
                                             placeholder="Total Drones Available"
                                         ),
@@ -430,12 +715,19 @@ app.layout = dbc.Container([
                                         dbc.Input(
                                             id="energy-target-coverage",
                                             type="number",
-                                            value=95.0,
+                                            value=85.0,
                                             min=80.0, max=99.9, step=0.1,
-                                            placeholder="Target Coverage %"
+                                            placeholder="Energy Mode Target %"
                                         ),
-                                        html.Small("Target Coverage (%)", className="text-muted small")
+                                        html.Small("Energy Mode Target (%)", className="text-muted small")
                                     ], width=6)
+                                ], className="mb-2"),
+                                
+                                # Add clarifying note
+                                html.Div([
+                                    html.I(className="fas fa-info-circle me-1 text-info"),
+                                    html.Small("Energy Mode Target: Coverage goal for energy-efficient optimization", 
+                                             className="text-info")
                                 ], className="mb-2"),
                                 
                                 dbc.Row([
@@ -479,6 +771,10 @@ app.layout = dbc.Container([
                     # Stopping Criteria Configuration
                     html.Div([
                         html.Label("Stopping Criteria:", className="form-label fw-bold fs-6"),
+                        html.Small([
+                            html.I(className="fas fa-info-circle me-1 text-info"),
+                            "Early Stop Target: Algorithm stops when this coverage is reached"
+                        ], className="text-info small d-block mb-2"),
                         dbc.Row([
                             dbc.Col([
                                 dbc.Switch(
@@ -497,7 +793,7 @@ app.layout = dbc.Container([
                                 dbc.Input(
                                     id="max-iterations",
                                     type="number",
-                                    value=500,
+                                    value=150,
                                     min=20, max=5000, step=10,
                                     placeholder="Max Iterations",
                                     persistence=True,
@@ -509,13 +805,13 @@ app.layout = dbc.Container([
                                 dbc.Input(
                                     id="target-coverage",
                                     type="number",
-                                    value=99.0,
+                                    value=95.0,
                                     min=50.0, max=100.0, step=1.0,
-                                    placeholder="Target Coverage",
+                                    placeholder="Early Stop Target %",
                                     persistence=True,
                                     persistence_type='memory'
                                 ),
-                                html.Small("Target Coverage (%)", className="text-muted small")
+                                html.Small("Early Stop Target (%)", className="text-muted small")
                             ], width=6)
                         ], className="mb-2"),
                         dbc.Row([
@@ -535,7 +831,7 @@ app.layout = dbc.Container([
                                 dbc.Input(
                                     id="stagnation-limit",
                                     type="number",
-                                    value=100,
+                                    value=30,
                                     min=5, max=500, step=5,
                                     placeholder="Stagnation Limit",
                                     persistence=True,
@@ -614,6 +910,21 @@ app.layout = dbc.Container([
                     ]),
                     dcc.Graph(
                         id='active-sleep-grid',
+                        figure={
+                            'data': [],
+                            'layout': {
+                                'title': 'Active/Sleep Drone Visualization',
+                                'xaxis': {'title': 'X Position', 'range': [0, 60]},
+                                'yaxis': {'title': 'Y Position', 'range': [0, 60]},
+                                'annotations': [{
+                                    'text': 'Run simulation to see drone deployment',
+                                    'x': 30, 'y': 30,
+                                    'showarrow': False,
+                                    'font': {'size': 16, 'color': 'gray'}
+                                }],
+                                'template': 'plotly_white'
+                            }
+                        },
                         config={'displayModeBar': True},
                         style={"height": "450px"}
                     ),
@@ -689,6 +1000,8 @@ app.layout = dbc.Container([
                     ], className="mb-0 fw-bold")
                 ]),
                 dbc.CardBody([
+                    # Validation Feedback Area
+                    html.Div(id='validation-feedback', className="mb-3"),
                     html.Div(id='status-display', className="mb-3"),
                     html.Hr(),
                     html.Div([
@@ -1450,6 +1763,95 @@ def export_csv(n_clicks, simulation_data):
     df = pd.DataFrame(csv_data)
     return dcc.send_data_frame(df.to_csv, filename, index=False)
 
+# Real-time Validation Feedback Callback
+@app.callback(
+    Output('validation-feedback', 'children'),
+    [Input('algorithm-dropdown', 'value'),
+     Input('grid-width', 'value'),
+     Input('grid-height', 'value'),
+     Input('num-drones', 'value'),
+     Input('coverage-radius', 'value'),
+     Input('target-coverage', 'value')]
+)
+def update_validation_feedback(algorithm, width, height, num_drones, radius, target_coverage):
+    """Provide real-time validation feedback as users change settings"""
+    
+    # Don't show validation if no values are set yet
+    if not any([algorithm, width, height, num_drones, radius]):
+        return html.Div()
+    
+    # Get validation results
+    validation_result = validate_experiment_settings(
+        width, height, num_drones, radius, target_coverage, algorithm
+    )
+    
+    feedback_components = []
+    
+    # Show errors
+    if validation_result['errors']:
+        error_alerts = []
+        for error in validation_result['errors']:
+            error_alerts.append(
+                dbc.Alert([
+                    html.I(className="fas fa-exclamation-triangle me-2"),
+                    error
+                ], color="danger", className="mb-2")
+            )
+        
+        feedback_components.extend([
+            html.H6("⚠️ Issues Found:", className="text-danger mb-2"),
+            html.Div(error_alerts)
+        ])
+    
+    # Show warnings  
+    if validation_result['warnings']:
+        warning_alerts = []
+        for warning in validation_result['warnings']:
+            warning_alerts.append(
+                dbc.Alert([
+                    html.I(className="fas fa-exclamation-circle me-2"),
+                    warning
+                ], color="warning", className="mb-2")
+            )
+        
+        if feedback_components:
+            feedback_components.append(html.Hr())
+            
+        feedback_components.extend([
+            html.H6("⚠️ Warnings:", className="text-warning mb-2"), 
+            html.Div(warning_alerts)
+        ])
+    
+    # Show recommendations
+    if validation_result['recommendations']:
+        rec_alerts = []
+        for rec in validation_result['recommendations']:
+            rec_alerts.append(
+                dbc.Alert([
+                    html.I(className="fas fa-lightbulb me-2"),
+                    rec
+                ], color="info", className="mb-2")
+            )
+        
+        if feedback_components:
+            feedback_components.append(html.Hr())
+            
+        feedback_components.extend([
+            html.H6("💡 Suggestions:", className="text-info mb-2"),
+            html.Div(rec_alerts)
+        ])
+    
+    # Show success message if all good
+    if validation_result['is_valid'] and not validation_result['warnings']:
+        feedback_components.append(
+            dbc.Alert([
+                html.I(className="fas fa-check-circle me-2"),
+                "✅ Settings look good! Ready to run experiment."
+            ], color="success", className="mb-2")
+        )
+    
+    return html.Div(feedback_components)
+
 # Status Display Callback
 @app.callback(
     [Output('status-display', 'children'),
@@ -1483,14 +1885,47 @@ def update_status(current_state):
         
         message = current_state.get('message', status.title())
         
-        status_display = dbc.Alert([
-            html.I(className=f"{icon} me-2"),
-            f"Status: {message}"
-        ], color=color, className="mb-0")
+        # Handle detailed validation error messages
+        if status == 'error' and isinstance(message, str) and len(message) > 100:
+            # For long validation messages, create expandable alert
+            lines = message.split('\n')
+            summary = lines[0] if lines else message[:100] + "..."
+            
+            status_display = dbc.Alert([
+                html.I(className=f"{icon} me-2"),
+                html.Div([
+                    html.Strong(f"Status: {summary}"),
+                    dbc.Collapse([
+                        html.Hr(),
+                        html.Pre(message, style={'font-size': '12px', 'max-height': '300px', 'overflow-y': 'auto'})
+                    ], id="error-details-collapse", is_open=False),
+                    html.Div([
+                        dbc.Button("Show Details", id="toggle-error-details", size="sm", 
+                                 color="outline-danger", className="mt-2")
+                    ])
+                ])
+            ], color=color, className="mb-0")
+        else:
+            status_display = dbc.Alert([
+                html.I(className=f"{icon} me-2"),
+                f"Status: {message}"
+            ], color=color, className="mb-0")
     
     algorithm_version_info = f"{algo_version} ({algo_updated})"
     
     return status_display, algorithm_version_info
+
+# Error Details Toggle Callback
+@app.callback(
+    [Output("error-details-collapse", "is_open"),
+     Output("toggle-error-details", "children")],
+    [Input("toggle-error-details", "n_clicks")],
+    [State("error-details-collapse", "is_open")]
+)
+def toggle_error_details(n_clicks, is_open):
+    if n_clicks:
+        return not is_open, "Hide Details" if not is_open else "Show Details"
+    return is_open, "Show Details"
 
 # ===== ACTIVE/SLEEP DRONE MANAGEMENT CALLBACKS =====
 
@@ -1504,92 +1939,140 @@ def update_status(current_state):
      Input('coverage-radius', 'value')]
 )
 def update_active_sleep_grid(simulation_data, width, height, num_drones, radius):
-    """Update the Active/Sleep drone grid visualization using enhanced 2D visualization"""
-    
-    # Set default values if not provided
-    width = width or 50
-    height = height or 50
-    num_drones = num_drones or 15
-    radius = radius or 8
+    """Update the Active/Sleep drone grid visualization - SIMPLIFIED VERSION"""
     
     try:
-        # Create simulation environment
-        env = DroneSimulationEnvironment(width, height, num_drones, radius)
+        # Set default values if not provided
+        width = width or 50
+        height = height or 50
+        num_drones = num_drones or 15
+        radius = radius or 8
+        
+        # Create a simple Plotly figure
+        fig = go.Figure()
+        
+        # Add grid boundary
+        fig.add_shape(
+            type="rect",
+            x0=0, y0=0, x1=width, y1=height,
+            line=dict(color="black", width=2),
+            fillcolor="lightblue",
+            opacity=0.1
+        )
         
         if simulation_data and 'activation_pattern' in simulation_data:
-            # Use actual results from optimization
+            # Show actual simulation results with REAL drone positions
             activation_pattern = simulation_data['activation_pattern']
-            env.set_active_drones(activation_pattern)
+            drone_positions = simulation_data.get('drone_positions', [])
+            env_params = simulation_data.get('environment_params', {})
+            sensing_radius = env_params.get('sensing_radius', radius)
             
-            # Prepare drone data for enhanced visualization
-            drone_positions = env.get_drone_positions()
-            drones_data = []
+            if drone_positions and len(drone_positions) == len(activation_pattern):
+                # Use REAL drone positions from PSO optimization
+                positions = drone_positions
+                logger.info(f"🎯 Using REAL drone positions from PSO: {len(positions)} drones")
+            else:
+                # Fallback to grid positions only if real positions not available
+                positions = []
+                for i in range(len(activation_pattern)):
+                    x = (i % int(width**0.5)) * (width / int(width**0.5))
+                    y = (i // int(width**0.5)) * (height / int(width**0.5))
+                    positions.append([x, y])
+                logger.warning(f"⚠️ Using fallback grid positions: {len(positions)} drones")
             
-            for i, pos in enumerate(drone_positions):
-                is_active = i in activation_pattern
-                drones_data.append({
-                    'id': i + 1,
-                    'x': pos[0],
-                    'y': pos[1],
-                    'active': is_active,
-                    'coverage_area': radius if is_active else 0,
-                    'strategic_score': 0.8 if is_active else 0.2
-                })
+            # Separate active and sleeping drones based on activation pattern
+            active_indices = [i for i, active in enumerate(activation_pattern) if active >= 0.5]
+            active_positions = [positions[i] for i in active_indices if i < len(positions)]
+            active_x = [pos[0] for pos in active_positions]
+            active_y = [pos[1] for pos in active_positions]
             
-            # Prepare coverage data
-            coverage_data = {
-                'coverage': simulation_data.get('final_coverage', 0) * 100,
-                'energy_saved': ((num_drones - len(activation_pattern)) / num_drones) * 100,
-                'active_count': len(activation_pattern),
-                'total_count': num_drones
-            }
+            sleeping_indices = [i for i, active in enumerate(activation_pattern) if active < 0.5]
+            sleeping_positions = [positions[i] for i in sleeping_indices if i < len(positions)]
+            sleeping_x = [pos[0] for pos in sleeping_positions]
+            sleeping_y = [pos[1] for pos in sleeping_positions]
             
-            # Prepare simulation parameters
-            simulation_params = {
-                'width': width,
-                'height': height,
-                'sensing_range': radius
-            }
+            # Add coverage circles for active drones
+            for pos in active_positions:
+                fig.add_shape(
+                    type="circle",
+                    xref="x", yref="y",
+                    x0=pos[0] - sensing_radius, y0=pos[1] - sensing_radius,
+                    x1=pos[0] + sensing_radius, y1=pos[1] + sensing_radius,
+                    line=dict(color="lightgreen", width=1),
+                    fillcolor="lightgreen",
+                    opacity=0.2
+                )
             
-            # Create enhanced 2D visualization
-            fig = create_2d_drone_visualization(drones_data, coverage_data, simulation_params)
+            # Add active drones
+            if active_x:
+                fig.add_trace(go.Scatter(
+                    x=active_x, y=active_y,
+                    mode='markers',
+                    marker=dict(size=15, color='green', symbol='circle', line=dict(width=2, color='darkgreen')),
+                    name=f'Active Drones ({len(active_x)})',
+                    hovertemplate='<b>Active Drone</b><br>X: %{x:.1f}<br>Y: %{y:.1f}<br>Coverage Radius: ' + f'{sensing_radius}<extra></extra>'
+                ))
+            
+            # Add sleeping drones
+            if sleeping_x:
+                fig.add_trace(go.Scatter(
+                    x=sleeping_x, y=sleeping_y,
+                    mode='markers',
+                    marker=dict(size=12, color='gray', symbol='circle', opacity=0.7, line=dict(width=1, color='darkgray')),
+                    name=f'Sleeping Drones ({len(sleeping_x)})',
+                    hovertemplate='<b>Sleeping Drone</b><br>X: %{x:.1f}<br>Y: %{y:.1f}<br>Status: Energy Saving<extra></extra>'
+                ))
+            
+            # Update title with real statistics
+            total_drones = len(activation_pattern)
+            active_count = len(active_x)
+            coverage_percent = simulation_data.get('final_coverage', 0)
+            title = f"PSO Optimized Deployment: {active_count}/{total_drones} active drones, {coverage_percent:.1f}% coverage"
             
         else:
-            # Default view - show all drones as sleeping (gray)
-            drone_positions = env.get_drone_positions()
-            drones_data = []
-            
-            for i, pos in enumerate(drone_positions):
-                drones_data.append({
-                    'id': i + 1,
-                    'x': pos[0],
-                    'y': pos[1],
-                    'active': False,
-                    'coverage_area': 0,
-                    'strategic_score': 0.2
-                })
-            
-            coverage_data = {
-                'coverage': 0,
-                'energy_saved': 100,  # All sleeping = 100% energy saved
-                'active_count': 0,
-                'total_count': num_drones
-            }
-            
-            simulation_params = {
-                'width': width,
-                'height': height,
-                'sensing_range': radius
-            }
-            
-            # Create default visualization
-            fig = create_2d_drone_visualization(drones_data, coverage_data, simulation_params)
+            # Add default message
+            fig.add_annotation(
+                text="Run simulation to see active/sleep drone deployment",
+                x=width/2, y=height/2,
+                xref="x", yref="y",
+                showarrow=False,
+                font=dict(size=16, color="gray")
+            )
+            title = "Active/Sleep Drone Visualization (Awaiting Simulation)"
+        
+        # Update layout with proper bounds
+        if simulation_data and 'environment_params' in simulation_data:
+            env_params = simulation_data['environment_params']
+            actual_width = env_params.get('width', width)
+            actual_height = env_params.get('height', height)
+        else:
+            actual_width = width
+            actual_height = height
+        
+        # Update layout
+        fig.update_layout(
+            title=title,
+            xaxis=dict(title="X Position (m)", range=[0, actual_width], showgrid=True, gridcolor='lightgray'),
+            yaxis=dict(title="Y Position (m)", range=[0, actual_height], showgrid=True, gridcolor='lightgray'),
+            showlegend=True,
+            template="plotly_white",
+            plot_bgcolor='white',
+            width=800,
+            height=450,
+            font=dict(size=12),
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1
+            )
+        )
         
         return fig
         
     except Exception as e:
-        logger.error(f"Error updating active/sleep grid: {e}")
-        # Return empty figure with error message
+        # Return error visualization
         fig = go.Figure()
         fig.add_annotation(
             text=f"Visualization Error: {str(e)}",
@@ -1599,12 +2082,64 @@ def update_active_sleep_grid(simulation_data, width, height, num_drones, radius)
             font=dict(size=16, color="red")
         )
         fig.update_layout(
-            title="Active/Sleep Drone Visualization",
-            xaxis=dict(range=[0, width], title="X Position"),
-            yaxis=dict(range=[0, height], title="Y Position"),
-            height=450
+            title="Visualization Error",
+            template="plotly_white"
         )
         return fig
+
+
+# Active/Sleep Status Callback with enhanced error handling
+@app.callback(
+    Output('active-sleep-status', 'children'),
+    [Input('simulation-store', 'data')]
+)
+def update_active_sleep_status(simulation_data):
+    """Update active/sleep drone status display"""
+    if not simulation_data:
+        return html.Div("No simulation data available", className="text-muted")
+    
+    try:
+        # Extract status information from simulation data
+        active_count = simulation_data.get('active_drones', 0)
+        total_count = simulation_data.get('total_drones', 0)
+        energy_savings = simulation_data.get('energy_savings', 0)
+        coverage = simulation_data.get('coverage', 0)
+        
+        # Create status cards
+        status_cards = [
+            dbc.Card([
+                dbc.CardBody([
+                    html.H4(f"{active_count}", className="card-title text-success"),
+                    html.P("Active Drones", className="card-text")
+                ])
+            ], color="light", className="mb-2"),
+            
+            dbc.Card([
+                dbc.CardBody([
+                    html.H4(f"{total_count - active_count}", className="card-title text-secondary"),
+                    html.P("Sleeping Drones", className="card-text")
+                ])
+            ], color="light", className="mb-2"),
+            
+            dbc.Card([
+                dbc.CardBody([
+                    html.H4(f"{energy_savings:.1f}%", className="card-title text-info"),
+                    html.P("Energy Savings", className="card-text")
+                ])
+            ], color="light", className="mb-2"),
+            
+            dbc.Card([
+                dbc.CardBody([
+                    html.H4(f"{coverage:.1f}%", className="card-title text-primary"),
+                    html.P("Coverage", className="card-text")
+                ])
+            ], color="light", className="mb-2")
+        ]
+        
+        return html.Div(status_cards)
+        
+    except Exception as e:
+        return html.Div(f"Error updating status: {str(e)}", className="text-danger")
 
 # Update Energy Efficiency Displays
 @app.callback(
@@ -1662,13 +2197,29 @@ def enhanced_control_simulation(run_clicks, stop_clicks, reset_clicks,
     ctx_triggered = ctx.triggered[0]['prop_id'].split('.')[0] if ctx.triggered else None
     
     if ctx_triggered == 'run-btn' and run_clicks:
-        logger.info(f"🚀 Starting Enhanced {algorithm} optimization with Active/Sleep management...")
+        logger.info(f"� Validating experiment settings...")
         
-        if not algorithm:
-            return {}, {'status': 'error', 'message': 'No algorithm selected'}, True
+        # Comprehensive validation
+        validation_result = validate_experiment_settings(
+            width, height, total_drones, radius, target_coverage, algorithm
+        )
         
-        if not all([width, height, total_drones, radius]):
-            return {}, {'status': 'error', 'message': 'Please fill in all environment parameters'}, True
+        if not validation_result['is_valid']:
+            # Format detailed error message
+            error_message = format_validation_message(validation_result)
+            logger.warning(f"❌ Validation failed: {validation_result['errors']}")
+            
+            return {}, {
+                'status': 'error', 
+                'message': error_message,
+                'validation_details': validation_result
+            }, True
+        
+        # Log warnings if any (experiment can still run)
+        if validation_result['warnings']:
+            logger.warning(f"⚠️ Validation warnings: {validation_result['warnings']}")
+        
+        logger.info(f"✅ Validation passed. Starting Enhanced {algorithm} optimization...")
         
         try:
             # Create simulation environment
@@ -1679,10 +2230,16 @@ def enhanced_control_simulation(run_clicks, stop_clicks, reset_clicks,
             
             logger.info(f"Environment: {width}x{height}, {total_drones} drones, radius={radius}")
             logger.info(f"Target Coverage: {target_cov*100}%, Energy Mode: {energy_mode}")
+            logger.info(f"Algorithm selected: '{algorithm}', Algorithm type: {type(algorithm)}")
+            logger.info(f"Checking conditions: algorithm == 'greedy': {algorithm == 'greedy'}")
+            logger.info(f"Checking conditions: algorithm in ['pso', 'ga', 'sa']: {algorithm in ['pso', 'ga', 'sa']}")
             
             start_time = time.time()
             
+            logger.info(f"🔍 Algorithm: '{algorithm}', Energy Mode: {energy_mode}")
+            
             if energy_mode and algorithm == 'greedy':
+                # Use the new Active/Sleep Greedy algorithm
                 # Use the new Active/Sleep Greedy algorithm
                 from algorithms import optimize_active_sleep_greedy, get_active_sleep_statistics
                 
@@ -1707,8 +2264,84 @@ def enhanced_control_simulation(run_clicks, stop_clicks, reset_clicks,
                 
                 logger.info(f"✅ Optimization completed: {stats['coverage_percentage']:.1f}% coverage with {stats['active_drones']}/{stats['total_drones']} active drones")
                 
+            elif algorithm in ['pso', 'ga', 'sa']:
+                # ALWAYS use real algorithms for PSO, GA, SA
+                logger.info(f"🚀 Running real {algorithm.upper()} algorithm...")
+                logger.info(f"Running real {algorithm.upper()} algorithm with energy efficiency...")
+                
+                # Import the required algorithm functions
+                from algorithms import particle_swarm_optimization, genetic_algorithm, simulated_annealing
+                
+                # Run the actual algorithm with correct parameter names and OPTIMAL CONFIGURATIONS
+                if algorithm == 'pso':
+                    # Use PSO_Balanced configuration (optimal for dashboard)
+                    logger.info("🎯 Using PSO_Balanced configuration for optimal results")
+                    activation, result = particle_swarm_optimization(
+                        env,  # Pass env as simulation parameter 
+                        swarm_size=50,
+                        iterations=150,
+                        inertia=0.7,
+                        cognitive_weight=1.5,
+                        social_weight=1.5,
+                        parallel_processing=False,  # Critical: disable to avoid pickle errors
+                        desired_coverage=target_cov
+                    )
+                elif algorithm == 'ga':
+                    activation, result = genetic_algorithm(env, num_generations=max_iterations or 150, target_coverage=target_cov)
+                elif algorithm == 'sa':
+                    activation, result = simulated_annealing(env, num_iterations=max_iterations or 150, desired_coverage=target_cov)
+                
+                # Calculate coverage - use result.coverage if available, otherwise calculate from activation
+                if hasattr(result, 'coverage') and result.coverage is not None:
+                    # Use the algorithm's calculated coverage (this should be ~70%)
+                    final_coverage_percent = result.coverage
+                    actual_coverage = final_coverage_percent / 100.0
+                    logger.info(f"📊 Using algorithm's coverage result: {final_coverage_percent:.1f}%")
+                else:
+                    # Fallback: calculate coverage from activation pattern
+                    env.set_active_drones(activation)
+                    actual_coverage = env.calculate_coverage_percentage()
+                    final_coverage_percent = actual_coverage * 100
+                    logger.info(f"📊 Calculated coverage from activation: {final_coverage_percent:.1f}%")
+                
+                # Log detailed results for debugging
+                logger.info(f"🔍 Debug Results:")
+                logger.info(f"  - Result type: {type(result)}")
+                logger.info(f"  - Result coverage: {getattr(result, 'coverage', 'N/A')}")
+                logger.info(f"  - Activation sum: {np.sum(activation)}")
+                logger.info(f"  - Final coverage: {final_coverage_percent:.1f}%")
+
+                simulation_data = {
+                    'algorithm': f'Enhanced {algorithm.upper()} (Active/Sleep)',
+                    'final_coverage': final_coverage_percent,  # Use the correct coverage value
+                    'iterations': len(result.fitness_history) if hasattr(result, 'fitness_history') else max_iterations or 150,
+                    'execution_time': result.execution_time if hasattr(result, 'execution_time') else 0,
+                    'fitness_history': result.fitness_history if hasattr(result, 'fitness_history') else [],
+                    'coverage_history': result.coverage_history if hasattr(result, 'coverage_history') else [],
+                    'activation_pattern': activation,
+                    'drone_positions': env.get_drone_positions().tolist(),  # Add real drone positions
+                    'environment_params': {  # Add environment parameters for visualization
+                        'width': env.width,
+                        'height': env.height,
+                        'sensing_radius': env.sensing_radius,
+                        'total_drones': len(env.drones)
+                    },
+                    'energy_statistics': {
+                        'total_drones': len(env.drones),
+                        'active_drones': int(np.sum(activation)),
+                        'sleeping_drones': len(env.drones) - int(np.sum(activation)),
+                        'coverage_percentage': final_coverage_percent,  # Use correct coverage
+                        'energy_saved_percentage': ((len(env.drones) - int(np.sum(activation))) / len(env.drones)) * 100
+                    },
+                    'target_achieved': (final_coverage_percent / 100.0) >= target_cov,
+                    'timestamp': datetime.now().isoformat()
+                }
+                
+                logger.info(f"✅ Real {algorithm.upper()} optimization completed: {final_coverage_percent:.1f}% coverage with {int(np.sum(activation))}/{len(env.drones)} active drones")
+                
             else:
                 # Fallback to enhanced simulation for other algorithms
+                logger.info("🔧 Using enhanced simulation mode...")
                 logger.info("Using enhanced simulation mode...")
                 
                 # Simulate Active/Sleep optimization results
@@ -1721,9 +2354,11 @@ def enhanced_control_simulation(run_clicks, stop_clicks, reset_clicks,
                     final_coverage = min(0.95, 0.6 + np.random.normal(0, 0.05))
                     optimal_active_drones = int(total_drones * 0.8)
                 
-                # Create activation pattern
-                activation_pattern = np.zeros(total_drones)
-                active_indices = np.random.choice(total_drones, optimal_active_drones, replace=False)
+                # Create activation pattern - use actual number of drones from environment
+                actual_num_drones = len(env.drones)
+                activation_pattern = np.zeros(actual_num_drones)
+                optimal_active_drones = min(optimal_active_drones, actual_num_drones)  # Ensure we don't exceed available drones
+                active_indices = np.random.choice(actual_num_drones, optimal_active_drones, replace=False)
                 activation_pattern[active_indices] = 1
                 
                 # Simulate iteration history
@@ -1739,11 +2374,11 @@ def enhanced_control_simulation(run_clicks, stop_clicks, reset_clicks,
                     'coverage_history': coverage_history.tolist(),
                     'activation_pattern': activation_pattern.tolist(),
                     'energy_statistics': {
-                        'total_drones': total_drones,
+                        'total_drones': actual_num_drones,
                         'active_drones': optimal_active_drones,
-                        'sleeping_drones': total_drones - optimal_active_drones,
+                        'sleeping_drones': actual_num_drones - optimal_active_drones,
                         'coverage_percentage': final_coverage * 100,
-                        'energy_saved_percentage': ((total_drones - optimal_active_drones) / total_drones) * 100
+                        'energy_saved_percentage': ((actual_num_drones - optimal_active_drones) / actual_num_drones) * 100
                     },
                     'target_achieved': final_coverage >= target_cov,
                     'timestamp': datetime.now().isoformat()
@@ -1753,6 +2388,9 @@ def enhanced_control_simulation(run_clicks, stop_clicks, reset_clicks,
             
         except Exception as e:
             logger.error(f"Error in enhanced simulation: {e}")
+            logger.error(f"Exception type: {type(e)}")
+            import traceback
+            logger.error(f"Full traceback: {traceback.format_exc()}")
             return {}, {'status': 'error', 'message': f'Simulation failed: {str(e)}'}, True
     
     elif ctx_triggered == 'reset-btn':
