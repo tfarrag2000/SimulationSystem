@@ -176,8 +176,8 @@ ALGORITHM_CONFIGS = {
         'recommended_for': 'Quick results, small to medium problems',
         'parallel_support': False,
         'params': {
-            'coverage_target': {'default': 0.90, 'min': 0.5, 'max': 1.0, 'step': 0.01},  # Optimal: 90% for balance
-            'overlap_penalty': {'default': 0.2, 'min': 0.0, 'max': 1.0, 'step': 0.05}   # Optimal: Lower penalty for better coverage
+            'coverage_target': {'default': 0.95, 'min': 0.5, 'max': 1.0, 'step': 0.01},
+            'overlap_penalty': {'default': 0.3, 'min': 0.0, 'max': 1.0, 'step': 0.05}
         }
     },
     'ga': {
@@ -187,10 +187,10 @@ ALGORITHM_CONFIGS = {
         'recommended_for': 'Complex problems, balanced exploration',
         'parallel_support': True,
         'params': {
-            'population_size': {'default': 60, 'min': 20, 'max': 200, 'step': 10},        # Optimal: 60 for drone problems
-            'generations': {'default': 150, 'min': 50, 'max': 500, 'step': 10},          # Optimal: 150 for convergence
-            'mutation_rate': {'default': 0.15, 'min': 0.01, 'max': 0.5, 'step': 0.01},  # Optimal: 15% for exploration
-            'crossover_rate': {'default': 0.85, 'min': 0.3, 'max': 1.0, 'step': 0.05}   # Optimal: 85% for exploitation
+            'population_size': {'default': 50, 'min': 20, 'max': 200, 'step': 10},
+            'generations': {'default': 100, 'min': 50, 'max': 500, 'step': 10},
+            'mutation_rate': {'default': 0.1, 'min': 0.01, 'max': 0.5, 'step': 0.01},
+            'crossover_rate': {'default': 0.8, 'min': 0.3, 'max': 1.0, 'step': 0.05}
         }
     },
     'pso': {
@@ -200,10 +200,10 @@ ALGORITHM_CONFIGS = {
         'recommended_for': 'Continuous optimization, fast convergence',
         'parallel_support': True,
         'params': {
-            'swarm_size': {'default': 50, 'min': 20, 'max': 100, 'step': 10},             # Optimal: 50 for spatial problems
-            'inertia': {'default': 0.729, 'min': 0.1, 'max': 1.0, 'step': 0.05},        # Optimal: Clerc's coefficient
-            'cognitive': {'default': 1.494, 'min': 0.5, 'max': 3.0, 'step': 0.1},       # Optimal: Clerc's coefficient  
-            'social': {'default': 1.494, 'min': 0.5, 'max': 3.0, 'step': 0.1}           # Optimal: Clerc's coefficient
+            'swarm_size': {'default': 40, 'min': 20, 'max': 100, 'step': 10},
+            'inertia': {'default': 0.7, 'min': 0.1, 'max': 1.0, 'step': 0.05},
+            'cognitive': {'default': 1.5, 'min': 0.5, 'max': 3.0, 'step': 0.1},
+            'social': {'default': 1.5, 'min': 0.5, 'max': 3.0, 'step': 0.1}
         }
     },
     'sa': {
@@ -213,9 +213,9 @@ ALGORITHM_CONFIGS = {
         'recommended_for': 'Avoiding local optima, quality solutions',
         'parallel_support': False,
         'params': {
-            'initial_temp': {'default': 1500, 'min': 100, 'max': 5000, 'step': 100},     # Optimal: Higher temp for exploration
-            'cooling_rate': {'default': 0.98, 'min': 0.8, 'max': 0.99, 'step': 0.01},   # Optimal: Slower cooling for quality
-            'min_temp': {'default': 0.1, 'min': 0.1, 'max': 10, 'step': 0.1}            # Optimal: Lower min for convergence
+            'initial_temp': {'default': 1000, 'min': 100, 'max': 5000, 'step': 100},
+            'cooling_rate': {'default': 0.95, 'min': 0.8, 'max': 0.99, 'step': 0.01},
+            'min_temp': {'default': 1, 'min': 0.1, 'max': 10, 'step': 0.1}
         }
     },
     'ga_sa': {
@@ -225,10 +225,10 @@ ALGORITHM_CONFIGS = {
         'recommended_for': 'High-quality solutions, complex landscapes',
         'parallel_support': True,
         'params': {
-            'population_size': {'default': 40, 'min': 15, 'max': 100, 'step': 5},        # Optimal: 40 for hybrid balance
-            'generations': {'default': 120, 'min': 30, 'max': 300, 'step': 10},          # Optimal: 120 for hybrid convergence
-            'sa_temp': {'default': 800, 'min': 100, 'max': 2000, 'step': 100},           # Optimal: 800 for SA phase
-            'cooling_rate': {'default': 0.95, 'min': 0.8, 'max': 0.99, 'step': 0.01}    # Optimal: 0.95 for stability
+            'population_size': {'default': 30, 'min': 15, 'max': 100, 'step': 5},
+            'generations': {'default': 80, 'min': 30, 'max': 300, 'step': 10},
+            'sa_temp': {'default': 500, 'min': 100, 'max': 2000, 'step': 100},
+            'cooling_rate': {'default': 0.9, 'min': 0.8, 'max': 0.99, 'step': 0.01}
         }
     },
     'gwo': {
@@ -238,9 +238,9 @@ ALGORITHM_CONFIGS = {
         'recommended_for': 'Multi-modal optimization, exploration',
         'parallel_support': True,
         'params': {
-            'pack_size': {'default': 30, 'min': 20, 'max': 80, 'step': 5},               # Optimal: 30 for wolf pack dynamics
-            'a_decay': {'default': 2.0, 'min': 1, 'max': 4, 'step': 0.1},               # Optimal: Linear decay from 2
-            'leadership_factor': {'default': 0.7, 'min': 0.5, 'max': 1.0, 'step': 0.05} # Optimal: 0.7 for balance
+            'pack_size': {'default': 35, 'min': 20, 'max': 80, 'step': 5},
+            'a_decay': {'default': 2, 'min': 1, 'max': 4, 'step': 0.1},
+            'leadership_factor': {'default': 0.8, 'min': 0.5, 'max': 1.0, 'step': 0.05}
         }
     },
     'mrfo': {
@@ -250,9 +250,9 @@ ALGORITHM_CONFIGS = {
         'recommended_for': 'Global optimization, balanced search',
         'parallel_support': True,
         'params': {
-            'population_size': {'default': 35, 'min': 25, 'max': 90, 'step': 5},         # Optimal: 35 for manta dynamics
-            'beta': {'default': 2.5, 'min': 1, 'max': 5, 'step': 0.1},                  # Optimal: 2.5 for foraging behavior
-            'somersault_factor': {'default': 0.3, 'min': 0.1, 'max': 1.0, 'step': 0.05} # Optimal: 0.3 for exploration balance
+            'population_size': {'default': 45, 'min': 25, 'max': 90, 'step': 5},
+            'beta': {'default': 2, 'min': 1, 'max': 5, 'step': 0.1},
+            'somersault_factor': {'default': 0.5, 'min': 0.1, 'max': 1.0, 'step': 0.05}
         }
     }
 }
@@ -554,7 +554,7 @@ class DroneSimulationEnvironment:
             if covered:
                 covered_points += 1
         
-        return (covered_points / total_points) * 100  # Return percentage, not ratio
+        return covered_points / total_points
     
     def get_energy_statistics(self):
         """Get energy efficiency statistics"""
@@ -609,13 +609,13 @@ app.layout = dbc.Container([
                         f"v{__version__}"
                     ], className="badge bg-primary text-white ms-2 fs-6")
                 ], className="text-center text-muted mb-4 fs-5")
-            ], className="py-2")
+            ], className="py-3")
         ])
     ]),
     
-    # Main Content - 3 Column Layout
+    # Main Content
     dbc.Row([
-        # Left Panel - Configuration Part 1 (Narrower)
+        # Left Panel - Configuration
         dbc.Col([
             dbc.Card([
                 dbc.CardHeader([
@@ -625,20 +625,93 @@ app.layout = dbc.Container([
                     ], className="mb-0 fw-bold")
                 ]),
                 dbc.CardBody([
+                    # ===== ACTIVE/SLEEP DRONE MANAGEMENT - MOVED TO TOP =====
+                    html.Div([
+                        html.Label([
+                            html.I(className="fas fa-battery-three-quarters me-2 text-success"),
+                            "Active/Sleep Management:"
+                        ], className="form-label fw-bold fs-6 text-success"),
+                        dbc.Card([
+                            dbc.CardBody([
+                                dbc.Row([
+                                    dbc.Col([
+                                        dbc.Switch(
+                                            id="energy-efficiency-mode",
+                                            label="Energy Efficiency Mode",
+                                            value=True,
+                                            persistence=True,
+                                            persistence_type='memory'
+                                        ),
+                                        html.Small("Optimize for minimum active drones", className="text-muted small")
+                                    ], width=12)
+                                ], className="mb-2"),
+                                
+                                dbc.Row([
+                                    dbc.Col([
+                                        dbc.Input(
+                                            id="total-available-drones",
+                                            type="number",
+                                            value=25,
+                                            min=10, max=100, step=1,
+                                            placeholder="Total Drones Available"
+                                        ),
+                                        html.Small("Total Available Drones", className="text-muted small")
+                                    ], width=6),
+                                    dbc.Col([
+                                        dbc.Input(
+                                            id="energy-target-coverage",
+                                            type="number",
+                                            value=85.0,
+                                            min=80.0, max=99.9, step=0.1,
+                                            placeholder="Energy Mode Target %"
+                                        ),
+                                        html.Small("Energy Mode Target (%)", className="text-muted small")
+                                    ], width=6)
+                                ], className="mb-2"),
+                                
+                                # Add clarifying note
+                                html.Div([
+                                    html.I(className="fas fa-info-circle me-1 text-info"),
+                                    html.Small("Energy Mode Target: Coverage goal for energy-efficient optimization", 
+                                             className="text-info")
+                                ], className="mb-2"),
+                                
+                                dbc.Row([
+                                    dbc.Col([
+                                        html.Div([
+                                            html.Label("Active Drones: ", className="small text-muted"),
+                                            html.Span("0", id="active-drones-display", className="badge bg-success ms-1"),
+                                            html.Label(" / ", className="small text-muted mx-1"),
+                                            html.Span("0", id="total-drones-display", className="badge bg-secondary"),
+                                        ], className="d-flex align-items-center")
+                                    ], width=6),
+                                    dbc.Col([
+                                        html.Div([
+                                            html.Label("Energy Saved: ", className="small text-muted"),
+                                            html.Span("0%", id="energy-saved-display", className="badge bg-warning ms-1")
+                                        ], className="d-flex align-items-center")
+                                    ], width=6)
+                                ], className="mb-2"),
+                                
+                                html.Small([
+                                    html.I(className="fas fa-lightbulb me-1 text-warning"),
+                                    "Achieve 95%+ coverage with minimum active drones for maximum energy efficiency"
+                                ], className="text-info d-block")
+                            ])
+                        ], className="bg-light")
+                    ], className="mb-4"),
+                    
                     # Quick Load Test Cases
                     html.Div([
                         html.Label("Quick Load Test Case:", className="form-label fw-bold fs-6"),
                         dcc.Dropdown(
                             id='test-case-dropdown',
                             options=[
-                                # Basic Scenarios
                                 {'label': '🚀 Small Area - Few Drones (25x25, 5 drones)', 'value': 'small_area_few_drones'},
                                 {'label': '📊 Medium Area - Standard (50x50, 15 drones)', 'value': 'medium_area_standard'},
                                 {'label': '🏢 Large Area - Many Drones (100x100, 30 drones)', 'value': 'large_area_many_drones'},
-                                # Advanced Scenarios  
                                 {'label': '⚡ Challenging - Small Radius (60x60, 20 drones)', 'value': 'challenging_small_radius'},
                                 {'label': '🎯 Efficiency Test (40x40, 12 drones)', 'value': 'efficiency_test'},
-                                # Performance Testing
                                 {'label': '💻 Parallel Processing Test (80x80, 25 drones)', 'value': 'parallel_processing_test'}
                             ],
                             placeholder="Select a predefined test case...",
@@ -652,10 +725,7 @@ app.layout = dbc.Container([
                         dcc.Dropdown(
                             id='algorithm-dropdown',
                             options=[
-                                {
-                                    'label': config['name'], 
-                                    'value': key
-                                }
+                                {'label': config['name'], 'value': key}
                                 for key, config in ALGORITHM_CONFIGS.items()
                             ],
                             value='pso',
@@ -663,10 +733,7 @@ app.layout = dbc.Container([
                         )
                     ]),
                     
-                    # Parallel Processing Warning
-                    html.Div(id='parallel-warning', children=[], className="mb-3"),
-                    
-                    # Environment Settings (Grid only)
+                    # Environment Settings
                     html.Div([
                         html.Label("Environment:", className="form-label fw-bold fs-6"),
                         dbc.Row([
@@ -690,15 +757,11 @@ app.layout = dbc.Container([
                                 ),
                                 html.Small("Grid Height", className="text-muted small")
                             ], width=6)
-                        ], className="mb-3")
-                    ]),
-                    
-                    # Enhanced Drone Configuration
-                    html.Div([
-                        html.Label([
-                            html.I(className="fas fa-drone me-2 text-warning"),
-                            "Drone Configuration:"
-                        ], className="form-label fw-bold fs-6 text-dark"),
+                        ], className="mb-2"),
+                        html.Small([
+                            html.I(className="fas fa-info-circle me-1 text-info"),
+                            "Recommended: Keep total area (width × height) ≤ 100,000 for optimal performance"
+                        ], className="text-info d-block mb-3"),
                         dbc.Row([
                             dbc.Col([
                                 dbc.Input(
@@ -723,102 +786,23 @@ app.layout = dbc.Container([
                         ], className="mb-3")
                     ]),
                     
-                    # Parallel Processing Configuration (MOVED HERE)
-                    html.Div(id='parallel-processing-section', children=[
-                        html.Label([
-                            html.I(className="fas fa-bolt me-2 text-warning"),
-                            "Parallel Processing:"
-                        ], className="form-label fw-bold fs-6"),
-                        
-                        # Dynamic parallel controls based on algorithm
-                        html.Div(id='parallel-config-dynamic', children=[
-                            dbc.Row([
-                                dbc.Col([
-                                    dbc.Switch(
-                                        id="enable-parallel",
-                                        label="Enable Parallel Processing",
-                                        value=True,
-                                        persistence=True
-                                    ),
-                                    html.Small("Use multiple CPU cores", className="text-muted small")
-                                ], width=12)
-                            ], className="mb-2"),
-                            dbc.Row([
-                                dbc.Col([
-                                    dbc.Input(
-                                        id="parallel-workers",
-                                        type="number",
-                                        value=min(CPU_COUNT, 8),
-                                        min=1, max=CPU_COUNT, step=1
-                                    ),
-                                    html.Small(f"Recommended: {min(CPU_COUNT, 8)}", className="text-muted small")
-                                ], width=6),
-                                dbc.Col([
-                                    dbc.Input(
-                                        id="batch-size",
-                                        type="number",
-                                        value=100,
-                                        min=50, max=500, step=50
-                                    ),
-                                    html.Small("Batch Size", className="text-muted small")
-                                ], width=6)
-                            ], className="mb-2"),
-                        ]),
-                        html.Small([
-                            html.I(className="fas fa-microchip me-1"),
-                            f"System: {CPU_COUNT} CPU cores available"
-                        ], className="text-info d-block mb-3")
-                    ]),
-                    
-                    # Controls/Buttons
-                    html.Div([
-                        dbc.ButtonGroup([
-                            dbc.Button([
-                                html.I(className="fas fa-play me-2"),
-                                "Run"
-                            ], id="run-btn", color="success"),
-                            dbc.Button([
-                                html.I(className="fas fa-stop me-2"),
-                                "Stop"
-                            ], id="stop-btn", color="danger"),
-                            dbc.Button([
-                                html.I(className="fas fa-redo me-2"),
-                                "Reset"
-                            ], id="reset-btn", color="secondary")
-                        ], className="w-100 mb-3"),
-                        
-                        # Progress Indicator
-                        html.Div(id="progress-container", children=[
-                            html.Div(id="progress-indicator", children=[], style={'display': 'none'}),
-                            dbc.Progress(
-                                id="optimization-progress",
-                                value=0,
-                                striped=True,
-                                animated=True,
-                                color="info",
-                                style={'display': 'none'},
-                                className="mt-2"
-                            )
-                        ])
-                    ])
-                ])
-            ])
-        ], width=3),
-        
-        # Middle Panel - Configuration Part 2 (Narrower)
-        dbc.Col([
-            dbc.Card([
-                dbc.CardHeader([
-                    html.H6([
-                        html.I(className="fas fa-sliders-h me-2"),
-                        "Advanced Settings"
-                    ], className="mb-0 fw-bold")
-                ]),
-                dbc.CardBody([
                     # Algorithm Parameters
                     html.Div([
                         html.Label("Parameters:", className="form-label fw-bold fs-6"),
                         html.Div(id='algorithm-params', className="mb-3")
+                    ]),
+                    
+                    # Parallel Processing Configuration
+                    html.Div([
+                        html.Label([
+                            html.I(className="fas fa-bolt me-2 text-warning"),
+                            "Parallel Processing:"
+                        ], className="form-label fw-bold fs-6"),
+                        html.Div(id='parallel-config', className="mb-3"),
+                        html.Small([
+                            html.I(className="fas fa-microchip me-1"),
+                            f"System: {CPU_COUNT} CPU cores available"
+                        ], className="text-info d-block")
                     ]),
                     
                     # Stopping Criteria Configuration
@@ -896,86 +880,42 @@ app.layout = dbc.Container([
                         ]) # Close stopping-criteria-controls div
                     ]),
                     
-                    # ===== ACTIVE/SLEEP DRONE MANAGEMENT =====
+                    # Controls
                     html.Div([
-                        html.Label([
-                            html.I(className="fas fa-battery-three-quarters me-2 text-success"),
-                            "Active/Sleep Management:"
-                        ], className="form-label fw-bold fs-6 text-success"),
-                        dbc.Card([
-                            dbc.CardBody([
-                                dbc.Row([
-                                    dbc.Col([
-                                        dbc.Switch(
-                                            id="energy-efficiency-mode",
-                                            label="Energy Efficiency Mode",
-                                            value=True,
-                                            persistence=True,
-                                            persistence_type='memory'
-                                        ),
-                                        html.Small("Optimize for minimum active drones", className="text-muted small")
-                                    ], width=12)
-                                ], className="mb-2"),
-                                
-                                dbc.Row([
-                                    dbc.Col([
-                                        dbc.Input(
-                                            id="total-available-drones",
-                                            type="number",
-                                            value=25,
-                                            min=10, max=100, step=1,
-                                            placeholder="Total Drones Available"
-                                        ),
-                                        html.Small("Total Available Drones", className="text-muted small")
-                                    ], width=6),
-                                    dbc.Col([
-                                        dbc.Input(
-                                            id="energy-target-coverage",
-                                            type="number",
-                                            value=85.0,
-                                            min=80.0, max=99.9, step=0.1,
-                                            placeholder="Energy Mode Target %"
-                                        ),
-                                        html.Small("Energy Mode Target (%)", className="text-muted small")
-                                    ], width=6)
-                                ], className="mb-2"),
-                                
-                                # Add clarifying note
-                                html.Div([
-                                    html.I(className="fas fa-info-circle me-1 text-info"),
-                                    html.Small("Energy Mode Target: Coverage goal for energy-efficient optimization", 
-                                             className="text-info")
-                                ], className="mb-2"),
-                                
-                                dbc.Row([
-                                    dbc.Col([
-                                        html.Div([
-                                            html.Label("Active Drones: ", className="small text-muted"),
-                                            html.Span("0", id="active-drones-display", className="badge bg-success ms-1"),
-                                            html.Label(" / ", className="small text-muted mx-1"),
-                                            html.Span("0", id="total-drones-display", className="badge bg-secondary"),
-                                        ], className="d-flex align-items-center")
-                                    ], width=6),
-                                    dbc.Col([
-                                        html.Div([
-                                            html.Label("Energy Saved: ", className="small text-muted"),
-                                            html.Span("0%", id="energy-saved-display", className="badge bg-warning ms-1")
-                                        ], className="d-flex align-items-center")
-                                    ], width=6)
-                                ], className="mb-2"),
-                                
-                                html.Small([
-                                    html.I(className="fas fa-lightbulb me-1 text-warning"),
-                                    "Achieve 95%+ coverage with minimum active drones for maximum energy efficiency"
-                                ], className="text-info d-block")
-                            ])
-                        ], className="bg-light")
+                        dbc.ButtonGroup([
+                            dbc.Button([
+                                html.I(className="fas fa-play me-2"),
+                                "Run"
+                            ], id="run-btn", color="success"),
+                            dbc.Button([
+                                html.I(className="fas fa-stop me-2"),
+                                "Stop"
+                            ], id="stop-btn", color="danger"),
+                            dbc.Button([
+                                html.I(className="fas fa-redo me-2"),
+                                "Reset"
+                            ], id="reset-btn", color="secondary")
+                        ], className="w-100"),
+                        
+                        # Progress Indicator
+                        html.Div(id="progress-container", children=[
+                            html.Div(id="progress-indicator", children=[], style={'display': 'none'}),
+                            dbc.Progress(
+                                id="optimization-progress",
+                                value=0,
+                                striped=True,
+                                animated=True,
+                                color="info",
+                                style={'display': 'none'},
+                                className="mt-3"
+                            )
+                        ])
                     ])
                 ])
             ])
-        ], width=3),
+        ], width=4),
         
-        # Right Panel - Visualization and Results (Wider)
+        # Right Panel - Visualization and Results
         dbc.Col([
             # ===== ACTIVE/SLEEP DRONE VISUALIZATION =====
             dbc.Card([
@@ -1137,7 +1077,7 @@ app.layout = dbc.Container([
                     ])
                 ])
             ])
-        ], width=6)
+        ], width=8)
     ]),
     
     # Data Storage
@@ -1147,18 +1087,13 @@ app.layout = dbc.Container([
     
     # Hidden fallback components for callbacks
     html.Div([
-        dbc.Switch(id="enable-parallel", value=True, style={'display': 'none'}),
-        dbc.Input(id="parallel-workers", type="number", value=min(CPU_COUNT, 8), style={'display': 'none'}),
-        dbc.Input(id="batch-size", type="number", value=100, style={'display': 'none'}),
-        dbc.Switch(id="enable-parallel-dynamic", value=True, style={'display': 'none'}),
-        dbc.Input(id="parallel-workers-dynamic", type="number", value=min(CPU_COUNT, 8), style={'display': 'none'}),
-        dbc.Input(id="batch-size-dynamic", type="number", value=100, style={'display': 'none'}),
+        dbc.Switch(id="enable-parallel", value=False, style={'display': 'none'}),
         dbc.Input(id="max-workers", type="number", value=1, style={'display': 'none'}),
         dbc.Switch(id="enable-parallel-visible", value=False, style={'display': 'none'}),
         dbc.Input(id="max-workers-visible", type="number", value=1, style={'display': 'none'})
     ], style={'display': 'none'})
     
-], fluid=True, className="py-2")
+], fluid=True, className="py-3")
 
 # Import test cases
 try:
@@ -1201,18 +1136,61 @@ def load_test_case(test_case_name):
         criteria.get('enable_early_stopping', True)
     ]
 
-# Algorithm Parameters Callback
+# Algorithm Parameters Callback with Parallel Processing
 @app.callback(
-    Output('algorithm-params', 'children'),
+    [Output('algorithm-params', 'children'),
+     Output('parallel-config', 'children')],
     Input('algorithm-dropdown', 'value'),
     prevent_initial_call=True
 )
 def update_algorithm_params(selected_algorithm):
     if not selected_algorithm:
-        return ""
+        return "", ""
     
     config = ALGORITHM_CONFIGS[selected_algorithm]
     params = config.get('params', {})
+    parallel_support = config.get('parallel_support', False)
+    
+    # Create parallel processing configuration
+    if parallel_support and PARALLEL_SUPPORT:
+        parallel_config = dbc.Row([
+            dbc.Col([
+                dbc.Switch(
+                    id="enable-parallel-visible",
+                    label="Enable Parallel Processing",
+                    value=True,
+                    className="mb-2"
+                )
+            ], width=12),
+            dbc.Col([
+                html.Label("Max Workers:", className="form-label fs-6"),
+                dbc.Input(
+                    id="max-workers-visible",
+                    type="number",
+                    value=min(CPU_COUNT, 8),
+                    min=1, max=CPU_COUNT, step=1,
+                    size="sm"
+                ),
+                html.Small(f"Recommended: {min(CPU_COUNT, 8)}", className="text-muted")
+            ], width=6),
+            dbc.Col([
+                html.Div([
+                    html.I(className="fas fa-tachometer-alt me-1 text-success"),
+                    html.Small("Performance boost expected", className="text-success fw-bold")
+                ], className="mt-4")
+            ], width=6)
+        ])
+    else:
+        if not parallel_support:
+            parallel_config = dbc.Alert([
+                html.I(className="fas fa-info-circle me-2"),
+                "This algorithm uses sequential processing"
+            ], color="info", className="py-2")
+        else:
+            parallel_config = dbc.Alert([
+                html.I(className="fas fa-exclamation-triangle me-2"),
+                "Parallel processing not available on this system"
+            ], color="warning", className="py-2")
     
     if not params:
         param_display = html.P("No configurable parameters", className="text-muted fs-6")
@@ -1239,94 +1217,18 @@ def update_algorithm_params(selected_algorithm):
             )
         param_display = html.Div(param_inputs)
     
-    return param_display
+    return (param_display, parallel_config)
 
-
-# Parallel Processing Section Visibility and Dynamic Content
+# Sync visible parallel components with hidden ones
 @app.callback(
-    [Output('parallel-processing-section', 'style'),
-     Output('parallel-config-dynamic', 'children'),
-     Output('parallel-warning', 'children')],
-    [Input('algorithm-dropdown', 'value')],
+    [Output('enable-parallel', 'value'),
+     Output('max-workers', 'value')],
+    [Input('enable-parallel-visible', 'value'),
+     Input('max-workers-visible', 'value')],
     prevent_initial_call=True
 )
-def control_parallel_section_and_content(selected_algorithm):
-    if not selected_algorithm:
-        return {'display': 'block'}, [], []
-    
-    config = ALGORITHM_CONFIGS.get(selected_algorithm, {})
-    parallel_support = config.get('parallel_support', False)
-    
-    if not parallel_support:
-        # Hide the parallel processing section for sequential algorithms
-        return {'display': 'none'}, [], [
-            dbc.Alert([
-                html.I(className="fas fa-info-circle me-2"),
-                html.Strong("Note: "),
-                f"The {config.get('name', 'selected algorithm')} runs sequentially only. "
-                "Parallel processing section is hidden."
-            ], color="info", dismissable=True, className="mb-3")
-        ]
-    else:
-        # Show parallel section with dynamic content for parallel algorithms
-        if PARALLEL_SUPPORT:
-            # Full parallel controls with performance indicator
-            dynamic_content = [
-                dbc.Row([
-                    dbc.Col([
-                        dbc.Switch(
-                            id="enable-parallel-dynamic",
-                            label="Enable Parallel Processing",
-                            value=True,
-                            persistence=True
-                        ),
-                        html.Small("Use multiple CPU cores", className="text-muted small")
-                    ], width=12)
-                ], className="mb-2"),
-                dbc.Row([
-                    dbc.Col([
-                        html.Label("Max Workers:", className="form-label fs-6"),
-                        dbc.Input(
-                            id="parallel-workers-dynamic",
-                            type="number",
-                            value=min(CPU_COUNT, 8),
-                            min=1, max=CPU_COUNT, step=1
-                        ),
-                        html.Small(f"Recommended: {min(CPU_COUNT, 8)}", className="text-muted small")
-                    ], width=6),
-                    dbc.Col([
-                        html.Label("Batch Size:", className="form-label fs-6"),
-                        dbc.Input(
-                            id="batch-size-dynamic",
-                            type="number",
-                            value=100,
-                            min=50, max=500, step=50
-                        ),
-                        html.Small("Processing batch size", className="text-muted small")
-                    ], width=6)
-                ], className="mb-2"),
-                # Performance boost indicator
-                dbc.Row([
-                    dbc.Col([
-                        html.Div([
-                            html.I(className="fas fa-tachometer-alt me-1 text-success"),
-                            html.Small("Performance boost expected", className="text-success fw-bold")
-                        ], className="mt-2")
-                    ], width=12)
-                ], className="mb-2")
-            ]
-        else:
-            # System doesn't support parallel processing
-            dynamic_content = [
-                dbc.Alert([
-                    html.I(className="fas fa-exclamation-triangle me-2"),
-                    html.Strong("Warning: "),
-                    "Parallel processing not available on this system"
-                ], color="warning", className="py-2")
-            ]
-        
-        return {'display': 'block'}, dynamic_content, []
-
+def sync_parallel_components(enable_visible, workers_visible):
+    return enable_visible if enable_visible is not None else False, workers_visible if workers_visible is not None else 1
 
 # Stopping Criteria Controls Visibility
 @app.callback(
@@ -1339,26 +1241,6 @@ def toggle_stopping_criteria_controls(enable_stopping):
         return {'display': 'block'}
     else:
         return {'display': 'none'}
-
-
-# Sync dynamic parallel controls with hidden fallback controls
-@app.callback(
-    [Output('enable-parallel', 'value'),
-     Output('parallel-workers', 'value'),
-     Output('batch-size', 'value')],
-    [Input('enable-parallel-dynamic', 'value'),
-     Input('parallel-workers-dynamic', 'value'),
-     Input('batch-size-dynamic', 'value')],
-    prevent_initial_call=True
-)
-def sync_dynamic_parallel_controls(enable_dynamic, workers_dynamic, batch_dynamic):
-    """Sync dynamic parallel controls with hidden fallback controls for callbacks"""
-    return (
-        enable_dynamic if enable_dynamic is not None else True,
-        workers_dynamic if workers_dynamic is not None else min(CPU_COUNT, 8),
-        batch_dynamic if batch_dynamic is not None else 100
-    )
-
 
 # Progress Indicator and Button States
 @app.callback(
@@ -2608,8 +2490,8 @@ def enhanced_control_simulation(run_clicks, stop_clicks, reset_clicks,
                 else:
                     # Fallback: calculate coverage from activation pattern
                     env.set_active_drones(activation)
-                    final_coverage_percent = env.calculate_coverage_percentage()  # Now returns percentage
-                    actual_coverage = final_coverage_percent / 100.0
+                    actual_coverage = env.calculate_coverage_percentage()
+                    final_coverage_percent = actual_coverage * 100
                     logger.info(f"📊 Calculated coverage from activation: {final_coverage_percent:.1f}%")
                 
                 # Log detailed results for debugging

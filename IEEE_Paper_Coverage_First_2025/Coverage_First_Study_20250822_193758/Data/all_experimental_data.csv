@@ -1,0 +1,505 @@
+Scenario,Scenario_Description,Scenario_Complexity,Algorithm,Algorithm_Display,Coverage,Active_Drones,Total_Drones,Energy_Efficiency,Coverage_Efficiency,Execution_Time,Converged,Config_ID,Run_Number
+small_coverage,Small area - High coverage potential,Low,greedy,Greedy Algorithm (Baseline),96.74393682767379,12,12,0.0,96.74393682767379,0.09515166282653809,True,1,1
+small_coverage,Small area - High coverage potential,Low,greedy,Greedy Algorithm (Baseline),95.11505979602133,12,12,0.0,95.11505979602133,0.06824159622192383,True,1,2
+small_coverage,Small area - High coverage potential,Low,greedy,Greedy Algorithm (Baseline),93.5277358099797,12,12,0.0,93.5277358099797,0.14517927169799805,True,1,3
+small_coverage,Small area - High coverage potential,Low,greedy,Greedy Algorithm (Baseline),88.52786182367707,12,12,0.0,88.52786182367707,0.05023765563964844,True,2,1
+small_coverage,Small area - High coverage potential,Low,greedy,Greedy Algorithm (Baseline),90.78582414313564,12,12,0.0,90.78582414313564,0.031751394271850586,True,2,2
+small_coverage,Small area - High coverage potential,Low,greedy,Greedy Algorithm (Baseline),85.04574416062148,12,12,0.0,85.04574416062148,0.04099750518798828,True,2,3
+small_coverage,Small area - High coverage potential,Low,greedy,Greedy Algorithm (Baseline),95.4529869513009,12,12,0.0,95.4529869513009,0.04517412185668945,True,3,1
+small_coverage,Small area - High coverage potential,Low,greedy,Greedy Algorithm (Baseline),93.71082422505758,12,12,0.0,93.71082422505758,0.052462100982666016,True,3,2
+small_coverage,Small area - High coverage potential,Low,greedy,Greedy Algorithm (Baseline),97.36888873359965,12,12,0.0,97.36888873359965,0.04912519454956055,True,3,3
+small_coverage,Small area - High coverage potential,Low,greedy,Greedy Algorithm (Baseline),92.39020060762492,12,12,0.0,92.39020060762492,0.2001323699951172,True,4,1
+small_coverage,Small area - High coverage potential,Low,greedy,Greedy Algorithm (Baseline),94.68553361488641,12,12,0.0,94.68553361488641,0.04027891159057617,True,4,2
+small_coverage,Small area - High coverage potential,Low,greedy,Greedy Algorithm (Baseline),89.93402285799999,12,12,0.0,89.93402285799999,0.18812227249145508,True,4,3
+small_coverage,Small area - High coverage potential,Low,pso_standard,Standard PSO,94.71591772365178,11,12,8.333333333333332,103.32645569852923,0.0,True,1,1
+small_coverage,Small area - High coverage potential,Low,pso_standard,Standard PSO,96.6002760637511,11,12,8.333333333333332,105.38211934227392,0.002123117446899414,True,1,2
+small_coverage,Small area - High coverage potential,Low,pso_standard,Standard PSO,93.72524398648177,11,12,8.333333333333332,102.24572071252557,0.003998517990112305,True,1,3
+small_coverage,Small area - High coverage potential,Low,pso_standard,Standard PSO,88.90804496805778,11,12,8.333333333333332,96.99059451060849,0.006000995635986328,False,2,1
+small_coverage,Small area - High coverage potential,Low,pso_standard,Standard PSO,94.355663925429,10,12,16.666666666666664,113.22679671051479,0.0009999275207519531,True,2,2
+small_coverage,Small area - High coverage potential,Low,pso_standard,Standard PSO,91.35678821197017,10,12,16.666666666666664,109.62814585436419,0.002000093460083008,True,2,3
+small_coverage,Small area - High coverage potential,Low,pso_standard,Standard PSO,93.01762844061004,10,12,16.666666666666664,111.62115412873204,0.0020036697387695312,True,3,1
+small_coverage,Small area - High coverage potential,Low,pso_standard,Standard PSO,90.26650830959785,11,12,8.333333333333332,98.4725545195613,0.016003131866455078,True,3,2
+small_coverage,Small area - High coverage potential,Low,pso_standard,Standard PSO,96.75865227326264,9,12,25.0,129.01153636435018,0.02599954605102539,True,3,3
+small_coverage,Small area - High coverage potential,Low,pso_standard,Standard PSO,92.2274359795999,10,12,16.666666666666664,110.67292317551988,0.0010018348693847656,True,4,1
+small_coverage,Small area - High coverage potential,Low,pso_standard,Standard PSO,89.72349617434848,11,12,8.333333333333332,97.88017764474381,0.00099945068359375,True,4,2
+small_coverage,Small area - High coverage potential,Low,pso_standard,Standard PSO,90.1299574480509,10,12,16.666666666666664,108.15594893766108,0.028124094009399414,True,4,3
+small_coverage,Small area - High coverage potential,Low,pso_smart,Smart PSO (Coverage-First),96.09533296866326,10,12,16.666666666666664,111.37366094436972,0.0009992122650146484,True,1,1
+small_coverage,Small area - High coverage potential,Low,pso_smart,Smart PSO (Coverage-First),99.9,10,12,16.666666666666664,116.35454384115152,0.0019865036010742188,True,1,2
+small_coverage,Small area - High coverage potential,Low,pso_smart,Smart PSO (Coverage-First),97.35046019231154,9,12,25.0,121.0366099068882,0.007110595703125,True,1,3
+small_coverage,Small area - High coverage potential,Low,pso_smart,Smart PSO (Coverage-First),99.9,10,12,16.666666666666664,115.42878489431506,0.00099945068359375,True,2,1
+small_coverage,Small area - High coverage potential,Low,pso_smart,Smart PSO (Coverage-First),97.69195463673734,10,12,16.666666666666664,110.87036235125123,0.005993366241455078,True,2,2
+small_coverage,Small area - High coverage potential,Low,pso_smart,Smart PSO (Coverage-First),92.62980492637625,11,12,8.333333333333332,98.64432637929664,0.002002716064453125,True,2,3
+small_coverage,Small area - High coverage potential,Low,pso_smart,Smart PSO (Coverage-First),98.22308615805287,10,12,16.666666666666664,109.14108738099104,0.003000020980834961,True,3,1
+small_coverage,Small area - High coverage potential,Low,pso_smart,Smart PSO (Coverage-First),99.08387535716889,10,12,16.666666666666664,114.12916128975215,0.001997232437133789,True,3,2
+small_coverage,Small area - High coverage potential,Low,pso_smart,Smart PSO (Coverage-First),94.5888874662605,9,12,25.0,122.69566653628895,0.0009987354278564453,True,3,3
+small_coverage,Small area - High coverage potential,Low,pso_smart,Smart PSO (Coverage-First),98.27479523479771,11,12,8.333333333333332,104.62338315469829,0.006963968276977539,True,4,1
+small_coverage,Small area - High coverage potential,Low,pso_smart,Smart PSO (Coverage-First),91.69811350148143,11,12,8.333333333333332,97.36350030305641,0.003002166748046875,True,4,2
+small_coverage,Small area - High coverage potential,Low,pso_smart,Smart PSO (Coverage-First),99.9,11,12,8.333333333333332,104.28327229569558,0.030008316040039062,True,4,3
+small_coverage,Small area - High coverage potential,Low,ga_standard,Standard GA,95.30352704306925,9,12,25.0,127.071369390759,0.008996725082397461,True,1,1
+small_coverage,Small area - High coverage potential,Low,ga_standard,Standard GA,92.44012473709098,10,12,16.666666666666664,110.92814968450918,0.0020008087158203125,True,1,2
+small_coverage,Small area - High coverage potential,Low,ga_standard,Standard GA,87.543208880177,11,12,8.333333333333332,95.50168241473855,0.004000186920166016,True,1,3
+small_coverage,Small area - High coverage potential,Low,ga_standard,Standard GA,93.51468870722064,9,12,25.0,124.68625160962752,0.01099705696105957,True,2,1
+small_coverage,Small area - High coverage potential,Low,ga_standard,Standard GA,88.14500358075516,10,12,16.666666666666664,105.77400429690618,0.002000093460083008,True,2,2
+small_coverage,Small area - High coverage potential,Low,ga_standard,Standard GA,93.37292144303517,11,12,8.333333333333332,101.86136884694746,0.006000995635986328,True,2,3
+small_coverage,Small area - High coverage potential,Low,ga_standard,Standard GA,93.72874860389015,9,12,25.0,124.97166480518688,0.002002716064453125,True,3,1
+small_coverage,Small area - High coverage potential,Low,ga_standard,Standard GA,91.85156246314934,9,12,25.0,122.46874995086579,0.0,True,3,2
+small_coverage,Small area - High coverage potential,Low,ga_standard,Standard GA,87.26370771607425,11,12,8.333333333333332,95.19677205389918,0.0020008087158203125,True,3,3
+small_coverage,Small area - High coverage potential,Low,ga_standard,Standard GA,85.30719991666767,10,12,16.666666666666664,102.3686399000012,0.0,True,4,1
+small_coverage,Small area - High coverage potential,Low,ga_standard,Standard GA,86.93474721456167,11,12,8.333333333333332,94.8379060522491,0.0009987354278564453,True,4,2
+small_coverage,Small area - High coverage potential,Low,ga_standard,Standard GA,94.4018098099997,9,12,25.0,125.86907974666627,0.0009882450103759766,True,4,3
+small_coverage,Small area - High coverage potential,Low,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),93.0757131924525,9,12,25.0,124.10095092326999,0.0010025501251220703,True,1,1
+small_coverage,Small area - High coverage potential,Low,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),93.91539502822836,11,12,8.333333333333332,102.45315821261276,0.002001523971557617,True,1,2
+small_coverage,Small area - High coverage potential,Low,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),86.90773150659726,11,12,8.333333333333332,94.80843437083338,0.0010039806365966797,True,1,3
+small_coverage,Small area - High coverage potential,Low,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),87.64595448490108,10,12,16.666666666666664,105.1751453818813,0.006002664566040039,True,2,1
+small_coverage,Small area - High coverage potential,Low,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),95.84867933449925,11,12,8.333333333333332,104.56219563763555,0.001996278762817383,True,2,2
+small_coverage,Small area - High coverage potential,Low,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),92.5067172704424,11,12,8.333333333333332,100.91641884048262,0.006007671356201172,True,2,3
+small_coverage,Small area - High coverage potential,Low,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),92.05518905594339,10,12,16.666666666666664,110.46622686713206,0.010002374649047852,True,3,1
+small_coverage,Small area - High coverage potential,Low,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),93.73197556854593,10,12,16.666666666666664,112.47837068225512,0.014998435974121094,True,3,2
+small_coverage,Small area - High coverage potential,Low,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),85.3108450313468,9,12,25.0,113.74779337512906,0.005109071731567383,True,3,3
+small_coverage,Small area - High coverage potential,Low,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),94.25780944157361,9,12,25.0,125.67707925543148,0.0019996166229248047,True,4,1
+small_coverage,Small area - High coverage potential,Low,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),89.13571239302237,11,12,8.333333333333332,97.23895897420623,0.0,True,4,2
+small_coverage,Small area - High coverage potential,Low,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),85.88160278754057,10,12,16.666666666666664,103.05792334504868,0.0010111331939697266,True,4,3
+small_coverage,Small area - High coverage potential,Low,gwo,Grey Wolf Optimizer,87.49151347605768,11,12,8.333333333333332,95.44528742842655,0.002003192901611328,True,1,1
+small_coverage,Small area - High coverage potential,Low,gwo,Grey Wolf Optimizer,87.6712185589281,11,12,8.333333333333332,95.64132933701248,0.0010006427764892578,True,1,2
+small_coverage,Small area - High coverage potential,Low,gwo,Grey Wolf Optimizer,90.32311686801602,9,12,25.0,120.43082249068802,0.0,True,1,3
+small_coverage,Small area - High coverage potential,Low,gwo,Grey Wolf Optimizer,94.09899012568465,11,12,8.333333333333332,102.65344377347417,0.0019965171813964844,True,2,1
+small_coverage,Small area - High coverage potential,Low,gwo,Grey Wolf Optimizer,88.19453316276756,10,12,16.666666666666664,105.83343979532106,0.0009992122650146484,True,2,2
+small_coverage,Small area - High coverage potential,Low,gwo,Grey Wolf Optimizer,92.6431276969848,11,12,8.333333333333332,101.06523021489252,0.0010004043579101562,True,2,3
+small_coverage,Small area - High coverage potential,Low,gwo,Grey Wolf Optimizer,92.30563772326403,9,12,25.0,123.0741836310187,0.0010020732879638672,True,3,1
+small_coverage,Small area - High coverage potential,Low,gwo,Grey Wolf Optimizer,88.82211437480157,11,12,8.333333333333332,96.89685204523808,0.0,True,3,2
+small_coverage,Small area - High coverage potential,Low,gwo,Grey Wolf Optimizer,90.80498732292664,11,12,8.333333333333332,99.05998617046542,0.0,True,3,3
+small_coverage,Small area - High coverage potential,Low,gwo,Grey Wolf Optimizer,88.53410782363612,10,12,16.666666666666664,106.24092938836334,0.0,True,4,1
+small_coverage,Small area - High coverage potential,Low,gwo,Grey Wolf Optimizer,89.51173438163744,10,12,16.666666666666664,107.41408125796492,0.0010044574737548828,True,4,2
+small_coverage,Small area - High coverage potential,Low,gwo,Grey Wolf Optimizer,88.69961945031534,10,12,16.666666666666664,106.4395433403784,0.0,True,4,3
+small_coverage,Small area - High coverage potential,Low,mrfo,Manta Ray Foraging Optimization,91.60420741738356,10,12,16.666666666666664,109.92504890086028,0.0010001659393310547,True,1,1
+small_coverage,Small area - High coverage potential,Low,mrfo,Manta Ray Foraging Optimization,92.96287581453953,9,12,25.0,123.95050108605271,0.0009918212890625,True,1,2
+small_coverage,Small area - High coverage potential,Low,mrfo,Manta Ray Foraging Optimization,93.25486639848319,10,12,16.666666666666664,111.90583967817982,0.0010213851928710938,True,1,3
+small_coverage,Small area - High coverage potential,Low,mrfo,Manta Ray Foraging Optimization,93.32651210301748,11,12,8.333333333333332,101.81074047601908,0.0019998550415039062,True,2,1
+small_coverage,Small area - High coverage potential,Low,mrfo,Manta Ray Foraging Optimization,92.86690297348834,10,12,16.666666666666664,111.440283568186,0.0009980201721191406,True,2,2
+small_coverage,Small area - High coverage potential,Low,mrfo,Manta Ray Foraging Optimization,91.395519527394,10,12,16.666666666666664,109.67462343287279,0.002000093460083008,True,2,3
+small_coverage,Small area - High coverage potential,Low,mrfo,Manta Ray Foraging Optimization,92.89419438070887,11,12,8.333333333333332,101.3391211425915,0.039277076721191406,True,3,1
+small_coverage,Small area - High coverage potential,Low,mrfo,Manta Ray Foraging Optimization,85.53634140282543,8,12,33.33333333333333,128.30451210423814,0.0020008087158203125,True,3,2
+small_coverage,Small area - High coverage potential,Low,mrfo,Manta Ray Foraging Optimization,87.85750448618187,11,12,8.333333333333332,95.84455034856204,0.0019960403442382812,True,3,3
+small_coverage,Small area - High coverage potential,Low,mrfo,Manta Ray Foraging Optimization,90.30365043204964,9,12,25.0,120.40486724273285,0.0,True,4,1
+small_coverage,Small area - High coverage potential,Low,mrfo,Manta Ray Foraging Optimization,85.44668990142316,11,12,8.333333333333332,93.21457080155254,0.0,True,4,2
+small_coverage,Small area - High coverage potential,Low,mrfo,Manta Ray Foraging Optimization,88.42308902369068,10,12,16.666666666666664,106.1077068284288,0.0011396408081054688,True,4,3
+medium_coverage,Medium area - Balanced coverage test,Medium,greedy,Greedy Algorithm (Baseline),86.07592685257379,25,25,0.0,86.07592685257379,0.09842276573181152,True,1,1
+medium_coverage,Medium area - Balanced coverage test,Medium,greedy,Greedy Algorithm (Baseline),87.02323769757749,25,25,0.0,87.02323769757749,0.09458613395690918,True,1,2
+medium_coverage,Medium area - Balanced coverage test,Medium,greedy,Greedy Algorithm (Baseline),91.44023809001921,25,25,0.0,91.44023809001921,0.08545923233032227,True,1,3
+medium_coverage,Medium area - Balanced coverage test,Medium,greedy,Greedy Algorithm (Baseline),93.42071075637945,25,25,0.0,93.42071075637945,0.08212637901306152,True,2,1
+medium_coverage,Medium area - Balanced coverage test,Medium,greedy,Greedy Algorithm (Baseline),91.58954174566968,25,25,0.0,91.58954174566968,0.08497452735900879,True,2,2
+medium_coverage,Medium area - Balanced coverage test,Medium,greedy,Greedy Algorithm (Baseline),89.14182480821032,25,25,0.0,89.14182480821032,0.07030177116394043,True,2,3
+medium_coverage,Medium area - Balanced coverage test,Medium,greedy,Greedy Algorithm (Baseline),91.12524572613658,25,25,0.0,91.12524572613658,0.08420896530151367,True,3,1
+medium_coverage,Medium area - Balanced coverage test,Medium,greedy,Greedy Algorithm (Baseline),97.93407583122874,25,25,0.0,97.93407583122874,0.08788180351257324,True,3,2
+medium_coverage,Medium area - Balanced coverage test,Medium,greedy,Greedy Algorithm (Baseline),97.36718173122719,25,25,0.0,97.36718173122719,0.11322975158691406,True,3,3
+medium_coverage,Medium area - Balanced coverage test,Medium,greedy,Greedy Algorithm (Baseline),91.7507456143872,25,25,0.0,91.7507456143872,0.09199762344360352,True,4,1
+medium_coverage,Medium area - Balanced coverage test,Medium,greedy,Greedy Algorithm (Baseline),95.43295344092721,25,25,0.0,95.43295344092721,0.10094213485717773,True,4,2
+medium_coverage,Medium area - Balanced coverage test,Medium,greedy,Greedy Algorithm (Baseline),87.66519568122686,25,25,0.0,87.66519568122686,0.10234451293945312,True,4,3
+medium_coverage,Medium area - Balanced coverage test,Medium,pso_standard,Standard PSO,94.0168576304942,23,25,8.0,102.192236554885,0.0029997825622558594,True,1,1
+medium_coverage,Medium area - Balanced coverage test,Medium,pso_standard,Standard PSO,90.15432417146292,22,25,12.0,102.44809564938969,0.0,True,1,2
+medium_coverage,Medium area - Balanced coverage test,Medium,pso_standard,Standard PSO,94.68427492883136,22,25,12.0,107.59576696458109,0.008000373840332031,True,1,3
+medium_coverage,Medium area - Balanced coverage test,Medium,pso_standard,Standard PSO,91.4311861782933,21,25,16.0,108.84665021225393,0.0020008087158203125,True,2,1
+medium_coverage,Medium area - Balanced coverage test,Medium,pso_standard,Standard PSO,93.15451764799883,20,25,20.0,116.44314705999854,0.0009984970092773438,True,2,2
+medium_coverage,Medium area - Balanced coverage test,Medium,pso_standard,Standard PSO,89.44312732031584,23,25,8.0,97.22079056556069,0.0,True,2,3
+medium_coverage,Medium area - Balanced coverage test,Medium,pso_standard,Standard PSO,88.38817627401865,20,25,20.0,110.4852203425233,0.0,False,3,1
+medium_coverage,Medium area - Balanced coverage test,Medium,pso_standard,Standard PSO,91.77706645333276,24,25,4.0,95.6011108888883,0.0,True,3,2
+medium_coverage,Medium area - Balanced coverage test,Medium,pso_standard,Standard PSO,94.94102731593682,22,25,12.0,107.8875310408373,0.0009992122650146484,True,3,3
+medium_coverage,Medium area - Balanced coverage test,Medium,pso_standard,Standard PSO,89.12439860284489,22,25,12.0,101.27772568505101,0.0020003318786621094,True,4,1
+medium_coverage,Medium area - Balanced coverage test,Medium,pso_standard,Standard PSO,94.64774244542076,23,25,8.0,102.8779809189356,0.000993490219116211,True,4,2
+medium_coverage,Medium area - Balanced coverage test,Medium,pso_standard,Standard PSO,90.89922849548314,24,25,4.0,94.68669634946161,0.0009915828704833984,True,4,3
+medium_coverage,Medium area - Balanced coverage test,Medium,pso_smart,Smart PSO (Coverage-First),98.37445307947843,22,25,12.0,106.83564422171936,0.0009953975677490234,True,1,1
+medium_coverage,Medium area - Balanced coverage test,Medium,pso_smart,Smart PSO (Coverage-First),97.42401621500898,22,25,12.0,107.68346761533623,0.000997304916381836,True,1,2
+medium_coverage,Medium area - Balanced coverage test,Medium,pso_smart,Smart PSO (Coverage-First),99.71731645713665,21,25,16.0,112.62109333148877,0.006998777389526367,True,1,3
+medium_coverage,Medium area - Balanced coverage test,Medium,pso_smart,Smart PSO (Coverage-First),99.9,22,25,12.0,109.81744523761805,0.0,True,2,1
+medium_coverage,Medium area - Balanced coverage test,Medium,pso_smart,Smart PSO (Coverage-First),97.80644600407365,20,25,20.0,115.56005105363174,0.0,True,2,2
+medium_coverage,Medium area - Balanced coverage test,Medium,pso_smart,Smart PSO (Coverage-First),92.88891933358885,24,25,4.0,92.7782057531895,0.0,False,2,3
+medium_coverage,Medium area - Balanced coverage test,Medium,pso_smart,Smart PSO (Coverage-First),96.29350889060666,24,25,4.0,91.9987020457287,0.0019979476928710938,False,3,1
+medium_coverage,Medium area - Balanced coverage test,Medium,pso_smart,Smart PSO (Coverage-First),95.0941877870528,21,25,16.0,107.08519594820218,0.0020058155059814453,True,3,2
+medium_coverage,Medium area - Balanced coverage test,Medium,pso_smart,Smart PSO (Coverage-First),99.01307581585745,24,25,4.0,95.41803564454176,0.0,True,3,3
+medium_coverage,Medium area - Balanced coverage test,Medium,pso_smart,Smart PSO (Coverage-First),99.9,24,25,4.0,98.24359200398021,0.005004167556762695,True,4,1
+medium_coverage,Medium area - Balanced coverage test,Medium,pso_smart,Smart PSO (Coverage-First),99.9,20,25,20.0,117.418182759941,0.003000020980834961,True,4,2
+medium_coverage,Medium area - Balanced coverage test,Medium,pso_smart,Smart PSO (Coverage-First),98.78313524221207,24,25,4.0,98.84437666536193,0.10280799865722656,True,4,3
+medium_coverage,Medium area - Balanced coverage test,Medium,ga_standard,Standard GA,91.56836093173948,21,25,16.0,109.00995349016605,0.0010001659393310547,True,1,1
+medium_coverage,Medium area - Balanced coverage test,Medium,ga_standard,Standard GA,86.08496284376236,22,25,12.0,97.82382141336632,0.0,True,1,2
+medium_coverage,Medium area - Balanced coverage test,Medium,ga_standard,Standard GA,87.87798956662816,23,25,8.0,95.51955387676973,0.00096893310546875,True,1,3
+medium_coverage,Medium area - Balanced coverage test,Medium,ga_standard,Standard GA,93.2482239845426,19,25,24.0,122.69503155860869,0.005001068115234375,True,2,1
+medium_coverage,Medium area - Balanced coverage test,Medium,ga_standard,Standard GA,92.65001248615852,23,25,8.0,100.70653531104186,0.0030014514923095703,True,2,2
+medium_coverage,Medium area - Balanced coverage test,Medium,ga_standard,Standard GA,89.31473525053408,18,25,28.000000000000004,124.04824340351956,0.0,True,2,3
+medium_coverage,Medium area - Balanced coverage test,Medium,ga_standard,Standard GA,85.03338274482104,22,25,12.0,96.62884402820573,0.003000497817993164,True,3,1
+medium_coverage,Medium area - Balanced coverage test,Medium,ga_standard,Standard GA,91.05822122091683,23,25,8.0,98.97632741404003,0.0,True,3,2
+medium_coverage,Medium area - Balanced coverage test,Medium,ga_standard,Standard GA,86.08725839270683,22,25,12.0,97.8264299917123,0.0,True,3,3
+medium_coverage,Medium area - Balanced coverage test,Medium,ga_standard,Standard GA,93.20417666858758,20,25,20.0,116.50522083573446,0.004001617431640625,True,4,1
+medium_coverage,Medium area - Balanced coverage test,Medium,ga_standard,Standard GA,92.93329357066706,24,25,4.0,96.80551413611153,0.015002012252807617,True,4,2
+medium_coverage,Medium area - Balanced coverage test,Medium,ga_standard,Standard GA,92.26611031217922,20,25,20.0,115.33263789022402,0.02542591094970703,True,4,3
+medium_coverage,Medium area - Balanced coverage test,Medium,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),94.4690868507574,21,25,16.0,112.46319863185406,0.0020020008087158203,True,1,1
+medium_coverage,Medium area - Balanced coverage test,Medium,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),88.55166839094294,22,25,12.0,100.6268958987988,0.028002262115478516,True,1,2
+medium_coverage,Medium area - Balanced coverage test,Medium,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),90.27609489548523,21,25,16.0,107.47154154224432,0.0009999275207519531,True,1,3
+medium_coverage,Medium area - Balanced coverage test,Medium,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),89.54778362982697,18,25,28.000000000000004,124.37192170809301,0.007004261016845703,True,2,1
+medium_coverage,Medium area - Balanced coverage test,Medium,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),94.07554841020112,20,25,20.0,117.5944355127514,0.0,True,2,2
+medium_coverage,Medium area - Balanced coverage test,Medium,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),87.97435013584325,24,25,4.0,91.63994805817006,0.002001047134399414,True,2,3
+medium_coverage,Medium area - Balanced coverage test,Medium,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),88.70953887933481,21,25,16.0,105.60659390397002,0.009005308151245117,True,3,1
+medium_coverage,Medium area - Balanced coverage test,Medium,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),89.985535086761,24,25,4.0,93.73493238204271,0.001001596450805664,True,3,2
+medium_coverage,Medium area - Balanced coverage test,Medium,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),86.93218295622599,21,25,16.0,103.49069399550713,0.0,True,3,3
+medium_coverage,Medium area - Balanced coverage test,Medium,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),90.93640724000397,20,25,20.0,113.67050905000497,0.0010001659393310547,True,4,1
+medium_coverage,Medium area - Balanced coverage test,Medium,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),89.24127592548777,23,25,8.0,97.00138687553019,0.0,True,4,2
+medium_coverage,Medium area - Balanced coverage test,Medium,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),95.27105049237082,20,25,20.0,119.08881311546352,0.0040056705474853516,True,4,3
+medium_coverage,Medium area - Balanced coverage test,Medium,gwo,Grey Wolf Optimizer,89.27316970617485,20,25,20.0,111.59146213271856,0.0,True,1,1
+medium_coverage,Medium area - Balanced coverage test,Medium,gwo,Grey Wolf Optimizer,86.1531036369357,19,25,24.0,113.35934689070486,0.0,True,1,2
+medium_coverage,Medium area - Balanced coverage test,Medium,gwo,Grey Wolf Optimizer,93.35177078801279,20,25,20.0,116.68971348501597,0.0009984970092773438,True,1,3
+medium_coverage,Medium area - Balanced coverage test,Medium,gwo,Grey Wolf Optimizer,90.45325899357451,23,25,8.0,98.31875977562446,0.0009989738464355469,True,2,1
+medium_coverage,Medium area - Balanced coverage test,Medium,gwo,Grey Wolf Optimizer,88.95929547825578,21,25,16.0,105.90392318839974,0.00099945068359375,True,2,2
+medium_coverage,Medium area - Balanced coverage test,Medium,gwo,Grey Wolf Optimizer,87.37247534311722,24,25,4.0,91.01299514908044,0.0009999275207519531,True,2,3
+medium_coverage,Medium area - Balanced coverage test,Medium,gwo,Grey Wolf Optimizer,87.16998557945706,20,25,20.0,108.96248197432132,0.0,True,3,1
+medium_coverage,Medium area - Balanced coverage test,Medium,gwo,Grey Wolf Optimizer,90.69845814498846,19,25,24.0,119.34007650656376,0.0009996891021728516,True,3,2
+medium_coverage,Medium area - Balanced coverage test,Medium,gwo,Grey Wolf Optimizer,94.62831470164069,19,25,24.0,124.51094039689565,0.0,True,3,3
+medium_coverage,Medium area - Balanced coverage test,Medium,gwo,Grey Wolf Optimizer,90.43531742044236,24,25,4.0,94.20345564629413,0.00600123405456543,True,4,1
+medium_coverage,Medium area - Balanced coverage test,Medium,gwo,Grey Wolf Optimizer,86.4700954796685,21,25,16.0,102.94058985674822,0.0,True,4,2
+medium_coverage,Medium area - Balanced coverage test,Medium,gwo,Grey Wolf Optimizer,91.49182532855465,19,25,24.0,120.38398069546665,0.002002716064453125,True,4,3
+medium_coverage,Medium area - Balanced coverage test,Medium,mrfo,Manta Ray Foraging Optimization,87.23514003427684,21,25,16.0,103.85135718366291,0.0010001659393310547,True,1,1
+medium_coverage,Medium area - Balanced coverage test,Medium,mrfo,Manta Ray Foraging Optimization,89.45242632454422,24,25,4.0,93.17961075473356,0.0009992122650146484,True,1,2
+medium_coverage,Medium area - Balanced coverage test,Medium,mrfo,Manta Ray Foraging Optimization,93.12837465900262,24,25,4.0,97.00872360312773,0.006998538970947266,True,1,3
+medium_coverage,Medium area - Balanced coverage test,Medium,mrfo,Manta Ray Foraging Optimization,88.4851701003741,19,25,24.0,116.42785539522909,0.0,True,2,1
+medium_coverage,Medium area - Balanced coverage test,Medium,mrfo,Manta Ray Foraging Optimization,90.95365658270094,21,25,16.0,108.2781625984535,0.000997781753540039,True,2,2
+medium_coverage,Medium area - Balanced coverage test,Medium,mrfo,Manta Ray Foraging Optimization,87.27838633717568,21,25,16.0,103.9028408775901,0.012004375457763672,True,2,3
+medium_coverage,Medium area - Balanced coverage test,Medium,mrfo,Manta Ray Foraging Optimization,89.55516772917008,17,25,32.0,131.69877607230893,0.003999471664428711,True,3,1
+medium_coverage,Medium area - Balanced coverage test,Medium,mrfo,Manta Ray Foraging Optimization,86.3410227157083,23,25,8.0,93.84893773446555,0.0010013580322265625,True,3,2
+medium_coverage,Medium area - Balanced coverage test,Medium,mrfo,Manta Ray Foraging Optimization,89.80154339545732,19,25,24.0,118.15992552033858,0.0010006427764892578,True,3,3
+medium_coverage,Medium area - Balanced coverage test,Medium,mrfo,Manta Ray Foraging Optimization,84.89353699598158,24,25,4.0,88.43076770414748,0.00099945068359375,True,4,1
+medium_coverage,Medium area - Balanced coverage test,Medium,mrfo,Manta Ray Foraging Optimization,85.08520346119154,18,25,28.000000000000004,118.17389369609937,0.01099848747253418,True,4,2
+medium_coverage,Medium area - Balanced coverage test,Medium,mrfo,Manta Ray Foraging Optimization,91.12616611956247,23,25,8.0,99.05018056474181,0.0,True,4,3
+large_coverage,Large area - Scalability test,High,greedy,Greedy Algorithm (Baseline),95.16071453258954,40,40,0.0,95.16071453258954,0.7313761711120605,True,1,1
+large_coverage,Large area - Scalability test,High,greedy,Greedy Algorithm (Baseline),92.27404274356773,40,40,0.0,92.27404274356773,0.26357340812683105,True,1,2
+large_coverage,Large area - Scalability test,High,greedy,Greedy Algorithm (Baseline),90.31563836937741,40,40,0.0,90.31563836937741,0.16620278358459473,True,1,3
+large_coverage,Large area - Scalability test,High,greedy,Greedy Algorithm (Baseline),93.14127264989908,40,40,0.0,93.14127264989908,0.15237188339233398,True,2,1
+large_coverage,Large area - Scalability test,High,greedy,Greedy Algorithm (Baseline),95.86400697104435,40,40,0.0,95.86400697104435,0.15248584747314453,True,2,2
+large_coverage,Large area - Scalability test,High,greedy,Greedy Algorithm (Baseline),92.90934829290093,40,40,0.0,92.90934829290093,0.10728240013122559,True,2,3
+large_coverage,Large area - Scalability test,High,greedy,Greedy Algorithm (Baseline),94.06224384617643,40,40,0.0,94.06224384617643,0.20126056671142578,True,3,1
+large_coverage,Large area - Scalability test,High,greedy,Greedy Algorithm (Baseline),88.82818334650386,40,40,0.0,88.82818334650386,0.1529099941253662,True,3,2
+large_coverage,Large area - Scalability test,High,greedy,Greedy Algorithm (Baseline),97.97596953180312,40,40,0.0,97.97596953180312,0.1576220989227295,True,3,3
+large_coverage,Large area - Scalability test,High,greedy,Greedy Algorithm (Baseline),96.65334992566369,40,40,0.0,96.65334992566369,0.11941790580749512,True,4,1
+large_coverage,Large area - Scalability test,High,greedy,Greedy Algorithm (Baseline),88.68831869364796,40,40,0.0,88.68831869364796,0.16924667358398438,True,4,2
+large_coverage,Large area - Scalability test,High,greedy,Greedy Algorithm (Baseline),91.07477037595069,40,40,0.0,91.07477037595069,0.1441662311553955,True,4,3
+large_coverage,Large area - Scalability test,High,pso_standard,Standard PSO,94.6984056866783,39,40,2.5,97.12656993505466,0.0,True,1,1
+large_coverage,Large area - Scalability test,High,pso_standard,Standard PSO,91.71096696888927,33,40,17.5,111.16480844713851,0.001001596450805664,True,1,2
+large_coverage,Large area - Scalability test,High,pso_standard,Standard PSO,92.35174112966654,34,40,15.0,108.6491072113724,0.0009870529174804688,True,1,3
+large_coverage,Large area - Scalability test,High,pso_standard,Standard PSO,90.44814031491876,34,40,15.0,106.40957684108089,0.0,True,2,1
+large_coverage,Large area - Scalability test,High,pso_standard,Standard PSO,88.25902683712465,35,40,12.5,100.86745924242817,0.020135879516601562,False,2,2
+large_coverage,Large area - Scalability test,High,pso_standard,Standard PSO,89.60630385603174,36,40,10.0,99.56255984003526,0.0029993057250976562,True,2,3
+large_coverage,Large area - Scalability test,High,pso_standard,Standard PSO,94.82018260872393,37,40,7.5,102.50830552294478,0.0009989738464355469,True,3,1
+large_coverage,Large area - Scalability test,High,pso_standard,Standard PSO,96.83545681055493,32,40,20.0,121.04432101319365,0.0,True,3,2
+large_coverage,Large area - Scalability test,High,pso_standard,Standard PSO,94.7130543112765,33,40,17.5,114.80370219548666,0.0,True,3,3
+large_coverage,Large area - Scalability test,High,pso_standard,Standard PSO,91.23806933649031,38,40,5.0,96.04007298577928,0.001001596450805664,True,4,1
+large_coverage,Large area - Scalability test,High,pso_standard,Standard PSO,96.069926226409,32,40,20.0,120.08740778301124,0.0009992122650146484,True,4,2
+large_coverage,Large area - Scalability test,High,pso_standard,Standard PSO,90.17809342664454,35,40,12.5,103.06067820187947,0.0009987354278564453,True,4,3
+large_coverage,Large area - Scalability test,High,pso_smart,Smart PSO (Coverage-First),99.10691068634307,34,40,15.0,109.78352472939707,0.0,True,1,1
+large_coverage,Large area - Scalability test,High,pso_smart,Smart PSO (Coverage-First),99.9,38,40,5.0,97.21426328554446,0.0010018348693847656,True,1,2
+large_coverage,Large area - Scalability test,High,pso_smart,Smart PSO (Coverage-First),93.43554691308621,39,40,2.5,91.09949571516876,0.0,False,1,3
+large_coverage,Large area - Scalability test,High,pso_smart,Smart PSO (Coverage-First),99.9,38,40,5.0,97.79360630069962,0.0,True,2,1
+large_coverage,Large area - Scalability test,High,pso_smart,Smart PSO (Coverage-First),97.81850791806187,34,40,15.0,106.33397309779821,0.0,True,2,2
+large_coverage,Large area - Scalability test,High,pso_smart,Smart PSO (Coverage-First),98.04802306984757,36,40,10.0,106.67000474789687,0.0,True,2,3
+large_coverage,Large area - Scalability test,High,pso_smart,Smart PSO (Coverage-First),93.03514674555666,33,40,17.5,107.4981413130214,0.0,False,3,1
+large_coverage,Large area - Scalability test,High,pso_smart,Smart PSO (Coverage-First),95.25339372492583,34,40,15.0,105.29657856755031,0.0009963512420654297,True,3,2
+large_coverage,Large area - Scalability test,High,pso_smart,Smart PSO (Coverage-First),95.91428503227897,39,40,2.5,94.10401564874627,0.000997304916381836,True,3,3
+large_coverage,Large area - Scalability test,High,pso_smart,Smart PSO (Coverage-First),94.42966630206146,32,40,20.0,114.47104125453433,0.0,True,4,1
+large_coverage,Large area - Scalability test,High,pso_smart,Smart PSO (Coverage-First),97.037944049076,38,40,5.0,99.37089435999226,0.0010020732879638672,True,4,2
+large_coverage,Large area - Scalability test,High,pso_smart,Smart PSO (Coverage-First),95.84003149009047,34,40,15.0,106.25908105466793,0.0010001659393310547,True,4,3
+large_coverage,Large area - Scalability test,High,ga_standard,Standard GA,93.6815052237003,34,40,15.0,110.21353555729448,0.0009999275207519531,True,1,1
+large_coverage,Large area - Scalability test,High,ga_standard,Standard GA,95.53609231231542,35,40,12.5,109.18410549978906,0.0,True,1,2
+large_coverage,Large area - Scalability test,High,ga_standard,Standard GA,90.51654151778322,35,40,12.5,103.44747602032369,0.0009989738464355469,True,1,3
+large_coverage,Large area - Scalability test,High,ga_standard,Standard GA,94.88615166262153,36,40,10.0,105.4290574029128,0.0029954910278320312,True,2,1
+large_coverage,Large area - Scalability test,High,ga_standard,Standard GA,95.22332141105448,32,40,20.0,119.0291517638181,0.0,True,2,2
+large_coverage,Large area - Scalability test,High,ga_standard,Standard GA,92.3795001417159,37,40,7.5,99.8697298829361,0.0009989738464355469,True,2,3
+large_coverage,Large area - Scalability test,High,ga_standard,Standard GA,95.40881325402646,38,40,5.0,100.43032974108048,0.0,True,3,1
+large_coverage,Large area - Scalability test,High,ga_standard,Standard GA,94.40375024853026,35,40,12.5,107.89000028403458,0.0,True,3,2
+large_coverage,Large area - Scalability test,High,ga_standard,Standard GA,90.95488204901439,38,40,5.0,95.74198110422567,0.00099945068359375,True,3,3
+large_coverage,Large area - Scalability test,High,ga_standard,Standard GA,85.45278023199472,37,40,7.5,92.38138403458889,0.0,True,4,1
+large_coverage,Large area - Scalability test,High,ga_standard,Standard GA,88.52254255449206,37,40,7.5,95.70004600485628,0.0,True,4,2
+large_coverage,Large area - Scalability test,High,ga_standard,Standard GA,87.47718051108312,31,40,22.5,112.87378130462338,0.0,True,4,3
+large_coverage,Large area - Scalability test,High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),93.38641897238097,32,40,20.0,116.73302371547621,0.0009999275207519531,True,1,1
+large_coverage,Large area - Scalability test,High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),94.42716830205919,37,40,7.5,102.08342519141533,0.0010001659393310547,True,1,2
+large_coverage,Large area - Scalability test,High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),90.32874499386327,30,40,25.0,120.43832665848436,0.002000093460083008,True,1,3
+large_coverage,Large area - Scalability test,High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),86.3067234874825,32,40,20.0,107.88340435935312,0.0,True,2,1
+large_coverage,Large area - Scalability test,High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),86.70929438373877,35,40,12.5,99.0963364385586,0.0020990371704101562,True,2,2
+large_coverage,Large area - Scalability test,High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),94.24391661043187,39,40,2.5,96.66042729275064,0.0,True,2,3
+large_coverage,Large area - Scalability test,High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),92.68818322527981,37,40,7.5,100.20344132462682,0.0009996891021728516,True,3,1
+large_coverage,Large area - Scalability test,High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),90.78554805343374,36,40,10.0,100.87283117048193,0.0,True,3,2
+large_coverage,Large area - Scalability test,High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),91.51220294816947,38,40,5.0,96.32863468228366,0.0,True,3,3
+large_coverage,Large area - Scalability test,High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),91.91721244874635,38,40,5.0,96.75496047236459,0.0009958744049072266,True,4,1
+large_coverage,Large area - Scalability test,High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),86.65597646801533,32,40,20.0,108.31997058501915,0.0,True,4,2
+large_coverage,Large area - Scalability test,High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),93.89614760978405,30,40,25.0,125.19486347971207,0.0010018348693847656,True,4,3
+large_coverage,Large area - Scalability test,High,gwo,Grey Wolf Optimizer,89.87621599738415,33,40,17.5,108.94086787561716,0.0009982585906982422,True,1,1
+large_coverage,Large area - Scalability test,High,gwo,Grey Wolf Optimizer,91.49045050991596,35,40,12.5,104.56051486847538,0.0,True,1,2
+large_coverage,Large area - Scalability test,High,gwo,Grey Wolf Optimizer,87.33762911155847,39,40,2.5,89.57705549903433,0.0,True,1,3
+large_coverage,Large area - Scalability test,High,gwo,Grey Wolf Optimizer,86.96509761748871,34,40,15.0,102.31187954998671,0.0,True,2,1
+large_coverage,Large area - Scalability test,High,gwo,Grey Wolf Optimizer,93.87667406736846,39,40,2.5,96.28376827422406,0.0009996891021728516,True,2,2
+large_coverage,Large area - Scalability test,High,gwo,Grey Wolf Optimizer,93.40260709520291,31,40,22.5,120.51949302606826,0.0,True,2,3
+large_coverage,Large area - Scalability test,High,gwo,Grey Wolf Optimizer,93.90369722737135,33,40,17.5,113.82266330590468,0.0,True,3,1
+large_coverage,Large area - Scalability test,High,gwo,Grey Wolf Optimizer,87.93421078115135,33,40,17.5,106.58692215897133,0.016997337341308594,True,3,2
+large_coverage,Large area - Scalability test,High,gwo,Grey Wolf Optimizer,92.96331507498786,35,40,12.5,106.24378865712899,0.0,True,3,3
+large_coverage,Large area - Scalability test,High,gwo,Grey Wolf Optimizer,86.91909282012294,38,40,5.0,91.49378191591889,0.0009987354278564453,True,4,1
+large_coverage,Large area - Scalability test,High,gwo,Grey Wolf Optimizer,93.59922611161512,31,40,22.5,120.7731949827292,0.0,True,4,2
+large_coverage,Large area - Scalability test,High,gwo,Grey Wolf Optimizer,86.62120500495301,30,40,25.0,115.49494000660401,0.002001047134399414,True,4,3
+large_coverage,Large area - Scalability test,High,mrfo,Manta Ray Foraging Optimization,93.41433880206722,28,40,30.0,133.4490554315246,0.0009796619415283203,True,1,1
+large_coverage,Large area - Scalability test,High,mrfo,Manta Ray Foraging Optimization,87.02732359978555,31,40,22.5,112.29332077391683,0.0,True,1,2
+large_coverage,Large area - Scalability test,High,mrfo,Manta Ray Foraging Optimization,90.47583750846944,38,40,5.0,95.23772369312573,0.006002902984619141,True,1,3
+large_coverage,Large area - Scalability test,High,mrfo,Manta Ray Foraging Optimization,85.56357308131177,35,40,12.5,97.78694066435631,0.0019996166229248047,True,2,1
+large_coverage,Large area - Scalability test,High,mrfo,Manta Ray Foraging Optimization,92.00378277849953,29,40,27.500000000000004,126.90176934965453,0.01746535301208496,True,2,2
+large_coverage,Large area - Scalability test,High,mrfo,Manta Ray Foraging Optimization,93.72038128226315,29,40,27.500000000000004,129.26949142381125,0.0,True,2,3
+large_coverage,Large area - Scalability test,High,mrfo,Manta Ray Foraging Optimization,88.523813084825,37,40,7.5,95.70141955116215,0.0029952526092529297,True,3,1
+large_coverage,Large area - Scalability test,High,mrfo,Manta Ray Foraging Optimization,88.43536084616342,35,40,12.5,101.06898382418676,0.0009992122650146484,True,3,2
+large_coverage,Large area - Scalability test,High,mrfo,Manta Ray Foraging Optimization,89.33742424833414,37,40,7.5,96.58099918738826,0.008997201919555664,True,3,3
+large_coverage,Large area - Scalability test,High,mrfo,Manta Ray Foraging Optimization,89.33966336698921,28,40,30.0,127.62809052427032,0.015002250671386719,True,4,1
+large_coverage,Large area - Scalability test,High,mrfo,Manta Ray Foraging Optimization,89.95544952680686,37,40,7.5,97.24913462357497,0.0009992122650146484,True,4,2
+large_coverage,Large area - Scalability test,High,mrfo,Manta Ray Foraging Optimization,84.10780551400681,39,40,2.5,86.26441591180186,0.0009992122650146484,True,4,3
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,greedy,Greedy Algorithm (Baseline),96.70934342857267,60,60,0.0,96.70934342857267,0.33300304412841797,True,1,1
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,greedy,Greedy Algorithm (Baseline),95.0627844417335,60,60,0.0,95.0627844417335,0.20122480392456055,True,1,2
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,greedy,Greedy Algorithm (Baseline),86.48454578697284,60,60,0.0,86.48454578697284,0.21984505653381348,True,1,3
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,greedy,Greedy Algorithm (Baseline),92.57586589276363,60,60,0.0,92.57586589276363,0.18983054161071777,True,2,1
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,greedy,Greedy Algorithm (Baseline),87.9956586413942,60,60,0.0,87.9956586413942,0.17672061920166016,True,2,2
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,greedy,Greedy Algorithm (Baseline),90.94015826430253,60,60,0.0,90.94015826430253,0.6259422302246094,True,2,3
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,greedy,Greedy Algorithm (Baseline),90.12434198085734,60,60,0.0,90.12434198085734,0.3191800117492676,True,3,1
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,greedy,Greedy Algorithm (Baseline),92.89801522569871,60,60,0.0,92.89801522569871,0.19710016250610352,True,3,2
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,greedy,Greedy Algorithm (Baseline),97.2585470191526,60,60,0.0,97.2585470191526,0.19275474548339844,True,3,3
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,greedy,Greedy Algorithm (Baseline),95.69758412367513,60,60,0.0,95.69758412367513,0.19802355766296387,True,4,1
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,greedy,Greedy Algorithm (Baseline),95.53765030734496,60,60,0.0,95.53765030734496,0.19875741004943848,True,4,2
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,greedy,Greedy Algorithm (Baseline),90.8889773683926,60,60,0.0,90.8889773683926,0.19922876358032227,True,4,3
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,pso_standard,Standard PSO,95.30640160639048,53,60,11.666666666666666,107.89403955440432,0.0,True,1,1
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,pso_standard,Standard PSO,93.15955667487151,55,60,8.333333333333332,101.62860728167801,0.0010013580322265625,True,1,2
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,pso_standard,Standard PSO,92.70642407683056,53,60,11.666666666666666,104.95066876622327,0.0,True,1,3
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,pso_standard,Standard PSO,88.29447755637207,56,60,6.666666666666667,94.60122595325579,0.0,False,2,1
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,pso_standard,Standard PSO,90.34592062681791,53,60,11.666666666666666,102.2784007096052,0.0,True,2,2
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,pso_standard,Standard PSO,95.15758660459046,57,60,5.0,100.16588063641102,0.0,True,2,3
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,pso_standard,Standard PSO,88.05742381645761,48,60,20.0,110.07177977057201,0.0,False,3,1
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,pso_standard,Standard PSO,94.3791270406515,49,60,18.333333333333332,115.56627800896102,0.0,True,3,2
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,pso_standard,Standard PSO,94.67995388492317,49,60,18.333333333333332,115.93463741011,0.0,True,3,3
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,pso_standard,Standard PSO,89.76355868207536,48,60,20.0,112.20444835259418,0.001001596450805664,True,4,1
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,pso_standard,Standard PSO,90.06962805751486,53,60,11.666666666666666,101.96561666888475,0.0,True,4,2
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,pso_standard,Standard PSO,88.21930999048715,53,60,11.666666666666666,99.87091697036281,0.0,False,4,3
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,pso_smart,Smart PSO (Coverage-First),97.84637492346552,59,60,1.6666666666666667,91.65343532063439,0.0,True,1,1
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,pso_smart,Smart PSO (Coverage-First),98.74649089628531,50,60,16.666666666666664,112.71916289206872,0.0,True,1,2
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,pso_smart,Smart PSO (Coverage-First),94.75802126008817,57,60,5.0,94.47988523510328,0.0,True,1,3
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,pso_smart,Smart PSO (Coverage-First),99.9,50,60,16.666666666666664,112.19559047897295,0.0043752193450927734,True,2,1
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,pso_smart,Smart PSO (Coverage-First),91.20557180695975,52,60,13.333333333333334,101.5612831423157,0.0,False,2,2
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,pso_smart,Smart PSO (Coverage-First),94.90408351780717,50,60,16.666666666666664,106.38939640445544,0.0,False,2,3
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,pso_smart,Smart PSO (Coverage-First),99.9,55,60,8.333333333333332,104.70837885072308,0.0,True,3,1
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,pso_smart,Smart PSO (Coverage-First),94.17821631966599,51,60,15.0,106.74501007390033,0.0,True,3,2
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,pso_smart,Smart PSO (Coverage-First),99.9,51,60,15.0,111.98244196260453,0.0,True,3,3
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,pso_smart,Smart PSO (Coverage-First),94.6236444609554,54,60,10.0,98.47166052486257,0.0,False,4,1
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,pso_smart,Smart PSO (Coverage-First),99.9,55,60,8.333333333333332,101.03423556657914,0.0,True,4,2
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,pso_smart,Smart PSO (Coverage-First),96.85735870266195,53,60,11.666666666666666,106.15146976272598,0.0010008811950683594,True,4,3
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,ga_standard,Standard GA,89.89633875211139,45,60,25.0,119.86178500281518,0.0,True,1,1
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,ga_standard,Standard GA,87.141860468924,50,60,16.666666666666664,104.57023256270878,0.0010001659393310547,True,1,2
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,ga_standard,Standard GA,86.47351349725983,51,60,15.0,101.73354529089391,0.0,True,1,3
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,ga_standard,Standard GA,85.11896253616652,47,60,21.666666666666668,108.66250536531896,0.0,True,2,1
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,ga_standard,Standard GA,90.79677835603299,47,60,21.666666666666668,115.91078088004211,0.0,True,2,2
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,ga_standard,Standard GA,86.46377662691971,45,60,25.0,115.28503550255961,0.0010044574737548828,True,2,3
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,ga_standard,Standard GA,91.86429646200915,53,60,11.666666666666666,103.99731674944432,0.0,True,3,1
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,ga_standard,Standard GA,95.41350638423418,54,60,10.0,106.01500709359354,0.0,True,3,2
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,ga_standard,Standard GA,95.207228405284,47,60,21.666666666666668,121.54114264504341,0.0,True,3,3
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,ga_standard,Standard GA,95.04278091247481,56,60,6.666666666666667,101.83155097765159,0.0,True,4,1
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,ga_standard,Standard GA,87.18006374446813,58,60,3.3333333333333335,90.18627283910496,0.0,True,4,2
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,ga_standard,Standard GA,88.58609288455038,55,60,8.333333333333332,96.63937405587315,0.0009999275207519531,True,4,3
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),86.29538907228746,56,60,6.666666666666667,92.45934543459371,0.0,True,1,1
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),90.38301083036974,50,60,16.666666666666664,108.45961299644368,0.0,True,1,2
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),92.41040549208583,48,60,20.0,115.51300686510729,0.0,True,1,3
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),88.85516579718083,57,60,5.0,93.53175347071667,0.0,True,2,1
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),87.4116127431811,57,60,5.0,92.01222394019064,0.0,True,2,2
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),90.42937168475318,56,60,6.666666666666667,96.8886125193784,0.0010008811950683594,True,2,3
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),88.38781507118604,53,60,11.666666666666666,100.06167743907854,0.0010018348693847656,True,3,1
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),91.88422868703735,52,60,13.333333333333334,106.02026386965848,0.0,True,3,2
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),95.53876600415182,53,60,11.666666666666666,108.15709358960584,0.0,True,3,3
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),85.03312830381634,56,60,6.666666666666667,91.10692318266037,0.0,True,4,1
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),92.75506154587558,57,60,5.0,97.63690689039535,0.0,True,4,2
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),94.76317129034764,58,60,3.3333333333333335,98.03086685208376,0.0010018348693847656,True,4,3
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,gwo,Grey Wolf Optimizer,90.0416694553047,48,60,20.0,112.55208681913086,0.0,True,1,1
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,gwo,Grey Wolf Optimizer,88.47683921939525,53,60,11.666666666666666,100.16245949365499,0.0010013580322265625,True,1,2
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,gwo,Grey Wolf Optimizer,90.60903615085955,55,60,8.333333333333332,98.84622125548316,0.0,True,1,3
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,gwo,Grey Wolf Optimizer,90.10898511911736,53,60,11.666666666666666,102.01017183296305,0.0,True,2,1
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,gwo,Grey Wolf Optimizer,90.62131504340014,57,60,5.0,95.39085794042121,0.0010039806365966797,True,2,2
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,gwo,Grey Wolf Optimizer,90.44909764724657,56,60,6.666666666666667,96.90974747919276,0.0,True,2,3
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,gwo,Grey Wolf Optimizer,92.14763520648054,57,60,5.0,96.99751074366374,0.0010018348693847656,True,3,1
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,gwo,Grey Wolf Optimizer,92.88070072463276,46,60,23.333333333333332,121.14874007560795,0.000997781753540039,True,3,2
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,gwo,Grey Wolf Optimizer,87.14200120821278,55,60,8.333333333333332,95.0640013180503,0.005003929138183594,True,3,3
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,gwo,Grey Wolf Optimizer,89.06358192996433,45,60,25.0,118.75144257328577,0.0,True,4,1
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,gwo,Grey Wolf Optimizer,88.71785691869682,57,60,5.0,93.38721780915456,0.0010008811950683594,True,4,2
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,gwo,Grey Wolf Optimizer,89.36346285678799,54,60,10.0,99.2927365075422,0.000997781753540039,True,4,3
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,mrfo,Manta Ray Foraging Optimization,93.42391487455754,57,60,5.0,98.34096302585004,0.0,True,1,1
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,mrfo,Manta Ray Foraging Optimization,91.84012729063866,46,60,23.333333333333332,119.7914703790939,0.0010018348693847656,True,1,2
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,mrfo,Manta Ray Foraging Optimization,85.179415379903,44,60,26.666666666666668,116.15374824532229,0.0,True,1,3
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,mrfo,Manta Ray Foraging Optimization,89.94800639265688,43,60,28.333333333333332,125.50884612928867,0.0009958744049072266,True,2,1
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,mrfo,Manta Ray Foraging Optimization,90.60864095656632,45,60,25.0,120.81152127542175,0.0,True,2,2
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,mrfo,Manta Ray Foraging Optimization,86.06854512553862,42,60,30.0,122.95506446505517,0.0,True,2,3
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,mrfo,Manta Ray Foraging Optimization,87.55480404691227,59,60,1.6666666666666667,89.03878377652096,0.0,True,3,1
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,mrfo,Manta Ray Foraging Optimization,88.65684652439481,53,60,11.666666666666666,100.36624134837149,0.0,True,3,2
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,mrfo,Manta Ray Foraging Optimization,91.6370138890004,42,60,30.0,130.91001984142915,0.0,True,3,3
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,mrfo,Manta Ray Foraging Optimization,91.82439216901106,53,60,11.666666666666666,103.95214207812573,0.0019996166229248047,True,4,1
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,mrfo,Manta Ray Foraging Optimization,87.15436622994945,44,60,26.666666666666668,118.84686304084016,0.00601959228515625,True,4,2
+extreme_coverage,Extreme scale - Maximum coverage challenge,Extreme,mrfo,Manta Ray Foraging Optimization,91.64578994775371,49,60,18.333333333333332,112.2193346299025,0.0010020732879638672,True,4,3
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,greedy,Greedy Algorithm (Baseline),93.55579308001167,30,30,0.0,93.55579308001167,0.12697482109069824,True,1,1
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,greedy,Greedy Algorithm (Baseline),89.89301023225177,30,30,0.0,89.89301023225177,0.11555600166320801,True,1,2
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,greedy,Greedy Algorithm (Baseline),97.25803941867666,30,30,0.0,97.25803941867666,0.09114551544189453,True,1,3
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,greedy,Greedy Algorithm (Baseline),88.59484021941394,30,30,0.0,88.59484021941394,0.07012367248535156,True,2,1
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,greedy,Greedy Algorithm (Baseline),97.48618029534745,30,30,0.0,97.48618029534745,0.06977486610412598,True,2,2
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,greedy,Greedy Algorithm (Baseline),93.91257401479773,30,30,0.0,93.91257401479773,0.06943559646606445,True,2,3
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,greedy,Greedy Algorithm (Baseline),94.38694232918213,30,30,0.0,94.38694232918213,0.07028508186340332,True,3,1
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,greedy,Greedy Algorithm (Baseline),89.5902646206104,30,30,0.0,89.5902646206104,0.1073601245880127,True,3,2
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,greedy,Greedy Algorithm (Baseline),95.03493554347618,30,30,0.0,95.03493554347618,0.07111859321594238,True,3,3
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,greedy,Greedy Algorithm (Baseline),90.86030656357431,30,30,0.0,90.86030656357431,0.08081769943237305,True,4,1
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,greedy,Greedy Algorithm (Baseline),87.09368239218725,30,30,0.0,87.09368239218725,0.0735020637512207,True,4,2
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,greedy,Greedy Algorithm (Baseline),85.53548897973468,30,30,0.0,85.53548897973468,0.07967138290405273,True,4,3
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,pso_standard,Standard PSO,92.10296919473757,28,30,6.666666666666667,98.6817527086474,0.0,True,1,1
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,pso_standard,Standard PSO,92.77624827690568,27,30,10.0,103.08472030767297,0.0,True,1,2
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,pso_standard,Standard PSO,91.7174884601926,27,30,10.0,101.9083205113251,0.000995635986328125,True,1,3
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,pso_standard,Standard PSO,93.67897241355153,29,30,3.3333333333333335,96.90928180712227,0.0009982585906982422,True,2,1
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,pso_standard,Standard PSO,94.99105495775012,27,30,10.0,105.54561661972235,0.001008749008178711,True,2,2
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,pso_standard,Standard PSO,92.32419151229192,24,30,20.0,115.4052393903649,0.0,True,2,3
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,pso_standard,Standard PSO,90.08588171272174,28,30,6.666666666666667,96.52058754934473,0.0,True,3,1
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,pso_standard,Standard PSO,93.66171324215199,28,30,6.666666666666667,100.35183561659142,0.0,True,3,2
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,pso_standard,Standard PSO,90.55756180163159,25,30,16.666666666666664,108.66907416195791,0.0,True,3,3
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,pso_standard,Standard PSO,93.47106275814868,24,30,20.0,116.83882844768584,0.0,True,4,1
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,pso_standard,Standard PSO,95.56852734083255,27,30,10.0,106.18725260092505,0.0,True,4,2
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,pso_standard,Standard PSO,92.67871331508243,29,30,3.3333333333333335,95.87453101560251,0.0,True,4,3
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,pso_smart,Smart PSO (Coverage-First),96.5575666121265,29,30,3.3333333333333335,97.3807566747456,0.0,True,1,1
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,pso_smart,Smart PSO (Coverage-First),97.93737847817664,24,30,20.0,119.24727453498082,0.0,True,1,2
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,pso_smart,Smart PSO (Coverage-First),95.69200359511818,28,30,6.666666666666667,98.20865063254188,0.0,True,1,3
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,pso_smart,Smart PSO (Coverage-First),99.9,29,30,3.3333333333333335,99.3059677974054,0.0010008811950683594,True,2,1
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,pso_smart,Smart PSO (Coverage-First),93.88878322539345,27,30,10.0,98.3300332351191,0.0,False,2,2
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,pso_smart,Smart PSO (Coverage-First),97.36320394626912,26,30,13.333333333333334,107.92170274010044,0.0010006427764892578,True,2,3
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,pso_smart,Smart PSO (Coverage-First),94.8614640594801,28,30,6.666666666666667,97.03552507906547,0.0010008811950683594,True,3,1
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,pso_smart,Smart PSO (Coverage-First),98.8458943620082,24,30,20.0,120.32871290809399,0.0,True,3,2
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,pso_smart,Smart PSO (Coverage-First),98.92354254641138,29,30,3.3333333333333335,98.16863822481632,0.0,True,3,3
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,pso_smart,Smart PSO (Coverage-First),97.87493891989492,28,30,6.666666666666667,100.76224397329595,0.0,True,4,1
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,pso_smart,Smart PSO (Coverage-First),98.70696714288046,27,30,10.0,104.47175244204641,0.00099945068359375,True,4,2
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,pso_smart,Smart PSO (Coverage-First),94.57071911083897,28,30,6.666666666666667,95.80760780184765,0.0,True,4,3
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,ga_standard,Standard GA,89.09445890974192,23,30,23.333333333333332,116.21016379531554,0.0,True,1,1
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,ga_standard,Standard GA,85.4963118530628,25,30,16.666666666666664,102.59557422367536,0.0,True,1,2
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,ga_standard,Standard GA,85.15217120845766,25,30,16.666666666666664,102.18260545014918,0.0,True,1,3
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,ga_standard,Standard GA,93.39701562079156,25,30,16.666666666666664,112.07641874494988,0.0010006427764892578,True,2,1
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,ga_standard,Standard GA,89.18196517746283,27,30,10.0,99.09107241940313,0.0,True,2,2
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,ga_standard,Standard GA,85.72265901672665,24,30,20.0,107.15332377090832,0.0010004043579101562,True,2,3
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,ga_standard,Standard GA,94.46109576645668,27,30,10.0,104.95677307384075,0.0040013790130615234,True,3,1
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,ga_standard,Standard GA,92.6352599774516,23,30,23.333333333333332,120.82859997058902,0.0009999275207519531,True,3,2
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,ga_standard,Standard GA,86.98309591123711,22,30,26.666666666666668,118.61331260623244,0.0009982585906982422,True,3,3
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,ga_standard,Standard GA,89.51616831774545,26,30,13.333333333333334,103.28788652047552,0.0,True,4,1
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,ga_standard,Standard GA,87.38534498784664,22,30,26.666666666666668,119.16183407433633,0.0,True,4,2
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,ga_standard,Standard GA,87.12952162712749,23,30,23.333333333333332,113.64720212234019,0.0010008811950683594,True,4,3
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),90.8324215737898,28,30,6.666666666666667,97.32045168620336,0.0,True,1,1
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),85.0965462251377,26,30,13.333333333333334,98.18832256746657,0.0,True,1,2
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),86.21902144256605,27,30,10.0,95.79891271396227,0.0,True,1,3
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),89.7548211774524,24,30,20.0,112.19352647181549,0.0,True,2,1
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),89.22990495683601,25,30,16.666666666666664,107.07588594820321,0.0,True,2,2
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),94.24411044730792,27,30,10.0,104.71567827478657,0.0009980201721191406,True,2,3
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),87.88651793417937,29,30,3.3333333333333335,90.91708751811659,0.0,True,3,1
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),93.2311401402955,27,30,10.0,103.59015571143944,0.007003307342529297,True,3,2
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),95.03457434820696,24,30,20.0,118.7932179352587,0.0010013580322265625,True,3,3
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),94.41543380075484,24,30,20.0,118.01929225094355,0.0,True,4,1
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),87.65055515064834,27,30,10.0,97.3895057229426,0.0,True,4,2
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),95.9102386517789,26,30,13.333333333333334,110.66565998282181,0.0,True,4,3
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,gwo,Grey Wolf Optimizer,89.61249504426152,24,30,20.0,112.0156188053269,0.0009987354278564453,True,1,1
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,gwo,Grey Wolf Optimizer,91.3009966242619,27,30,10.0,101.44555180473544,0.0,True,1,2
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,gwo,Grey Wolf Optimizer,89.36626348560102,23,30,23.333333333333332,116.56469150295786,0.0030028820037841797,True,1,3
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,gwo,Grey Wolf Optimizer,87.93155411159309,29,30,3.3333333333333335,90.96367666716526,0.0010018348693847656,True,2,1
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,gwo,Grey Wolf Optimizer,92.13277991022507,28,30,6.666666666666667,98.71369276095542,0.0010006427764892578,True,2,2
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,gwo,Grey Wolf Optimizer,94.99524810609468,29,30,3.3333333333333335,98.27094631664967,0.009001731872558594,True,2,3
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,gwo,Grey Wolf Optimizer,87.75511566388458,26,30,13.333333333333334,101.2559026890976,0.01271963119506836,True,3,1
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,gwo,Grey Wolf Optimizer,90.49398874911448,27,30,10.0,100.54887638790497,0.001394510269165039,True,3,2
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,gwo,Grey Wolf Optimizer,91.67739675819183,26,30,13.333333333333334,105.7816116440675,0.0010004043579101562,True,3,3
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,gwo,Grey Wolf Optimizer,93.92187140252754,25,30,16.666666666666664,112.70624568303305,0.008874654769897461,True,4,1
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,gwo,Grey Wolf Optimizer,93.85880961122459,28,30,6.666666666666667,100.56301029774063,0.0,True,4,2
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,gwo,Grey Wolf Optimizer,89.8501192758928,27,30,10.0,99.8334658621031,0.0,True,4,3
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,mrfo,Manta Ray Foraging Optimization,90.31906658012926,25,30,16.666666666666664,108.3828798961551,0.0,True,1,1
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,mrfo,Manta Ray Foraging Optimization,92.44597709277977,22,30,26.666666666666668,126.06269603560878,0.001035928726196289,True,1,2
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,mrfo,Manta Ray Foraging Optimization,91.7791295384557,22,30,26.666666666666668,125.15335846153052,0.0,True,1,3
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,mrfo,Manta Ray Foraging Optimization,93.0551056988281,28,30,6.666666666666667,99.7018989630301,0.0010004043579101562,True,2,1
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,mrfo,Manta Ray Foraging Optimization,89.52927200149018,29,30,3.3333333333333335,92.61648827740363,0.0019114017486572266,True,2,2
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,mrfo,Manta Ray Foraging Optimization,89.30722677572868,28,30,6.666666666666667,95.68631440256644,0.0,True,2,3
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,mrfo,Manta Ray Foraging Optimization,86.99452391086545,24,30,20.0,108.74315488858181,0.0,True,3,1
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,mrfo,Manta Ray Foraging Optimization,86.00880474294163,23,30,23.333333333333332,112.18539749079343,0.002034902572631836,True,3,2
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,mrfo,Manta Ray Foraging Optimization,88.98564193089933,27,30,10.0,98.87293547877704,0.0009953975677490234,True,3,3
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,mrfo,Manta Ray Foraging Optimization,86.93823585979851,25,30,16.666666666666664,104.32588303175821,0.0,True,4,1
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,mrfo,Manta Ray Foraging Optimization,92.53640420216209,27,30,10.0,102.8182268912912,0.0,True,4,2
+dense_optimal,Dense deployment - Optimal coverage,Medium-High,mrfo,Manta Ray Foraging Optimization,88.7463716944377,22,30,26.666666666666668,121.01777958332414,0.0,True,4,3
+sparse_challenge,Sparse deployment - Coverage challenge,High,greedy,Greedy Algorithm (Baseline),92.43640394443474,25,25,0.0,92.43640394443474,0.11984801292419434,True,1,1
+sparse_challenge,Sparse deployment - Coverage challenge,High,greedy,Greedy Algorithm (Baseline),92.85868364412751,25,25,0.0,92.85868364412751,0.09727954864501953,True,1,2
+sparse_challenge,Sparse deployment - Coverage challenge,High,greedy,Greedy Algorithm (Baseline),97.71938305975291,25,25,0.0,97.71938305975291,0.09889578819274902,True,1,3
+sparse_challenge,Sparse deployment - Coverage challenge,High,greedy,Greedy Algorithm (Baseline),93.89457812174092,25,25,0.0,93.89457812174092,0.13509440422058105,True,2,1
+sparse_challenge,Sparse deployment - Coverage challenge,High,greedy,Greedy Algorithm (Baseline),97.06545204087159,25,25,0.0,97.06545204087159,0.11330223083496094,True,2,2
+sparse_challenge,Sparse deployment - Coverage challenge,High,greedy,Greedy Algorithm (Baseline),87.67900997434067,25,25,0.0,87.67900997434067,0.12274646759033203,True,2,3
+sparse_challenge,Sparse deployment - Coverage challenge,High,greedy,Greedy Algorithm (Baseline),93.3469299604492,25,25,0.0,93.3469299604492,0.13800454139709473,True,3,1
+sparse_challenge,Sparse deployment - Coverage challenge,High,greedy,Greedy Algorithm (Baseline),93.11014460837063,25,25,0.0,93.11014460837063,0.1333920955657959,True,3,2
+sparse_challenge,Sparse deployment - Coverage challenge,High,greedy,Greedy Algorithm (Baseline),96.79434746921746,25,25,0.0,96.79434746921746,0.12297677993774414,True,3,3
+sparse_challenge,Sparse deployment - Coverage challenge,High,greedy,Greedy Algorithm (Baseline),85.60679970200877,25,25,0.0,85.60679970200877,0.10182046890258789,True,4,1
+sparse_challenge,Sparse deployment - Coverage challenge,High,greedy,Greedy Algorithm (Baseline),89.02268261682306,25,25,0.0,89.02268261682306,0.15560245513916016,True,4,2
+sparse_challenge,Sparse deployment - Coverage challenge,High,greedy,Greedy Algorithm (Baseline),87.04420732464052,25,25,0.0,87.04420732464052,0.11313509941101074,True,4,3
+sparse_challenge,Sparse deployment - Coverage challenge,High,pso_standard,Standard PSO,88.60948511530795,24,25,4.0,92.30154699511245,0.0029969215393066406,False,1,1
+sparse_challenge,Sparse deployment - Coverage challenge,High,pso_standard,Standard PSO,88.9791873172471,23,25,8.0,96.71650795352944,0.0,False,1,2
+sparse_challenge,Sparse deployment - Coverage challenge,High,pso_standard,Standard PSO,89.56337882613698,24,25,4.0,93.29518627722602,0.0,True,1,3
+sparse_challenge,Sparse deployment - Coverage challenge,High,pso_standard,Standard PSO,95.00853744663868,21,25,16.0,113.10540172218892,0.0,True,2,1
+sparse_challenge,Sparse deployment - Coverage challenge,High,pso_standard,Standard PSO,90.08387975021408,20,25,20.0,112.6048496877676,0.0009996891021728516,True,2,2
+sparse_challenge,Sparse deployment - Coverage challenge,High,pso_standard,Standard PSO,95.63555839543933,20,25,20.0,119.54444799429916,0.0,True,2,3
+sparse_challenge,Sparse deployment - Coverage challenge,High,pso_standard,Standard PSO,89.8840403614289,20,25,20.0,112.35505045178613,0.0,True,3,1
+sparse_challenge,Sparse deployment - Coverage challenge,High,pso_standard,Standard PSO,90.95071089200187,24,25,4.0,94.74032384583528,0.0009999275207519531,True,3,2
+sparse_challenge,Sparse deployment - Coverage challenge,High,pso_standard,Standard PSO,93.85590726448247,23,25,8.0,102.01729050487225,0.0,True,3,3
+sparse_challenge,Sparse deployment - Coverage challenge,High,pso_standard,Standard PSO,91.20701733119978,23,25,8.0,99.1380623165215,0.0,True,4,1
+sparse_challenge,Sparse deployment - Coverage challenge,High,pso_standard,Standard PSO,91.49762128979054,23,25,8.0,99.45393618455493,0.0009961128234863281,True,4,2
+sparse_challenge,Sparse deployment - Coverage challenge,High,pso_standard,Standard PSO,93.03244303724514,21,25,16.0,110.7529083776728,0.0,True,4,3
+sparse_challenge,Sparse deployment - Coverage challenge,High,pso_smart,Smart PSO (Coverage-First),99.9,22,25,12.0,108.11778154400409,0.0,True,1,1
+sparse_challenge,Sparse deployment - Coverage challenge,High,pso_smart,Smart PSO (Coverage-First),99.33117784910796,22,25,12.0,105.8997306563028,0.0009980201721191406,True,1,2
+sparse_challenge,Sparse deployment - Coverage challenge,High,pso_smart,Smart PSO (Coverage-First),94.14760070679517,23,25,8.0,97.03868361948955,0.0,True,1,3
+sparse_challenge,Sparse deployment - Coverage challenge,High,pso_smart,Smart PSO (Coverage-First),95.7752017283329,24,25,4.0,92.99947935466608,0.0,True,2,1
+sparse_challenge,Sparse deployment - Coverage challenge,High,pso_smart,Smart PSO (Coverage-First),95.49266901430862,24,25,4.0,93.44468700414684,0.0009903907775878906,True,2,2
+sparse_challenge,Sparse deployment - Coverage challenge,High,pso_smart,Smart PSO (Coverage-First),93.63181316761876,21,25,16.0,107.67682600873714,0.001003265380859375,True,2,3
+sparse_challenge,Sparse deployment - Coverage challenge,High,pso_smart,Smart PSO (Coverage-First),97.03636530195587,22,25,12.0,106.53515102972939,0.0,True,3,1
+sparse_challenge,Sparse deployment - Coverage challenge,High,pso_smart,Smart PSO (Coverage-First),99.57782328967626,23,25,8.0,101.94280618321291,0.0,True,3,2
+sparse_challenge,Sparse deployment - Coverage challenge,High,pso_smart,Smart PSO (Coverage-First),93.784034124789,21,25,16.0,107.47603304896795,0.0030078887939453125,True,3,3
+sparse_challenge,Sparse deployment - Coverage challenge,High,pso_smart,Smart PSO (Coverage-First),97.91780695909148,21,25,16.0,113.6179886327838,0.0009980201721191406,True,4,1
+sparse_challenge,Sparse deployment - Coverage challenge,High,pso_smart,Smart PSO (Coverage-First),97.66252671239495,23,25,8.0,97.6243317916389,0.0,True,4,2
+sparse_challenge,Sparse deployment - Coverage challenge,High,pso_smart,Smart PSO (Coverage-First),95.46540988290137,22,25,12.0,100.17659945334206,0.0,False,4,3
+sparse_challenge,Sparse deployment - Coverage challenge,High,ga_standard,Standard GA,94.67679682588415,22,25,12.0,107.5872691203229,0.0,True,1,1
+sparse_challenge,Sparse deployment - Coverage challenge,High,ga_standard,Standard GA,95.5558648526198,21,25,16.0,113.75698196740453,0.0009992122650146484,True,1,2
+sparse_challenge,Sparse deployment - Coverage challenge,High,ga_standard,Standard GA,85.06127118088406,19,25,24.0,111.92272523800534,0.0,True,1,3
+sparse_challenge,Sparse deployment - Coverage challenge,High,ga_standard,Standard GA,91.50546658582408,19,25,24.0,120.40192971818958,0.0009996891021728516,True,2,1
+sparse_challenge,Sparse deployment - Coverage challenge,High,ga_standard,Standard GA,92.28929187566973,21,25,16.0,109.86820461389254,0.0010018348693847656,True,2,2
+sparse_challenge,Sparse deployment - Coverage challenge,High,ga_standard,Standard GA,86.43783414284351,20,25,20.0,108.04729267855438,0.0,True,2,3
+sparse_challenge,Sparse deployment - Coverage challenge,High,ga_standard,Standard GA,95.41842978691612,19,25,24.0,125.55056550910015,0.0009961128234863281,True,3,1
+sparse_challenge,Sparse deployment - Coverage challenge,High,ga_standard,Standard GA,92.47346457986053,20,25,20.0,115.59183072482566,0.0,True,3,2
+sparse_challenge,Sparse deployment - Coverage challenge,High,ga_standard,Standard GA,86.66650780873067,20,25,20.0,108.33313476091334,0.0,True,3,3
+sparse_challenge,Sparse deployment - Coverage challenge,High,ga_standard,Standard GA,95.16780341382105,20,25,20.0,118.95975426727631,0.0020020008087158203,True,4,1
+sparse_challenge,Sparse deployment - Coverage challenge,High,ga_standard,Standard GA,95.83667799579233,22,25,12.0,108.90531590430946,0.0,True,4,2
+sparse_challenge,Sparse deployment - Coverage challenge,High,ga_standard,Standard GA,88.10935257050875,18,25,28.000000000000004,122.37410079237327,0.0,True,4,3
+sparse_challenge,Sparse deployment - Coverage challenge,High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),95.10833228876851,19,25,24.0,125.14254248522172,0.0,True,1,1
+sparse_challenge,Sparse deployment - Coverage challenge,High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),89.516001447605,21,25,16.0,106.56666839000596,0.0,True,1,2
+sparse_challenge,Sparse deployment - Coverage challenge,High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),86.95849115026932,21,25,16.0,103.52201327413015,0.0010001659393310547,True,1,3
+sparse_challenge,Sparse deployment - Coverage challenge,High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),87.99012363798778,22,25,12.0,99.98877686134975,0.0,True,2,1
+sparse_challenge,Sparse deployment - Coverage challenge,High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),93.72337211774476,20,25,20.0,117.15421514718095,0.0,True,2,2
+sparse_challenge,Sparse deployment - Coverage challenge,High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),91.52134886860304,21,25,16.0,108.95398674833696,0.0,True,2,3
+sparse_challenge,Sparse deployment - Coverage challenge,High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),92.24246455893149,22,25,12.0,104.82098245333124,0.0,True,3,1
+sparse_challenge,Sparse deployment - Coverage challenge,High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),92.03252995019686,19,25,24.0,121.09543414499586,0.0010018348693847656,True,3,2
+sparse_challenge,Sparse deployment - Coverage challenge,High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),85.66540514526154,20,25,20.0,107.08175643157692,0.0009999275207519531,True,3,3
+sparse_challenge,Sparse deployment - Coverage challenge,High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),93.3341611512451,24,25,4.0,97.22308453254698,0.0,True,4,1
+sparse_challenge,Sparse deployment - Coverage challenge,High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),94.85469675228518,19,25,24.0,124.80881151616471,0.00099945068359375,True,4,2
+sparse_challenge,Sparse deployment - Coverage challenge,High,ga_sa_hybrid,GA+SA Hybrid (Coverage-First),90.85287243923385,19,25,24.0,119.54325320951823,0.0009992122650146484,True,4,3
+sparse_challenge,Sparse deployment - Coverage challenge,High,gwo,Grey Wolf Optimizer,92.02087454233725,24,25,4.0,95.85507764826798,0.0009982585906982422,True,1,1
+sparse_challenge,Sparse deployment - Coverage challenge,High,gwo,Grey Wolf Optimizer,89.49941460762422,23,25,8.0,97.28197239959154,0.0,True,1,2
+sparse_challenge,Sparse deployment - Coverage challenge,High,gwo,Grey Wolf Optimizer,91.05297758380604,21,25,16.0,108.39640188548339,0.0009984970092773438,True,1,3
+sparse_challenge,Sparse deployment - Coverage challenge,High,gwo,Grey Wolf Optimizer,88.03099825855742,21,25,16.0,104.7988074506636,0.00400090217590332,True,2,1
+sparse_challenge,Sparse deployment - Coverage challenge,High,gwo,Grey Wolf Optimizer,87.68498307805949,20,25,20.0,109.60622884757436,0.0,True,2,2
+sparse_challenge,Sparse deployment - Coverage challenge,High,gwo,Grey Wolf Optimizer,88.28386481172608,19,25,24.0,116.16298001542904,0.0,True,2,3
+sparse_challenge,Sparse deployment - Coverage challenge,High,gwo,Grey Wolf Optimizer,88.78610060984434,18,25,28.000000000000004,123.31402862478382,0.00099945068359375,True,3,1
+sparse_challenge,Sparse deployment - Coverage challenge,High,gwo,Grey Wolf Optimizer,92.59507070332322,21,25,16.0,110.23222702776573,0.0009970664978027344,True,3,2
+sparse_challenge,Sparse deployment - Coverage challenge,High,gwo,Grey Wolf Optimizer,93.70857477311205,22,25,12.0,106.48701678762733,0.000997781753540039,True,3,3
+sparse_challenge,Sparse deployment - Coverage challenge,High,gwo,Grey Wolf Optimizer,90.36156204805613,20,25,20.0,112.95195256007015,0.0,True,4,1
+sparse_challenge,Sparse deployment - Coverage challenge,High,gwo,Grey Wolf Optimizer,91.59481877457073,19,25,24.0,120.51949838759306,0.0,True,4,2
+sparse_challenge,Sparse deployment - Coverage challenge,High,gwo,Grey Wolf Optimizer,86.29603897039405,21,25,16.0,102.73337972665959,0.0010046958923339844,True,4,3
+sparse_challenge,Sparse deployment - Coverage challenge,High,mrfo,Manta Ray Foraging Optimization,88.31461280713019,20,25,20.0,110.39326600891273,0.0009984970092773438,True,1,1
+sparse_challenge,Sparse deployment - Coverage challenge,High,mrfo,Manta Ray Foraging Optimization,84.09246097327507,19,25,24.0,110.64797496483561,0.0009989738464355469,True,1,2
+sparse_challenge,Sparse deployment - Coverage challenge,High,mrfo,Manta Ray Foraging Optimization,91.49787816832996,18,25,28.000000000000004,127.08038634490273,0.0,True,1,3
+sparse_challenge,Sparse deployment - Coverage challenge,High,mrfo,Manta Ray Foraging Optimization,90.15171940862278,22,25,12.0,102.4451356916168,0.0,True,2,1
+sparse_challenge,Sparse deployment - Coverage challenge,High,mrfo,Manta Ray Foraging Optimization,86.50890066674127,24,25,4.0,90.11343819452216,0.002004861831665039,True,2,2
+sparse_challenge,Sparse deployment - Coverage challenge,High,mrfo,Manta Ray Foraging Optimization,88.3682736152931,24,25,4.0,92.05028501593033,0.0,True,2,3
+sparse_challenge,Sparse deployment - Coverage challenge,High,mrfo,Manta Ray Foraging Optimization,92.5195817919402,20,25,20.0,115.64947723992525,0.0,True,3,1
+sparse_challenge,Sparse deployment - Coverage challenge,High,mrfo,Manta Ray Foraging Optimization,84.10390673063918,24,25,4.0,87.60823617774915,0.0009889602661132812,True,3,2
+sparse_challenge,Sparse deployment - Coverage challenge,High,mrfo,Manta Ray Foraging Optimization,89.75925803068428,17,25,32.0,131.99890886865333,0.0009946823120117188,True,3,3
+sparse_challenge,Sparse deployment - Coverage challenge,High,mrfo,Manta Ray Foraging Optimization,90.87507447175034,21,25,16.0,108.18461246636946,0.0009996891021728516,True,4,1
+sparse_challenge,Sparse deployment - Coverage challenge,High,mrfo,Manta Ray Foraging Optimization,84.39040538704889,24,25,4.0,87.90667227817593,0.0,True,4,2
+sparse_challenge,Sparse deployment - Coverage challenge,High,mrfo,Manta Ray Foraging Optimization,87.77581851976483,18,25,28.000000000000004,121.91085905522893,0.003001689910888672,True,4,3

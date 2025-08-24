@@ -29,7 +29,7 @@ def test_quick():
             desired_coverage=0.85
         )
         final_coverage = env.calculate_coverage_percentage(activation)
-        print(f"✅ PSO: {final_coverage*100:.1f}% coverage, {sum(activation)}/{len(activation)} active")
+        print(f"✅ PSO: {final_coverage:.1f}% coverage, {sum(activation)}/{len(activation)} active")
         
         # Test GA (quick)
         print("\n🔬 Testing GA...")
@@ -41,7 +41,7 @@ def test_quick():
             desired_coverage=0.85
         )
         final_coverage = env2.calculate_coverage_percentage(activation)
-        print(f"✅ GA: {final_coverage*100:.1f}% coverage, {sum(activation)}/{len(activation)} active")
+        print(f"✅ GA: {final_coverage:.1f}% coverage, {sum(activation)}/{len(activation)} active")
         
         # Test SA (quick)
         print("\n🔬 Testing SA...")
@@ -53,7 +53,7 @@ def test_quick():
             desired_coverage=0.85
         )
         final_coverage = env3.calculate_coverage_percentage(activation)
-        print(f"✅ SA: {final_coverage*100:.1f}% coverage, {sum(activation)}/{len(activation)} active")
+        print(f"✅ SA: {final_coverage:.1f}% coverage, {sum(activation)}/{len(activation)} active")
         
         print("\n🎉 ALL ALGORITHMS WORKING!")
         

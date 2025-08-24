@@ -45,12 +45,12 @@ def test_algorithm(algorithm_name, algorithm_func, env, params):
         
         # Calculate final coverage
         env.set_active_drones(activation)
-        final_coverage = env.calculate_coverage_percentage()
+        final_coverage = env.calculate_coverage_percentage()  # Now returns percentage
         active_count = np.sum(activation)
         
         print(f"\n✅ {algorithm_name.upper()} Results:")
         print(f"   • Execution Time: {execution_time:.2f}s")
-        print(f"   • Final Coverage: {final_coverage*100:.1f}%")
+        print(f"   • Final Coverage: {final_coverage:.1f}%")  # No need to multiply by 100
         print(f"   • Active Drones: {active_count}/{len(env.drones)}")
         print(f"   • Energy Saved: {((len(env.drones) - active_count) / len(env.drones)) * 100:.1f}%")
         

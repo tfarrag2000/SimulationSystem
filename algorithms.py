@@ -49,70 +49,76 @@ def get_parallel_support():
         'sequential_algorithms': ['greedy', 'sa']
     }
 
-def smart_optimization_wrapper(algorithm_func, simulation, desired_coverage=0.90, smart_mode=True, **kwargs):
+def smart_optimization_wrapper(algorithm_func, simulation, desired_coverage=0.99, smart_mode=True, coverage_first=True, **kwargs):
     """
-    UNIVERSAL SMART OPTIMIZATION WRAPPER
+    UNIVERSAL SMART OPTIMIZATION WRAPPER - COVERAGE-FIRST VERSION
     Applies two-phase optimization to ANY algorithm:
-    Phase 1: Energy Efficiency - Minimize drones for target coverage
-    Phase 2: Coverage Maximization - Maximize coverage with available drones
+    Phase 1: COVERAGE MAXIMIZATION - Achieve maximum possible coverage
+    Phase 2: Energy Optimization - Optimize energy while maintaining high coverage
     
     Args:
         algorithm_func: The original algorithm function (pso, ga, sa, etc.)
         simulation: The simulation environment
-        desired_coverage: Target coverage threshold (0.0-1.0)
+        desired_coverage: Target coverage threshold (0.99 for maximum coverage)
         smart_mode: Enable smart two-phase optimization
+        coverage_first: Prioritize coverage over energy efficiency
         **kwargs: Algorithm-specific parameters
     
     Returns:
         activation, result: Standard algorithm return format with enhanced results
     """
     if not smart_mode:
-        # Use original algorithm as-is
+        # Use original algorithm with coverage-first fitness if enabled
+        if coverage_first:
+            kwargs['fitness_function'] = 'coverage_first'
         return algorithm_func(simulation, desired_coverage=desired_coverage, **kwargs)
     
-    print(f"🧠 SMART OPTIMIZATION ENABLED for {algorithm_func.__name__.upper()}")
-    print(f"   Phase 1: Energy Efficiency (Target: {desired_coverage*100:.1f}%)")
-    print(f"   Phase 2: Coverage Maximization")
+    print(f"🧠 SMART COVERAGE-FIRST OPTIMIZATION: {algorithm_func.__name__.upper()}")
+    print(f"   Phase 1: COVERAGE MAXIMIZATION (Target: {desired_coverage*100:.1f}%)")
+    print(f"   Phase 2: Energy Optimization (Maintain coverage)")
     
     start_time = time.time()
     
-    # PHASE 1: ENERGY EFFICIENCY OPTIMIZATION
-    print(f"🔋 Phase 1: Energy Efficiency Optimization")
+    # PHASE 1: COVERAGE MAXIMIZATION OPTIMIZATION
+    print(f"🎯 Phase 1: Coverage Maximization Optimization ({kwargs.get('iterations', 50)} iterations)")
     
-    # Modify kwargs for energy efficiency focus
+    # Modify kwargs for COVERAGE MAXIMIZATION focus
     phase1_kwargs = kwargs.copy()
+    phase1_kwargs['fitness_function'] = 'coverage_first'  # Use coverage-first fitness
     
     # Adjust iterations for two-phase approach
     if 'iterations' in phase1_kwargs:
         total_iterations = phase1_kwargs['iterations']
-        phase1_kwargs['iterations'] = total_iterations // 2
+        phase1_kwargs['iterations'] = int(total_iterations * 0.7)  # 70% for coverage
     elif 'num_generations' in phase1_kwargs:
         total_generations = phase1_kwargs['num_generations']
-        phase1_kwargs['num_generations'] = total_generations // 2
+        phase1_kwargs['num_generations'] = int(total_generations * 0.7)
     elif 'num_iterations' in phase1_kwargs:
         total_iterations = phase1_kwargs['num_iterations']
-        phase1_kwargs['num_iterations'] = total_iterations // 2
+        phase1_kwargs['num_iterations'] = int(total_iterations * 0.7)
     
-    # Run Phase 1 with energy efficiency focus
+    # Run Phase 1 with COVERAGE MAXIMIZATION focus
     phase1_activation, phase1_result = algorithm_func(
         simulation, desired_coverage=desired_coverage, **phase1_kwargs
     )
     
     phase1_coverage = getattr(phase1_result, 'coverage', 0)
-    phase1_active = np.sum(phase1_activation)
+    if phase1_coverage > 1:  # Handle percentage format
+        phase1_coverage = phase1_coverage / 100
     
-    print(f"✅ Phase 1 Complete: {phase1_coverage:.1f}% coverage with {phase1_active} drones")
+    phase1_active = np.sum(phase1_activation >= 0.5) if hasattr(phase1_activation, 'ndim') else np.sum(phase1_activation)
     
-    # PHASE 2: COVERAGE MAXIMIZATION OPTIMIZATION
-    print(f"🎯 Phase 2: Coverage Maximization")
+    print(f"✅ Phase 1 Complete: {phase1_coverage*100:.1f}% coverage with {phase1_active} drones")
     
-    # Create enhanced fitness function for phase 2
-    original_fitness = getattr(phase1_result, 'best_fitness', 0)
+    # PHASE 2: ENERGY OPTIMIZATION WHILE MAINTAINING COVERAGE
+    print(f"⚡ Phase 2: Energy Optimization (Maintain {phase1_coverage*100:.1f}% coverage)")
     
-    # Modify kwargs for coverage maximization
+    # Use Phase 1 result as starting point for Phase 2
     phase2_kwargs = kwargs.copy()
+    phase2_kwargs['initial_solution'] = phase1_activation  # Start from Phase 1 result
+    phase2_kwargs['minimum_coverage'] = max(0.95, phase1_coverage)  # Don't go below Phase 1 coverage
     
-    # Adjust remaining iterations
+    # Remaining iterations for energy optimization
     if 'iterations' in phase2_kwargs:
         phase2_kwargs['iterations'] = total_iterations - phase1_kwargs['iterations']
     elif 'num_generations' in phase2_kwargs:
@@ -294,6 +300,62 @@ def calculate_energy_efficiency_fitness(solution, simulation, target_coverage=0.
     fitness = coverage_score + energy_score - overlap_penalty
     return fitness
 
+def calculate_coverage_first_fitness(solution, simulation, target_coverage=0.99, 
+                                    w_coverage=1000, w_bonus=200, w_energy=20, w_overlap=5):
+    """
+    COVERAGE-FIRST fitness function - Prioritizes maximum coverage achievement
+    
+    Args:
+        solution: Drone positions and activation states
+        simulation: Simulation environment
+        target_coverage: Desired coverage percentage (default 99% for maximum coverage)
+        w_coverage: Weight for coverage component (HIGHEST PRIORITY)
+        w_bonus: Bonus weight for exceeding coverage targets
+        w_energy: Weight for energy efficiency (SECONDARY)
+        w_overlap: Weight for overlap penalty (MINIMAL)
+    
+    Returns:
+        fitness: Higher values indicate better solutions with coverage as primary goal
+    """
+    # Calculate coverage
+    coverage = calculate_coverage_with_solution(solution, simulation)
+    
+    # Calculate active drones ratio
+    if hasattr(solution, 'ndim') and solution.ndim == 2:
+        active_count = np.sum(solution[:, 2] >= 0.5)
+    else:
+        # Handle 1D binary activation arrays
+        active_count = np.sum(solution >= 0.5)
+    
+    total_drones = len(simulation.drones)
+    
+    # COVERAGE FIRST: Maximum weight for coverage achievement
+    coverage_score = coverage * w_coverage
+    
+    # COVERAGE BONUS: Reward for exceeding targets
+    if coverage >= 0.95:
+        coverage_bonus = (coverage - 0.95) * w_bonus * 10  # Big bonus for high coverage
+        coverage_score += coverage_bonus
+    
+    if coverage >= 0.98:
+        coverage_score += w_bonus * 5  # Extra bonus for excellent coverage
+    
+    # SECONDARY: Energy consideration (much lower weight)
+    energy_efficiency = 1 - (active_count / total_drones)
+    energy_score = energy_efficiency * w_energy
+    
+    # MINIMAL: Overlap penalty (very low weight)
+    overlap = calculate_overlap_penalty(solution, simulation)
+    overlap_penalty = overlap * w_overlap
+    
+    # COVERAGE-FIRST FITNESS: Coverage dominates completely
+    fitness = coverage_score + energy_score - overlap_penalty
+    
+    # Additional coverage boost - ensure coverage is the PRIMARY goal
+    fitness += coverage * 500  # Extra coverage boost
+    
+    return fitness
+
 def calculate_coverage_with_solution(solution, simulation):
     """Calculate coverage percentage for a given solution"""
     if hasattr(solution, 'ndim') and solution.ndim == 2:
@@ -306,7 +368,7 @@ def calculate_coverage_with_solution(solution, simulation):
     else:
         # Binary activation array
         active_indices = np.where(solution >= 0.5)[0]
-        active_positions = np.array([[simulation.drones[i].x, simulation.drones[i].y] 
+        active_positions = np.array([[simulation.drones.iloc[i]['x'], simulation.drones.iloc[i]['y']] 
                                    for i in active_indices])
     
     if len(active_positions) == 0:
@@ -314,8 +376,8 @@ def calculate_coverage_with_solution(solution, simulation):
     
     # Calculate coverage using grid-based approach
     grid_size = 50  # 50x50 grid for coverage calculation
-    x_points = np.linspace(0, simulation.area_width, grid_size)
-    y_points = np.linspace(0, simulation.area_height, grid_size)
+    x_points = np.linspace(0, simulation.width, grid_size)
+    y_points = np.linspace(0, simulation.height, grid_size)
     
     covered_points = 0
     total_points = grid_size * grid_size
@@ -344,7 +406,7 @@ def calculate_overlap_penalty(solution, simulation):
     else:
         # Binary activation array
         active_indices = np.where(solution >= 0.5)[0]
-        active_positions = np.array([[simulation.drones[i].x, simulation.drones[i].y] 
+        active_positions = np.array([[simulation.drones.iloc[i]['x'], simulation.drones.iloc[i]['y']] 
                                    for i in active_indices])
     
     if len(active_positions) <= 1:
@@ -469,10 +531,10 @@ def optimize_active_sleep_greedy(simulation, target_coverage=0.95, max_attempts=
     
     # Greedy selection: start with most strategic drones
     drone_scores = []
-    for i, drone in enumerate(simulation.drones):
+    for i, drone in simulation.drones.iterrows():
         # Score drones based on strategic position (center is better)
-        center_x, center_y = simulation.area_width/2, simulation.area_height/2
-        distance_to_center = np.sqrt((drone.x - center_x)**2 + (drone.y - center_y)**2)
+        center_x, center_y = simulation.width/2, simulation.height/2
+        distance_to_center = np.sqrt((drone['x'] - center_x)**2 + (drone['y'] - center_y)**2)
         max_distance = np.sqrt(center_x**2 + center_y**2)
         centrality_score = 1 - (distance_to_center / max_distance)
         drone_scores.append((i, centrality_score))
@@ -668,7 +730,8 @@ def genetic_algorithm(simulation,
                      max_workers=None,
                      energy_efficiency_mode=True,  # Enable Active/Sleep optimization
                      smart_mode=False,  # Enable smart two-phase optimization
-                     desired_coverage=0.90):  # For smart mode compatibility
+                     desired_coverage=0.90,  # For smart mode compatibility
+                     progress_callback=None):  # NEW: Progress callback support
     """Enhanced Genetic Algorithm with Active/Sleep drone management and Smart Mode"""
     
     if smart_mode:
@@ -781,6 +844,10 @@ def genetic_algorithm(simulation,
         if iteration % 10 == 0:
             print(f"Enhanced GA Iteration {iteration + 1}: Best Fitness = {best_fitness:.2f}, "
                   f"Coverage = {coverage_history[-1]:.2f}%, Active Drones = {active_nodes_history[-1]}")
+        
+        # Call progress callback if provided
+        if progress_callback:
+            progress_callback(iteration, num_generations, best_fitness, coverage_history[-1])
                   
         if coverage_history[-1] >= target_coverage * 100:
             print(f"🎯 Target coverage {target_coverage*100}% achieved with {active_nodes_history[-1]} active drones!")
@@ -837,7 +904,8 @@ def smart_particle_swarm_optimization(simulation,
                                      social_weight=1.5,
                                      desired_coverage=0.90,
                                      parallel_processing=False,
-                                     max_workers=None):
+                                     max_workers=None,
+                                     progress_callback=None):
     """
     SMART TWO-PHASE PSO OPTIMIZATION
     Phase 1: Minimize drones for target coverage (Energy Efficiency)
@@ -984,6 +1052,10 @@ def smart_particle_swarm_optimization(simulation,
         
         if iteration % 20 == 0:
             print(f"Phase 1 Iteration {iteration}: Coverage = {current_coverage:.1f}%, Active Drones = {active_count}")
+        
+        # Call progress callback if provided
+        if progress_callback:
+            progress_callback(iteration, phase1_iterations, gbest_fitness, current_coverage)
 
     print(f"✅ Phase 1 Complete: {current_coverage:.1f}% coverage with {active_count} drones")
     
@@ -1038,6 +1110,10 @@ def smart_particle_swarm_optimization(simulation,
         
         if iteration % 20 == 0:
             print(f"Phase 2 Iteration {iteration}: Coverage = {current_coverage:.1f}%, Active Drones = {active_count}")
+        
+        # Call progress callback if provided
+        if progress_callback:
+            progress_callback(iteration, iterations, gbest_fitness, current_coverage)
 
     # Final results
     final_coverage = calculate_coverage(gbest)
@@ -1079,7 +1155,8 @@ def particle_swarm_optimization(simulation,
                                desired_coverage=0.90,
                                parallel_processing=True,  # Enable by default
                                max_workers=None,
-                               smart_mode=True):  # NEW: Enable smart mode by default
+                               smart_mode=True,  # NEW: Enable smart mode by default
+                               progress_callback=None):  # NEW: Progress callback support
     """
     Particle Swarm Optimization for drone coverage
     Now with SMART MODE option for two-phase optimization
@@ -1089,7 +1166,7 @@ def particle_swarm_optimization(simulation,
         return smart_particle_swarm_optimization(
             simulation, swarm_size, iterations, inertia, 
             cognitive_weight, social_weight, desired_coverage, 
-            parallel_processing, max_workers
+            parallel_processing, max_workers, progress_callback
         )
     """Particle Swarm Optimization for drone coverage with parallel processing"""
     start_time = time.time()
@@ -1759,7 +1836,8 @@ def simulated_annealing(
     perturb_radius=5,
     desired_coverage=0.90,
     w1=0.6, w2=0.2, w3=0.2,
-    smart_mode=False  # Enable smart two-phase optimization
+    smart_mode=False,  # Enable smart two-phase optimization
+    progress_callback=None  # NEW: Progress callback support
 ):
     """Standalone Simulated Annealing for drone optimization with Smart Mode"""
     
@@ -1858,6 +1936,10 @@ def simulated_annealing(
             'coverage': coverage_history[-1],
             'algorithm': 'SA'
         })
+        
+        # Call progress callback if provided
+        if progress_callback:
+            progress_callback(iteration, num_iterations, best_fitness, coverage_history[-1])
 
         if coverage_history[-1] >= desired_coverage * 100:
             print(f"Stopping early: Desired coverage reached.")
