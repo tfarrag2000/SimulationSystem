@@ -1,8 +1,8 @@
 """
-DRONE OPTIMIZATION ALGORITHMS - ENHANCED VERSION WITH ACTIVE/SLEEP MANAGEMENT
+DRONE OPTIMIZATION ALGORITHMS - ENHANCED VERSION WITH STAGED OPTIMIZATION
 Multi-algorithm optimization suite for energy-efficient drone coverage optimization
-Version: 3.0.0 - Major upgrade with Active/Sleep node system and energy efficiency
-Last Updated: 2025-08-09
+Version: 5.0.0 - Added Staged Gap Filling & Redundancy Removal
+Last Updated: 2025-08-25
 Author: Drone Optimization System
 """
 
@@ -13,12 +13,25 @@ import concurrent.futures
 import time
 import threading
 from functools import partial
+from scipy.spatial.distance import cdist
+
+# Import staged coverage optimizer
+try:
+    from staged_coverage_optimizer import (
+        analyze_coverage_gaps_and_redundancy,
+        staged_gap_filling_optimization,
+        enhanced_coverage_first_fitness
+    )
+    STAGED_OPTIMIZER_AVAILABLE = True
+except ImportError:
+    print("⚠️ Staged coverage optimizer not available, using standard algorithms")
+    STAGED_OPTIMIZER_AVAILABLE = False
 
 # Version information
-__version__ = "4.0.0"
-__author__ = "Advanced Drone Optimization System"
-__last_updated__ = "2025-08-22"
-__description__ = "Smart Two-Phase Optimization with Universal Algorithm Intelligence and Enhanced AI"
+__version__ = "5.0.0"
+__author__ = "Advanced Drone Optimization System with Staged Optimization"
+__last_updated__ = "2025-08-25"
+__description__ = "Staged Optimization with Universal Algorithm Intelligence and Enhanced AI"
 
 def get_version_info():
     """Returns version information as a dictionary"""
@@ -49,38 +62,40 @@ def get_parallel_support():
         'sequential_algorithms': ['greedy', 'sa']
     }
 
-def smart_optimization_wrapper(algorithm_func, simulation, desired_coverage=0.99, smart_mode=True, coverage_first=True, **kwargs):
+def staged_optimization_wrapper(algorithm_func, simulation, desired_coverage=0.99, staged_mode=True, coverage_first=True, **kwargs):
     """
-    UNIVERSAL SMART OPTIMIZATION WRAPPER - COVERAGE-FIRST VERSION
-    Applies two-phase optimization to ANY algorithm:
-    Phase 1: COVERAGE MAXIMIZATION - Achieve maximum possible coverage
-    Phase 2: Energy Optimization - Optimize energy while maintaining high coverage
+    UNIVERSAL STAGED OPTIMIZATION WRAPPER - COVERAGE-FIRST VERSION
+    Applies multi-stage optimization to ANY algorithm:
+    Stage 1: COVERAGE MAXIMIZATION - Achieve maximum possible coverage
+    Stage 2: Energy Optimization - Optimize energy while maintaining high coverage
+    Stage 3: Gap Filling & Redundancy Removal - Fine-tune for optimal efficiency
     
     Args:
         algorithm_func: The original algorithm function (pso, ga, sa, etc.)
         simulation: The simulation environment
         desired_coverage: Target coverage threshold (0.99 for maximum coverage)
-        smart_mode: Enable smart two-phase optimization
+        staged_mode: Enable staged multi-phase optimization
         coverage_first: Prioritize coverage over energy efficiency
         **kwargs: Algorithm-specific parameters
     
     Returns:
         activation, result: Standard algorithm return format with enhanced results
     """
-    if not smart_mode:
+    if not staged_mode:
         # Use original algorithm with coverage-first fitness if enabled
         if coverage_first:
             kwargs['fitness_function'] = 'coverage_first'
         return algorithm_func(simulation, desired_coverage=desired_coverage, **kwargs)
     
-    print(f"🧠 SMART COVERAGE-FIRST OPTIMIZATION: {algorithm_func.__name__.upper()}")
-    print(f"   Phase 1: COVERAGE MAXIMIZATION (Target: {desired_coverage*100:.1f}%)")
-    print(f"   Phase 2: Energy Optimization (Maintain coverage)")
+    print(f"🎯 STAGED COVERAGE-FIRST OPTIMIZATION: {algorithm_func.__name__.upper()}")
+    print(f"   Stage 1: COVERAGE MAXIMIZATION (Target: {desired_coverage*100:.1f}%)")
+    print(f"   Stage 2: Energy Optimization (Maintain coverage)")
+    print(f"   Stage 3: Gap Filling & Redundancy Removal")
     
     start_time = time.time()
     
-    # PHASE 1: COVERAGE MAXIMIZATION OPTIMIZATION
-    print(f"🎯 Phase 1: Coverage Maximization Optimization ({kwargs.get('iterations', 50)} iterations)")
+    # STAGE 1: COVERAGE MAXIMIZATION OPTIMIZATION
+    print(f"🎯 Stage 1: Coverage Maximization Optimization ({kwargs.get('iterations', 50)} iterations)")
     
     # Modify kwargs for COVERAGE MAXIMIZATION focus
     phase1_kwargs = kwargs.copy()
@@ -165,9 +180,9 @@ def smart_optimization_wrapper(algorithm_func, simulation, desired_coverage=0.99
         'coverage_history': getattr(final_result, 'coverage_history', []),
         'active_nodes_history': getattr(final_result, 'active_nodes_history', []),
         'convergence_iteration': getattr(final_result, 'convergence_iteration', 0),
-        'algorithm_name': f'Smart {getattr(final_result, "algorithm_name", algorithm_func.__name__)}',
+        'algorithm_name': f'Staged {getattr(final_result, "algorithm_name", algorithm_func.__name__)}',
         'energy_saved_percentage': ((total_drones - final_active) / total_drones * 100),
-        'smart_mode': True,
+        'staged_mode': True,
         'best_phase': best_phase,
         'phase1_coverage': phase1_coverage,
         'phase1_active': phase1_active,
@@ -303,7 +318,7 @@ def calculate_energy_efficiency_fitness(solution, simulation, target_coverage=0.
 def calculate_coverage_first_fitness(solution, simulation, target_coverage=0.99, 
                                     w_coverage=1000, w_bonus=200, w_energy=20, w_overlap=5):
     """
-    COVERAGE-FIRST fitness function - Prioritizes maximum coverage achievement
+    SMART COVERAGE-FIRST fitness function - Prioritizes maximum coverage with gap analysis
     
     Args:
         solution: Drone positions and activation states
@@ -317,20 +332,74 @@ def calculate_coverage_first_fitness(solution, simulation, target_coverage=0.99,
     Returns:
         fitness: Higher values indicate better solutions with coverage as primary goal
     """
-    # Calculate coverage
+    # Calculate coverage with enhanced gap detection
     coverage = calculate_coverage_with_solution(solution, simulation)
     
-    # Calculate active drones ratio
+    # Calculate active drones information
     if hasattr(solution, 'ndim') and solution.ndim == 2:
         active_count = np.sum(solution[:, 2] >= 0.5)
+        active_positions = solution[solution[:, 2] >= 0.5, :2]
     else:
         # Handle 1D binary activation arrays
         active_count = np.sum(solution >= 0.5)
+        active_indices = np.where(solution >= 0.5)[0]
+        active_positions = np.array([[simulation.drones.iloc[i]['x'], simulation.drones.iloc[i]['y']] 
+                                   for i in active_indices])
     
     total_drones = len(simulation.drones)
     
     # COVERAGE FIRST: Maximum weight for coverage achievement
     coverage_score = coverage * w_coverage
+    
+    # SMART GAP ANALYSIS: Heavy penalty for coverage gaps
+    gap_penalty = 0
+    redundancy_penalty = 0
+    smart_bonus = 0
+    
+    if SMART_OPTIMIZER_AVAILABLE and len(active_positions) > 0:
+        try:
+            gaps, redundant_drones, efficiency_score, _ = analyze_coverage_gaps_and_redundancy(solution, simulation)
+            
+            # CRITICAL: Heavy penalty for coverage gaps (gaps are coverage failures)
+            gap_penalty = len(gaps) * w_coverage * 0.1  # Each gap reduces coverage score significantly
+            
+            # EFFICIENCY: Penalty for redundant drones
+            redundancy_penalty = len(redundant_drones) * w_energy * 0.5
+            
+            # BONUS: Reward for high efficiency
+            smart_bonus = efficiency_score * w_bonus * 0.2
+            
+            # Additional penalties for gap clusters (critical coverage failures)
+            if len(gaps) > 0:
+                # Find gap clusters (nearby uncovered areas)
+                gap_clusters = 0
+                processed_gaps = set()
+                
+                for i, (gx, gy) in enumerate(gaps):
+                    if i in processed_gaps:
+                        continue
+                    
+                    cluster_size = 1
+                    processed_gaps.add(i)
+                    
+                    for j, (gx2, gy2) in enumerate(gaps[i+1:], i+1):
+                        if j in processed_gaps:
+                            continue
+                        
+                        distance = np.sqrt((gx - gx2)**2 + (gy - gy2)**2)
+                        if distance <= simulation.sensing_range * 0.5:  # Nearby gaps
+                            cluster_size += 1
+                            processed_gaps.add(j)
+                    
+                    if cluster_size > 1:
+                        gap_clusters += 1
+                
+                # Extra penalty for gap clusters (major coverage failures)
+                gap_penalty += gap_clusters * w_coverage * 0.05
+                
+        except Exception as e:
+            # Fallback if smart analysis fails
+            print(f"⚠️ Smart analysis failed: {e}")
     
     # COVERAGE BONUS: Reward for exceeding targets
     if coverage >= 0.95:
@@ -344,20 +413,29 @@ def calculate_coverage_first_fitness(solution, simulation, target_coverage=0.99,
     energy_efficiency = 1 - (active_count / total_drones)
     energy_score = energy_efficiency * w_energy
     
-    # MINIMAL: Overlap penalty (very low weight)
+    # MINIMAL: Traditional overlap penalty (very low weight)
     overlap = calculate_overlap_penalty(solution, simulation)
     overlap_penalty = overlap * w_overlap
     
-    # COVERAGE-FIRST FITNESS: Coverage dominates completely
-    fitness = coverage_score + energy_score - overlap_penalty
+    # SMART COVERAGE-FIRST FITNESS: Coverage dominates, gaps heavily penalized
+    fitness = (coverage_score + 
+               energy_score + 
+               smart_bonus - 
+               gap_penalty - 
+               redundancy_penalty - 
+               overlap_penalty)
     
     # Additional coverage boost - ensure coverage is the PRIMARY goal
     fitness += coverage * 500  # Extra coverage boost
     
-    return fitness
+    # Ensure coverage gaps are heavily discouraged
+    if gap_penalty > 0:
+        fitness = max(fitness * 0.7, 0)  # Significant reduction for any gaps
+    
+    return max(fitness, 0)  # Ensure non-negative
 
 def calculate_coverage_with_solution(solution, simulation):
-    """Calculate coverage percentage for a given solution"""
+    """Calculate coverage percentage for a given solution with smart gap detection"""
     if hasattr(solution, 'ndim') and solution.ndim == 2:
         # Position-based solution (x, y, activation)
         active_positions = []
@@ -374,23 +452,38 @@ def calculate_coverage_with_solution(solution, simulation):
     if len(active_positions) == 0:
         return 0.0
     
-    # Calculate coverage using grid-based approach
-    grid_size = 50  # 50x50 grid for coverage calculation
+    # Calculate coverage using enhanced grid-based approach
+    grid_size = 75  # Increased resolution for better gap detection
     x_points = np.linspace(0, simulation.width, grid_size)
     y_points = np.linspace(0, simulation.height, grid_size)
     
     covered_points = 0
     total_points = grid_size * grid_size
+    gap_clusters = []  # Track gap locations for analysis
     
-    for x in x_points:
-        for y in y_points:
+    for i, x in enumerate(x_points):
+        for j, y in enumerate(y_points):
             point = np.array([x, y])
+            is_covered = False
             # Check if point is covered by any active drone
             for drone_pos in active_positions:
                 distance = np.linalg.norm(point - drone_pos)
                 if distance <= simulation.sensing_range:
                     covered_points += 1
+                    is_covered = True
                     break
+            
+            # Track uncovered points for gap analysis
+            if not is_covered:
+                gap_clusters.append((x, y))
+    
+    # Store gap information for smart optimization
+    if hasattr(simulation, 'last_gap_analysis'):
+        simulation.last_gap_analysis = {
+            'gaps': gap_clusters,
+            'coverage_ratio': covered_points / total_points,
+            'active_drones': len(active_positions)
+        }
     
     return covered_points / total_points
 
@@ -1121,6 +1214,40 @@ def smart_particle_swarm_optimization(simulation,
     execution_time = time.time() - start_time
     
     print(f"🎉 SMART PSO Complete:")
+    print(f"   Pre-optimization Coverage: {final_coverage:.1f}%")
+    print(f"   Pre-optimization Active Drones: {final_active}/{NumNodes}")
+    
+    # SMART POST-PROCESSING: Apply gap filling and redundancy removal
+    if SMART_OPTIMIZER_AVAILABLE:
+        print(f"🧠 Applying Smart Post-Processing...")
+        try:
+            # Apply smart optimization to the best solution
+            optimized_gbest = staged_gap_filling_optimization(gbest, simulation, max_relocations=3)
+            
+            # Recalculate metrics for optimized solution
+            optimized_coverage = calculate_coverage(optimized_gbest)
+            optimized_active = np.sum(optimized_gbest[:, 2] >= 0.5)
+            
+            # Use optimized solution if it's better or uses fewer drones with similar coverage
+            coverage_improvement = optimized_coverage - final_coverage
+            drone_reduction = final_active - optimized_active
+            
+            if (coverage_improvement > 0.01 or  # Better coverage
+                (abs(coverage_improvement) < 0.05 and drone_reduction > 0)):  # Similar coverage, fewer drones
+                print(f"✅ Smart optimization applied:")
+                print(f"   Coverage: {final_coverage:.1f}% → {optimized_coverage:.1f}% ({coverage_improvement:+.1f}%)")
+                print(f"   Active Drones: {final_active} → {optimized_active} ({drone_reduction:+d})")
+                
+                gbest = optimized_gbest
+                final_coverage = optimized_coverage
+                final_active = optimized_active
+            else:
+                print(f"ℹ️ Original solution already optimal")
+                
+        except Exception as e:
+            print(f"⚠️ Smart optimization failed: {e}, using original solution")
+    
+    print(f"🎯 Final Results:")
     print(f"   Final Coverage: {final_coverage:.1f}%")
     print(f"   Active Drones: {final_active}/{NumNodes}")
     print(f"   Energy Saved: {((NumNodes - final_active) / NumNodes * 100):.1f}%")

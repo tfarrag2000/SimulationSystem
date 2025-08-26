@@ -1,0 +1,7 @@
+algorithm,coverage_percentage_mean,coverage_percentage_max,coverage_percentage_min,coverage_percentage_std,energy_efficiency_mean,energy_efficiency_std,execution_time_mean,execution_time_std
+Enhanced_GA,97.63,100.0,91.111,3.84,5.753,2.419,4.674,2.852
+Enhanced_Greedy,93.201,96.667,91.111,2.459,5.443,2.137,0.556,0.519
+Enhanced_PSO,90.325,95.0,80.0,5.896,5.312,2.222,7.927,4.937
+Staged_Enhanced_GA,99.185,100.0,97.333,1.27,5.837,2.404,5.272,3.28
+Staged_Enhanced_Greedy,97.833,100.0,93.333,2.456,5.763,2.417,0.848,0.815
+Staged_Enhanced_PSO,95.722,100.0,86.667,5.009,5.656,2.458,7.338,4.409

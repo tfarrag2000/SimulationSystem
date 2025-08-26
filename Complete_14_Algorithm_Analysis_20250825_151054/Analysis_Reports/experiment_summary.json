@@ -1,0 +1,43 @@
+{
+  "timestamp": "2025-08-25T15:11:17.771617",
+  "total_experiments": 84,
+  "algorithms_tested": 14,
+  "scenarios_tested": 6,
+  "best_algorithm_overall": "Original_GA",
+  "best_coverage_overall": 37.939153439153436,
+  "avg_original_coverage": 37.93915343915344,
+  "avg_staged_coverage": 37.93915343915344,
+  "overall_improvement": 0.0,
+  "improvement_percentage": 0.0,
+  "energy_improvement": 0.693316215375039,
+  "individual_improvements": {
+    "GA_SA_Hybrid": {
+      "improvement": 0.0,
+      "improvement_percent": 0.0
+    },
+    "GA": {
+      "improvement": 0.0,
+      "improvement_percent": 0.0
+    },
+    "PSO": {
+      "improvement": 0.0,
+      "improvement_percent": 0.0
+    },
+    "GWO": {
+      "improvement": 0.0,
+      "improvement_percent": 0.0
+    },
+    "MRFO": {
+      "improvement": 0.0,
+      "improvement_percent": 0.0
+    },
+    "SA": {
+      "improvement": 0.0,
+      "improvement_percent": 0.0
+    },
+    "Greedy": {
+      "improvement": 0.0,
+      "improvement_percent": 0.0
+    }
+  }
+}

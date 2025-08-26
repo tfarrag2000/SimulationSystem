@@ -1,0 +1,7 @@
+Algorithm,Avg_Coverage (%),Max_Coverage (%),Min_Coverage (%),Energy_Efficiency,Execution_Time (s)
+Enhanced_Greedy,93.2,96.7,91.1,5.44,0.56
+Enhanced_GA,97.6,100.0,91.1,5.75,4.67
+Enhanced_PSO,90.3,95.0,80.0,5.31,7.93
+Staged_Enhanced_Greedy,97.8,100.0,93.3,5.76,0.85
+Staged_Enhanced_GA,99.2,100.0,97.3,5.84,5.27
+Staged_Enhanced_PSO,95.7,100.0,86.7,5.66,7.34

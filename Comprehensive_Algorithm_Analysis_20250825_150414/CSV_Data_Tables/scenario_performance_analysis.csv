@@ -1,0 +1,7 @@
+scenario,coverage_percentage_mean,coverage_percentage_std,energy_efficiency_mean,energy_efficiency_std,execution_time_mean,execution_time_std
+Dense_Deployment,37.381,7.127,2.336,0.445,0.017,0.011
+Extreme_Scale,26.857,6.227,1.074,0.249,0.046,0.059
+Large_Scale,25.714,4.68,1.978,0.36,0.028,0.021
+Medium_Scale,26.939,8.388,3.367,1.049,0.026,0.023
+Small_Scale,21.714,7.61,5.429,1.902,0.001,0.003
+Sparse_Coverage,6.349,3.253,1.058,0.542,0.044,0.032

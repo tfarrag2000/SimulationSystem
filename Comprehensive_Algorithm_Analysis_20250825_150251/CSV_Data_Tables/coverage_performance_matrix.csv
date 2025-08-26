@@ -1,0 +1,8 @@
+algorithm,Dense_Deployment,Extreme_Scale,Large_Scale,Medium_Scale,Small_Scale,Sparse_Coverage
+Staged_GA,38.33,20.0,26.0,25.71,24.0,4.44
+Staged_GA_SA_Hybrid,48.33,25.33,30.0,20.0,8.0,8.89
+Staged_GWO,25.0,25.33,26.0,37.14,20.0,13.33
+Staged_Greedy,48.33,22.67,26.0,22.86,28.0,6.67
+Staged_MRFO,36.67,13.33,28.0,31.43,20.0,8.89
+Staged_PSO,38.33,20.0,20.0,31.43,24.0,6.67
+Staged_SA,38.33,25.33,32.0,25.71,24.0,6.67

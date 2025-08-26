@@ -1,0 +1,8 @@
+algorithm,coverage_percentage_mean,coverage_percentage_std,coverage_percentage_min,coverage_percentage_max,active_drones_mean,active_drones_std,energy_efficiency_mean,energy_efficiency_std,execution_time_mean,execution_time_std
+Staged_GA,23.082,11.007,4.444,38.333,12.0,7.772,2.525,1.949,0.0,0.001
+Staged_GA_SA_Hybrid,23.426,15.022,8.0,48.333,12.0,7.772,2.054,0.723,0.01,0.025
+Staged_GWO,24.468,7.848,13.333,37.143,12.0,7.772,2.74,1.668,0.003,0.005
+Staged_Greedy,25.754,13.395,6.667,48.333,12.0,7.772,2.816,2.226,0.004,0.01
+Staged_MRFO,23.053,10.811,8.889,36.667,12.0,7.772,2.565,1.633,0.006,0.009
+Staged_PSO,23.405,10.871,6.667,38.333,12.0,7.772,2.629,1.997,0.0,0.001
+Staged_SA,25.341,10.619,6.667,38.333,12.0,7.772,2.699,1.826,0.008,0.019

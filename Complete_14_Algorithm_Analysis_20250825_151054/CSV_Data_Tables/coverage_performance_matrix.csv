@@ -1,0 +1,15 @@
+algorithm,Dense_Deployment,Extreme_Scale,Large_Scale,Medium_Scale,Small_Scale,Sparse_Coverage
+Original_GA,55.0,28.0,32.0,42.86,52.0,17.78
+Original_GA_SA_Hybrid,55.0,28.0,32.0,42.86,52.0,17.78
+Original_GWO,55.0,28.0,32.0,42.86,52.0,17.78
+Original_Greedy,55.0,28.0,32.0,42.86,52.0,17.78
+Original_MRFO,55.0,28.0,32.0,42.86,52.0,17.78
+Original_PSO,55.0,28.0,32.0,42.86,52.0,17.78
+Original_SA,55.0,28.0,32.0,42.86,52.0,17.78
+Staged_GA,55.0,28.0,32.0,42.86,52.0,17.78
+Staged_GA_SA_Hybrid,55.0,28.0,32.0,42.86,52.0,17.78
+Staged_GWO,55.0,28.0,32.0,42.86,52.0,17.78
+Staged_Greedy,55.0,28.0,32.0,42.86,52.0,17.78
+Staged_MRFO,55.0,28.0,32.0,42.86,52.0,17.78
+Staged_PSO,55.0,28.0,32.0,42.86,52.0,17.78
+Staged_SA,55.0,28.0,32.0,42.86,52.0,17.78
