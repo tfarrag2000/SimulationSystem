@@ -1,3 +1,42 @@
+# Map old algorithm keys to new keys for backward compatibility
+ALGO_KEY_MAP = {
+    'greedy': 'standard_greedy',
+    'ga': 'standard_ga',
+    'pso': 'standard_pso',
+    'sa': 'standard_sa',
+    'ga_sa': 'standard_ga_sa',
+    'gwo': 'standard_gwo',
+    'mrfo': 'standard_mrfo',
+    'staged_greedy': 'staged_greedy',
+    'staged_ga': 'staged_ga',
+    'staged_pso': 'staged_pso',
+    'staged_sa': 'staged_sa',
+    'staged_ga_sa': 'staged_ga_sa',
+    'staged_gwo': 'staged_gwo',
+    'staged_mrfo': 'staged_mrfo',
+}
+
+# Standard library imports
+import logging
+import os
+import time
+import base64
+import io
+from datetime import datetime
+
+# Third-party imports
+import dash
+from dash import dcc, html, Input, Output, State, ctx, dash_table
+import dash_bootstrap_components as dbc
+import plotly.graph_objs as go
+from plotly.subplots import make_subplots
+import numpy as np
+import pandas as pd
+import psutil
+
+# Project imports
+from algorithms import *
+from algorithms import __version__, __last_updated__, __author__
 #!/usr/bin/env python3
 """
 DRONE OPTIMIZATION SIMULATION SYSTEM - SMART OPTIMIZATION VERSION
@@ -8,113 +47,6 @@ Author: Advanced Drone Optimization System
 Features: Smart Mode, Active/Sleep Management, Parallel Processing, Multi-Algorithm Support
 """
 
-# Fix matplotlib backend for threading issues
-import matplotlib
-matplotlib.use('Agg')  # Use non-interactive backend
-import matplotlib.pyplot as plt
-plt.ioff()  # Turn off interactive mode
-
-# Version information
-__version__ = "4.0.0"
-__author__ = "Advanced Drone Optimization System"
-__last_updated__ = "2025-08-22"
-__description__ = "Smart Two-Phase Optimization with Universal Algorithm Intelligence"
-
-import dash
-from dash import dcc, html, Input, Output, State, ctx, dash_table
-import dash_bootstrap_components as dbc
-import plotly.graph_objs as go
-from plotly.subplots import make_subplots
-import numpy as np
-import pandas as pd
-from datetime import datetime
-import psutil
-import os
-import logging
-import base64
-import io
-import time
-try:
-    import openpyxl
-    import xlsxwriter
-    EXCEL_AVAILABLE = True
-except ImportError:
-    EXCEL_AVAILABLE = False
-
-# Import system modules
-from algorithms import *
-
-# Define visualization functions inline to avoid import issues
-def create_2d_drone_visualization(drones_data, coverage_data, simulation_params):
-    """Create 2D drone visualization using Plotly - INLINE VERSION"""
-    import plotly.graph_objs as go
-    
-    try:
-        # Get parameters
-        width = simulation_params.get('width', 60)
-        height = simulation_params.get('height', 60)
-        sensing_range = simulation_params.get('sensing_range', 15)
-        
-        fig = go.Figure()
-        
-        # Draw area boundary
-        fig.add_shape(
-            type="rect",
-            x0=0, y0=0, x1=width, y1=height,
-            line=dict(color="black", width=2),
-            fillcolor="lightgray",
-            opacity=0.3
-        )
-        
-        # Separate active and sleeping drones
-        active_drones = [d for d in drones_data if d.get('status') == 'active']
-        sleeping_drones = [d for d in drones_data if d.get('status') != 'active']
-        
-        # Add active drones
-        if active_drones:
-            active_x = [d['position'][0] for d in active_drones]
-            active_y = [d['position'][1] for d in active_drones]
-            fig.add_trace(go.Scatter(
-                x=active_x, y=active_y,
-                mode='markers',
-                marker=dict(size=12, color='green', symbol='circle'),
-                name='Active Drones'
-            ))
-        
-        # Add sleeping drones
-        if sleeping_drones:
-            sleeping_x = [d['position'][0] for d in sleeping_drones]
-            sleeping_y = [d['position'][1] for d in sleeping_drones]
-            fig.add_trace(go.Scatter(
-                x=sleeping_x, y=sleeping_y,
-                mode='markers',
-                marker=dict(size=10, color='gray', symbol='circle', opacity=0.7),
-                name='Sleeping Drones'
-            ))
-        
-        # Update layout
-        fig.update_layout(
-            title="Drone Deployment Visualization",
-            xaxis=dict(title="X Position", range=[0, width], showgrid=True),
-            yaxis=dict(title="Y Position", range=[0, height], showgrid=True),
-            showlegend=True,
-            template="plotly_white"
-        )
-        
-        return fig
-    
-    except Exception as e:
-        # Return error visualization
-        fig = go.Figure()
-        fig.add_annotation(
-            text=f"Error: {str(e)}",
-            x=0.5, y=0.5, xref="paper", yref="paper",
-            showarrow=False, font=dict(size=16, color="red")
-        )
-        return fig
-
-# REMOVED: create_2d_drone_visualization function - was causing scope issues
-# All visualizations now handled directly in callbacks
 
 def create_energy_efficiency_dashboard(data):
     """Create energy efficiency dashboard using Plotly"""
@@ -420,6 +352,13 @@ def format_validation_message(validation_result):
 # ===== ACTIVE/SLEEP DRONE SIMULATION ENVIRONMENT =====
 
 class DroneSimulationEnvironment:
+    def update_positions_from_solution(self, solution):
+        """Update drone positions in the environment from an algorithm solution array (x, y, activation)."""
+        if hasattr(solution, 'ndim') and solution.ndim == 2 and solution.shape[1] >= 2:
+            for i in range(min(len(self.drones), len(solution))):
+                self.drones.at[i, 'x'] = solution[i, 0]
+                self.drones.at[i, 'y'] = solution[i, 1]
+        # If solution is 1D or not position-based, do nothing
     """Enhanced simulation environment with Active/Sleep drone management"""
     
     def __init__(self, width, height, num_drones, sensing_radius):
@@ -1129,7 +1068,6 @@ app.layout = dbc.Container([
     html.Div([
     dbc.Switch(id="enable-parallel-hidden", value=True, style={'display': 'none'}),
     dbc.Input(id="parallel-workers-hidden", type="number", value=min(CPU_COUNT, 8), style={'display': 'none'}),
-        dbc.Input(id="batch-size", type="number", value=100, style={'display': 'none'}),
         dbc.Switch(id="enable-parallel-dynamic", value=True, style={'display': 'none'}),
         dbc.Input(id="parallel-workers-dynamic", type="number", value=min(CPU_COUNT, 8), style={'display': 'none'}),
         dbc.Input(id="batch-size-dynamic", type="number", value=100, style={'display': 'none'}),
@@ -1191,7 +1129,7 @@ def update_algorithm_params(selected_algorithm):
     if not selected_algorithm:
         return ""
     
-    config = ALGORITHM_CONFIGS[selected_algorithm]
+    config = ALGORITHM_CONFIGS[ALGO_KEY_MAP.get(selected_algorithm, selected_algorithm)]
     params = config.get('params', {})
     
     if not params:
@@ -1234,7 +1172,7 @@ def control_parallel_section_and_content(selected_algorithm):
     if not selected_algorithm:
         return {'display': 'block'}, [], []
     
-    config = ALGORITHM_CONFIGS.get(selected_algorithm, {})
+    config = ALGORITHM_CONFIGS.get(ALGO_KEY_MAP.get(selected_algorithm, selected_algorithm), {})
     parallel_support = config.get('parallel_support', False)
     
     if not parallel_support:
@@ -1438,25 +1376,25 @@ def update_graph(selected_algorithm, simulation_data):
         return fig
     
     if selected_algorithm:
-        config = ALGORITHM_CONFIGS[selected_algorithm]
-        
+        mapped_key = ALGO_KEY_MAP.get(selected_algorithm, selected_algorithm)
+        config = ALGORITHM_CONFIGS[mapped_key]
+        # Use the base algorithm name for preview curves
+        base_key = selected_algorithm.replace('standard_', '').replace('staged_', '')
         x = np.linspace(0, 100, 50)
-        # ALIGNED WITH EXECUTION PARAMETERS
-        if selected_algorithm == 'greedy':
-            y = 60 * (1 - np.exp(-x/20)) + np.random.normal(0, 1, 50) * 2  # Base: 60%
-        elif selected_algorithm == 'ga':
-            y = 65 * (1 - np.exp(-x/25)) + np.random.normal(0, 2, 50)  # Base: 65%
-        elif selected_algorithm == 'pso':
-            y = 70 * (1 - np.exp(-x/15)) + np.random.normal(0, 1.5, 50)  # Base: 70%
-        elif selected_algorithm == 'sa':
-            y = 62 * (1 - np.exp(-x/22)) + np.random.normal(0, 1.8, 50)  # Base: 62%
-        elif selected_algorithm == 'ga_sa':
-            y = 75 * (1 - np.exp(-x/18)) + np.random.normal(0, 1.2, 50)  # Base: 75%
-        elif selected_algorithm == 'gwo':
-            y = 68 * (1 - np.exp(-x/20)) + np.random.normal(0, 1.5, 50)  # Base: 68%
+        if base_key == 'greedy':
+            y = 60 * (1 - np.exp(-x/20)) + np.random.normal(0, 1, 50) * 2
+        elif base_key == 'ga':
+            y = 65 * (1 - np.exp(-x/25)) + np.random.normal(0, 2, 50)
+        elif base_key == 'pso':
+            y = 70 * (1 - np.exp(-x/15)) + np.random.normal(0, 1.5, 50)
+        elif base_key == 'sa':
+            y = 62 * (1 - np.exp(-x/22)) + np.random.normal(0, 1.8, 50)
+        elif base_key == 'ga_sa':
+            y = 75 * (1 - np.exp(-x/18)) + np.random.normal(0, 1.2, 50)
+        elif base_key == 'gwo':
+            y = 68 * (1 - np.exp(-x/20)) + np.random.normal(0, 1.5, 50)
         else:  # mrfo
-            y = 72 * (1 - np.exp(-x/17)) + np.random.normal(0, 1.4, 50)  # Base: 72%
-        
+            y = 72 * (1 - np.exp(-x/17)) + np.random.normal(0, 1.4, 50)
         fig = go.Figure()
         fig.add_trace(go.Scatter(
             x=x, y=np.clip(y, 0, 100),
@@ -1464,14 +1402,12 @@ def update_graph(selected_algorithm, simulation_data):
             name=config['name'],
             line=dict(color='#1f77b4', width=2, dash='dot')
         ))
-        
         fig.update_layout(
             title=f"Preview: {config['name']}",
             xaxis_title="Iteration",
             yaxis_title="Expected Coverage (%)",
             template="plotly_white"
         )
-        
         return fig
     
     fig = go.Figure()
@@ -2186,17 +2122,16 @@ def update_active_sleep_grid(simulation_data, width, height, num_drones, radius)
             sensing_radius = env_params.get('sensing_radius', radius)
             
             if drone_positions and len(drone_positions) == len(activation_pattern):
-                # Use REAL drone positions from PSO optimization
+                # Use REAL drone positions from optimization
                 positions = drone_positions
-                logger.info(f"🎯 Using REAL drone positions from PSO: {len(positions)} drones")
+                logger.info(f"🎯 Using REAL drone positions from optimization: {len(positions)} drones")
             else:
-                # Fallback to grid positions only if real positions not available
-                positions = []
-                for i in range(len(activation_pattern)):
-                    x = (i % int(width**0.5)) * (width / int(width**0.5))
-                    y = (i // int(width**0.5)) * (height / int(width**0.5))
-                    positions.append([x, y])
-                logger.warning(f"⚠️ Using fallback grid positions: {len(positions)} drones")
+                # No valid positions: show error annotation and return empty plot
+                fig.add_annotation(
+                    text="Error: No optimized drone positions available. Please check the optimization logic.",
+                    xref="paper", yref="paper", x=0.5, y=0.5, showarrow=False, font=dict(size=16, color="red")
+                )
+                return fig
             
             # Separate active and sleeping drones based on activation pattern
             active_indices = [i for i, active in enumerate(activation_pattern) if active >= 0.5]
@@ -2599,6 +2534,9 @@ def enhanced_control_simulation(run_clicks, stop_clicks, reset_clicks,
                 logger.info(f"  - Activation sum: {np.sum(activation)}")
                 logger.info(f"  - Final coverage: {final_coverage_percent:.1f}%")
 
+                # Update environment drone positions to match optimized solution
+                if hasattr(result, 'best_solution'):
+                    env.update_positions_from_solution(result.best_solution)
                 simulation_data = {
                     'algorithm': f'Enhanced {algorithm.upper()} (Active/Sleep)',
                     'final_coverage': final_coverage_percent,  # Use the correct coverage value
@@ -2607,7 +2545,7 @@ def enhanced_control_simulation(run_clicks, stop_clicks, reset_clicks,
                     'fitness_history': result.fitness_history if hasattr(result, 'fitness_history') else [],
                     'coverage_history': result.coverage_history if hasattr(result, 'coverage_history') else [],
                     'activation_pattern': activation,
-                    'drone_positions': env.get_drone_positions().tolist(),  # Add real drone positions
+                    'drone_positions': env.get_drone_positions().tolist(),  # Now reflects optimized positions
                     'environment_params': {  # Add environment parameters for visualization
                         'width': env.width,
                         'height': env.height,

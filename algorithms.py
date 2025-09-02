@@ -1,3 +1,9 @@
+# Smart optimizer availability flag (for gap/redundancy analysis)
+try:
+    from staged_coverage_optimizer import analyze_coverage_gaps_and_redundancy
+    SMART_OPTIMIZER_AVAILABLE = True
+except ImportError:
+    SMART_OPTIMIZER_AVAILABLE = False
 # === STANDARD ALGORITHM FUNCTIONS ===
 def standard_greedy(simulation, **kwargs):
     return greedy_optimization(simulation, **kwargs)
