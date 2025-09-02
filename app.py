@@ -168,94 +168,74 @@ except ImportError:
     logger.warning("⚠️ Parallel processing not available")
 
 # Enhanced Algorithm configurations with parallel processing support
-ALGORITHM_CONFIGS = {
+ALGORITHM_CONFIGS = {}
+_base_algorithms = [
+    ('greedy', 'Greedy Algorithm', False),
+    ('ga', 'Genetic Algorithm ⚡', True),
+    ('pso', 'Particle Swarm Optimization ⚡', True),
+    ('sa', 'Simulated Annealing', False),
+    ('ga_sa', 'GA + SA Hybrid ⚡', True),
+    ('gwo', 'Grey Wolf Optimizer ⚡', True),
+    ('mrfo', 'Manta Ray Foraging ⚡', True),
+]
+_base_params = {
     'greedy': {
-        'name': 'Greedy Algorithm',
-        'description': 'Fast heuristic algorithm that makes locally optimal choices',
-        'complexity': 'O(n²)',
-        'recommended_for': 'Quick results, small to medium problems',
-        'parallel_support': False,
-        'params': {
-            'coverage_target': {'default': 0.90, 'min': 0.5, 'max': 1.0, 'step': 0.01},  # Optimal: 90% for balance
-            'overlap_penalty': {'default': 0.2, 'min': 0.0, 'max': 1.0, 'step': 0.05}   # Optimal: Lower penalty for better coverage
-        }
+        'coverage_target': {'default': 0.90, 'min': 0.5, 'max': 1.0, 'step': 0.01},
+        'overlap_penalty': {'default': 0.2, 'min': 0.0, 'max': 1.0, 'step': 0.05}
     },
     'ga': {
-        'name': 'Genetic Algorithm ⚡',
-        'description': 'Evolution-inspired metaheuristic with parallel fitness evaluation',
-        'complexity': 'O(g × p × n)',
-        'recommended_for': 'Complex problems, balanced exploration',
-        'parallel_support': True,
-        'params': {
-            'population_size': {'default': 60, 'min': 20, 'max': 200, 'step': 10},        # Optimal: 60 for drone problems
-            'generations': {'default': 150, 'min': 50, 'max': 500, 'step': 10},          # Optimal: 150 for convergence
-            'mutation_rate': {'default': 0.15, 'min': 0.01, 'max': 0.5, 'step': 0.01},  # Optimal: 15% for exploration
-            'crossover_rate': {'default': 0.85, 'min': 0.3, 'max': 1.0, 'step': 0.05}   # Optimal: 85% for exploitation
-        }
+        'population_size': {'default': 60, 'min': 20, 'max': 200, 'step': 10},
+        'generations': {'default': 150, 'min': 50, 'max': 500, 'step': 10},
+        'mutation_rate': {'default': 0.15, 'min': 0.01, 'max': 0.5, 'step': 0.01},
+        'crossover_rate': {'default': 0.85, 'min': 0.3, 'max': 1.0, 'step': 0.05}
     },
     'pso': {
-        'name': 'Particle Swarm Optimization ⚡',
-        'description': 'Swarm intelligence with parallel particle evaluation',
-        'complexity': 'O(i × p × n)',
-        'recommended_for': 'Continuous optimization, fast convergence',
-        'parallel_support': True,
-        'params': {
-            'swarm_size': {'default': 50, 'min': 20, 'max': 100, 'step': 10},             # Optimal: 50 for spatial problems
-            'inertia': {'default': 0.729, 'min': 0.1, 'max': 1.0, 'step': 0.05},        # Optimal: Clerc's coefficient
-            'cognitive': {'default': 1.494, 'min': 0.5, 'max': 3.0, 'step': 0.1},       # Optimal: Clerc's coefficient  
-            'social': {'default': 1.494, 'min': 0.5, 'max': 3.0, 'step': 0.1}           # Optimal: Clerc's coefficient
-        }
+        'swarm_size': {'default': 50, 'min': 20, 'max': 100, 'step': 10},
+        'inertia': {'default': 0.729, 'min': 0.1, 'max': 1.0, 'step': 0.05},
+        'cognitive': {'default': 1.494, 'min': 0.5, 'max': 3.0, 'step': 0.1},
+        'social': {'default': 1.494, 'min': 0.5, 'max': 3.0, 'step': 0.1}
     },
     'sa': {
-        'name': 'Simulated Annealing',
-        'description': 'Probabilistic optimization inspired by metallurgy',
-        'complexity': 'O(n × log n)',
-        'recommended_for': 'Avoiding local optima, quality solutions',
-        'parallel_support': False,
-        'params': {
-            'initial_temp': {'default': 1500, 'min': 100, 'max': 5000, 'step': 100},     # Optimal: Higher temp for exploration
-            'cooling_rate': {'default': 0.98, 'min': 0.8, 'max': 0.99, 'step': 0.01},   # Optimal: Slower cooling for quality
-            'min_temp': {'default': 0.1, 'min': 0.1, 'max': 10, 'step': 0.1}            # Optimal: Lower min for convergence
-        }
+        'initial_temp': {'default': 1500, 'min': 100, 'max': 5000, 'step': 100},
+        'cooling_rate': {'default': 0.98, 'min': 0.8, 'max': 0.99, 'step': 0.01},
+        'min_temp': {'default': 0.1, 'min': 0.1, 'max': 10, 'step': 0.1}
     },
     'ga_sa': {
-        'name': 'GA + SA Hybrid ⚡',
-        'description': 'Hybrid optimization with parallel genetic operations',
-        'complexity': 'O(g × p × n × log n)',
-        'recommended_for': 'High-quality solutions, complex landscapes',
-        'parallel_support': True,
-        'params': {
-            'population_size': {'default': 40, 'min': 15, 'max': 100, 'step': 5},        # Optimal: 40 for hybrid balance
-            'generations': {'default': 120, 'min': 30, 'max': 300, 'step': 10},          # Optimal: 120 for hybrid convergence
-            'sa_temp': {'default': 800, 'min': 100, 'max': 2000, 'step': 100},           # Optimal: 800 for SA phase
-            'cooling_rate': {'default': 0.95, 'min': 0.8, 'max': 0.99, 'step': 0.01}    # Optimal: 0.95 for stability
-        }
+        'population_size': {'default': 40, 'min': 15, 'max': 100, 'step': 5},
+        'generations': {'default': 120, 'min': 30, 'max': 300, 'step': 10},
+        'sa_temp': {'default': 800, 'min': 100, 'max': 2000, 'step': 100},
+        'cooling_rate': {'default': 0.95, 'min': 0.8, 'max': 0.99, 'step': 0.01}
     },
     'gwo': {
-        'name': 'Grey Wolf Optimizer ⚡',
-        'description': 'Bio-inspired algorithm with parallel pack evaluation',
-        'complexity': 'O(i × n × d)',
-        'recommended_for': 'Multi-modal optimization, exploration',
-        'parallel_support': True,
-        'params': {
-            'pack_size': {'default': 30, 'min': 20, 'max': 80, 'step': 5},               # Optimal: 30 for wolf pack dynamics
-            'a_decay': {'default': 2.0, 'min': 1, 'max': 4, 'step': 0.1},               # Optimal: Linear decay from 2
-            'leadership_factor': {'default': 0.7, 'min': 0.5, 'max': 1.0, 'step': 0.05} # Optimal: 0.7 for balance
-        }
+        'pack_size': {'default': 30, 'min': 20, 'max': 80, 'step': 5},
+        'a_decay': {'default': 2.0, 'min': 1, 'max': 4, 'step': 0.1},
+        'leadership_factor': {'default': 0.7, 'min': 0.5, 'max': 1.0, 'step': 0.05}
     },
     'mrfo': {
-        'name': 'Manta Ray Foraging ⚡',
-        'description': 'Marine-inspired algorithm with parallel foraging evaluation',
-        'complexity': 'O(i × n × d)',
-        'recommended_for': 'Global optimization, balanced search',
-        'parallel_support': True,
-        'params': {
-            'population_size': {'default': 35, 'min': 25, 'max': 90, 'step': 5},         # Optimal: 35 for manta dynamics
-            'beta': {'default': 2.5, 'min': 1, 'max': 5, 'step': 0.1},                  # Optimal: 2.5 for foraging behavior
-            'somersault_factor': {'default': 0.3, 'min': 0.1, 'max': 1.0, 'step': 0.05} # Optimal: 0.3 for exploration balance
-        }
+        'population_size': {'default': 35, 'min': 25, 'max': 90, 'step': 5},
+        'beta': {'default': 2.5, 'min': 1, 'max': 5, 'step': 0.1},
+        'somersault_factor': {'default': 0.3, 'min': 0.1, 'max': 1.0, 'step': 0.05}
     }
 }
+for key, name, parallel in _base_algorithms:
+    # Standard
+    ALGORITHM_CONFIGS[f'standard_{key}'] = {
+        'name': f'{name} (Standard)',
+        'description': f'Standard {name.lower()}',
+        'complexity': '',
+        'recommended_for': '',
+        'parallel_support': parallel,
+        'params': _base_params[key]
+    }
+    # Staged
+    ALGORITHM_CONFIGS[f'staged_{key}'] = {
+        'name': f'{name} (Staged)',
+        'description': f'Staged {name.lower()} with multi-phase optimization',
+        'complexity': '',
+        'recommended_for': '',
+        'parallel_support': parallel,
+        'params': _base_params[key]
+    }
 
 # Initialize Dash app
 app = dash.Dash(
@@ -1147,8 +1127,8 @@ app.layout = dbc.Container([
     
     # Hidden fallback components for callbacks
     html.Div([
-        dbc.Switch(id="enable-parallel", value=True, style={'display': 'none'}),
-        dbc.Input(id="parallel-workers", type="number", value=min(CPU_COUNT, 8), style={'display': 'none'}),
+    dbc.Switch(id="enable-parallel-hidden", value=True, style={'display': 'none'}),
+    dbc.Input(id="parallel-workers-hidden", type="number", value=min(CPU_COUNT, 8), style={'display': 'none'}),
         dbc.Input(id="batch-size", type="number", value=100, style={'display': 'none'}),
         dbc.Switch(id="enable-parallel-dynamic", value=True, style={'display': 'none'}),
         dbc.Input(id="parallel-workers-dynamic", type="number", value=min(CPU_COUNT, 8), style={'display': 'none'}),
@@ -1343,8 +1323,8 @@ def toggle_stopping_criteria_controls(enable_stopping):
 
 # Sync dynamic parallel controls with hidden fallback controls
 @app.callback(
-    [Output('enable-parallel', 'value'),
-     Output('parallel-workers', 'value'),
+    [Output('enable-parallel-hidden', 'value'),
+     Output('parallel-workers-hidden', 'value'),
      Output('batch-size', 'value')],
     [Input('enable-parallel-dynamic', 'value'),
      Input('parallel-workers-dynamic', 'value'),
@@ -2421,7 +2401,7 @@ def update_energy_displays(simulation_data, total_drones):
      State('convergence-threshold', 'value'),
      State('stagnation-limit', 'value'),
      State('enable-stopping-criteria', 'value'),
-     State('enable-parallel', 'value'),
+    State('enable-parallel-hidden', 'value'),
      State('max-workers', 'value'),
      State('current-state', 'data')]
 )

@@ -1,3 +1,52 @@
+# === STANDARD ALGORITHM FUNCTIONS ===
+def standard_greedy(simulation, **kwargs):
+    return greedy_optimization(simulation, **kwargs)
+
+def standard_genetic(simulation, **kwargs):
+    return genetic_algorithm(simulation, **kwargs)
+
+def standard_pso(simulation, **kwargs):
+    return particle_swarm_optimization(simulation, **kwargs)
+
+def standard_sa(simulation, **kwargs):
+    return simulated_annealing(simulation, **kwargs)
+
+def standard_ga_sa(simulation, **kwargs):
+    return genetic_algorithm_with_sa(simulation, **kwargs)
+
+def standard_gwo(simulation, **kwargs):
+    return grey_wolf_optimizer(simulation, **kwargs)
+
+def standard_mrfo(simulation, **kwargs):
+    return manta_ray_foraging_optimization(simulation, **kwargs)
+
+# === STAGED ALGORITHM FUNCTIONS ===
+def staged_greedy(simulation, **kwargs):
+    return staged_optimization_wrapper(greedy_optimization, simulation, **kwargs)
+
+def staged_genetic(simulation, **kwargs):
+    return staged_optimization_wrapper(genetic_algorithm, simulation, **kwargs)
+
+def staged_pso(simulation, **kwargs):
+    return staged_optimization_wrapper(particle_swarm_optimization, simulation, **kwargs)
+
+def staged_sa(simulation, **kwargs):
+    return staged_optimization_wrapper(simulated_annealing, simulation, **kwargs)
+
+def staged_ga_sa(simulation, **kwargs):
+    return staged_optimization_wrapper(genetic_algorithm_with_sa, simulation, **kwargs)
+
+def staged_gwo(simulation, **kwargs):
+    return staged_optimization_wrapper(grey_wolf_optimizer, simulation, **kwargs)
+
+def staged_mrfo(simulation, **kwargs):
+    return staged_optimization_wrapper(manta_ray_foraging_optimization, simulation, **kwargs)
+
+# === EXPORT LIST ===
+__all__ = [
+    'standard_greedy', 'standard_genetic', 'standard_pso', 'standard_sa', 'standard_ga_sa', 'standard_gwo', 'standard_mrfo',
+    'staged_greedy', 'staged_genetic', 'staged_pso', 'staged_sa', 'staged_ga_sa', 'staged_gwo', 'staged_mrfo',
+]
 """
 DRONE OPTIMIZATION ALGORITHMS - ENHANCED VERSION WITH STAGED OPTIMIZATION
 Multi-algorithm optimization suite for energy-efficient drone coverage optimization
