@@ -1,0 +1,13 @@
+scenario,algorithm,coverage,improvement,active_drones,optimal_radius
+Urban Dense,Enhanced Greedy,60.88,5.759999999999998,18.0,
+Urban Dense,Adaptive Radius,80.92,25.799999999999997,12.0,9.0
+Urban Dense,Gap Filler,84.76,29.64,14.0,
+Urban Dense,Random Baseline,55.120000000000005,0.0,17.0,
+Suburban Balanced,Enhanced Greedy,60.8,14.32,17.0,
+Suburban Balanced,Adaptive Radius,86.24000000000001,39.76000000000001,13.0,12.0
+Suburban Balanced,Gap Filler,85.68,39.20000000000001,13.0,
+Suburban Balanced,Random Baseline,46.48,0.0,12.0,
+Rural Sparse,Enhanced Greedy,67.96,17.039999999999992,15.0,
+Rural Sparse,Adaptive Radius,90.48,39.56,14.0,18.0
+Rural Sparse,Gap Filler,90.48,39.56,13.0,
+Rural Sparse,Random Baseline,50.92,0.0,11.0,

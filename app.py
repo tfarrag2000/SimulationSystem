@@ -419,7 +419,7 @@ class DroneSimulationEnvironment:
                 distance = np.linalg.norm(positions[i] - positions[j])
                 if distance < min_distance_threshold:
                     to_remove.add(j)
-                    logger.info(f"🔧 Removing duplicate drone {j} (distance {distance:.2f} from drone {i})")
+                    logger.info(f"Removing duplicate drone {j} (distance {distance:.2f} from drone {i})")
         
         # Remove duplicates
         if to_remove:
@@ -430,7 +430,7 @@ class DroneSimulationEnvironment:
             self.drones['id'] = range(len(self.drones))
             self.num_drones = len(self.drones)
             
-            logger.info(f"✅ Removed {len(to_remove)} duplicate drones. Remaining: {self.num_drones} drones")
+            logger.info(f"Removed {len(to_remove)} duplicate drones. Remaining: {self.num_drones} drones")
     
     def get_drone_positions(self):
         """Get current drone positions as numpy array"""
@@ -560,7 +560,7 @@ app.layout = dbc.Container([
                                 # Performance Testing
                                 {'label': '💻 Parallel Processing Test (80x80, 25 drones)', 'value': 'parallel_processing_test'}
                             ],
-                            placeholder="Select a predefined test case...",
+                            value='medium_area_standard',
                             className="mb-3"
                         )
                     ]),
@@ -577,7 +577,7 @@ app.layout = dbc.Container([
                                 }
                                 for key, config in ALGORITHM_CONFIGS.items()
                             ],
-                            value='pso',
+                            value='staged_greedy',
                             className="mb-3"
                         )
                     ]),
@@ -1066,8 +1066,9 @@ app.layout = dbc.Container([
     
     # Hidden fallback components for callbacks
     html.Div([
-    dbc.Switch(id="enable-parallel-hidden", value=True, style={'display': 'none'}),
-    dbc.Input(id="parallel-workers-hidden", type="number", value=min(CPU_COUNT, 8), style={'display': 'none'}),
+        dbc.Switch(id="enable-parallel-hidden", value=True, style={'display': 'none'}),
+        dbc.Input(id="parallel-workers-hidden", type="number", value=min(CPU_COUNT, 8), style={'display': 'none'}),
+        dbc.Input(id="batch-size", type="number", value=100, style={'display': 'none'}),
         dbc.Switch(id="enable-parallel-dynamic", value=True, style={'display': 'none'}),
         dbc.Input(id="parallel-workers-dynamic", type="number", value=min(CPU_COUNT, 8), style={'display': 'none'}),
         dbc.Input(id="batch-size-dynamic", type="number", value=100, style={'display': 'none'}),
@@ -2570,22 +2571,26 @@ def enhanced_control_simulation(run_clicks, stop_clicks, reset_clicks,
                 logger.info("🔧 Using enhanced simulation mode...")
                 logger.info("Using enhanced simulation mode...")
                 
-                # Simulate Active/Sleep optimization results
-                if energy_mode:
-                    # Optimize for energy efficiency
-                    final_coverage = min(0.99, target_cov + np.random.normal(0, 0.02))
-                    optimal_active_drones = max(int(total_drones * 0.4), int(total_drones * final_coverage * 0.7))
-                else:
-                    # Traditional optimization
-                    final_coverage = min(0.95, 0.6 + np.random.normal(0, 0.05))
-                    optimal_active_drones = int(total_drones * 0.8)
-                
                 # Create activation pattern - use actual number of drones from environment
                 actual_num_drones = len(env.drones)
                 activation_pattern = np.zeros(actual_num_drones)
+                
+                # Determine optimal number of active drones based on energy mode
+                if energy_mode:
+                    # Optimize for energy efficiency - use fewer drones
+                    optimal_active_drones = max(int(total_drones * 0.5), int(total_drones * target_cov * 0.8))
+                else:
+                    # Traditional optimization - use more drones
+                    optimal_active_drones = int(total_drones * 0.8)
+                
                 optimal_active_drones = min(optimal_active_drones, actual_num_drones)  # Ensure we don't exceed available drones
                 active_indices = np.random.choice(actual_num_drones, optimal_active_drones, replace=False)
                 activation_pattern[active_indices] = 1
+                
+                # Calculate REAL coverage based on actual drone positions and activation
+                env.set_active_drones(activation_pattern)
+                final_coverage_percent = env.calculate_coverage_percentage()  # This returns percentage (0-100)
+                final_coverage = final_coverage_percent / 100.0  # Convert to ratio (0-1) for internal use
                 
                 # Simulate iteration history
                 iterations = np.random.randint(50, 200)
@@ -2594,16 +2599,23 @@ def enhanced_control_simulation(run_clicks, stop_clicks, reset_clicks,
                 
                 simulation_data = {
                     'algorithm': f'Enhanced {algorithm.upper()} (Active/Sleep)' if energy_mode else f'{algorithm.upper()}',
-                    'final_coverage': final_coverage,
+                    'final_coverage': final_coverage_percent,  # Use percentage value for consistency
                     'iterations': iterations,
                     'execution_time': time.time() - start_time,
                     'coverage_history': coverage_history.tolist(),
                     'activation_pattern': activation_pattern.tolist(),
+                    'drone_positions': env.get_drone_positions().tolist(),  # Add drone positions for visualization
+                    'environment_params': {  # Add environment parameters for visualization
+                        'width': env.width,
+                        'height': env.height,
+                        'sensing_radius': env.sensing_radius,
+                        'total_drones': len(env.drones)
+                    },
                     'energy_statistics': {
                         'total_drones': actual_num_drones,
                         'active_drones': optimal_active_drones,
                         'sleeping_drones': actual_num_drones - optimal_active_drones,
-                        'coverage_percentage': final_coverage * 100,
+                        'coverage_percentage': final_coverage_percent,  # Use calculated percentage
                         'energy_saved_percentage': ((actual_num_drones - optimal_active_drones) / actual_num_drones) * 100
                     },
                     'target_achieved': final_coverage >= target_cov,

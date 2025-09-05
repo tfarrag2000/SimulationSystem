@@ -1,0 +1,36 @@
+Removing duplicate drone 3 (distance 0.63 from drone 0)
+Removed 1 duplicate drones. Remaining: 4 drones
+Removing duplicate drone 27 (distance 1.45 from drone 14)
+Removed 1 duplicate drones. Remaining: 29 drones
+Removing duplicate drone 9 (distance 1.77 from drone 4)
+Removed 1 duplicate drones. Remaining: 11 drones
+Removing duplicate drone 3 (distance 1.15 from drone 2)
+Removed 1 duplicate drones. Remaining: 4 drones
+Removing duplicate drone 2 (distance 1.50 from drone 1)
+Removed 1 duplicate drones. Remaining: 14 drones
+Removing duplicate drone 10 (distance 1.85 from drone 5)
+Removed 1 duplicate drones. Remaining: 11 drones
+Removing duplicate drone 21 (distance 1.95 from drone 0)
+Removed 1 duplicate drones. Remaining: 24 drones
+Removing duplicate drone 14 (distance 1.57 from drone 8)
+Removed 1 duplicate drones. Remaining: 19 drones
+Removing duplicate drone 10 (distance 1.81 from drone 7)
+Removed 1 duplicate drones. Remaining: 14 drones
+Removing duplicate drone 4 (distance 1.76 from drone 3)
+Removing duplicate drone 6 (distance 1.39 from drone 5)
+Removed 2 duplicate drones. Remaining: 13 drones
+Removing duplicate drone 21 (distance 1.12 from drone 16)
+Removed 1 duplicate drones. Remaining: 29 drones
+Removing duplicate drone 8 (distance 0.90 from drone 1)
+Removed 1 duplicate drones. Remaining: 11 drones
+Removing duplicate drone 10 (distance 1.20 from drone 6)
+Removed 1 duplicate drones. Remaining: 19 drones
+Removing duplicate drone 10 (distance 1.80 from drone 9)
+Removed 1 duplicate drones. Remaining: 11 drones
+Removing duplicate drone 4 (distance 0.82 from drone 1)
+Removed 1 duplicate drones. Remaining: 4 drones
+Removing duplicate drone 13 (distance 1.23 from drone 12)
+Removed 1 duplicate drones. Remaining: 14 drones
+Removing duplicate drone 6 (distance 0.88 from drone 0)
+Removed 1 duplicate drones. Remaining: 11 drones
+Error in staged_greedy on large_area_many_drones: probabilities are not non-negative
