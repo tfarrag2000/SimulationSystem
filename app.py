@@ -465,8 +465,10 @@ class DroneSimulationEnvironment:
         
         for point in self.grid_points:
             covered = False
-            for _, drone in active_drones.iterrows():
-                distance = np.linalg.norm(point - [drone.x, drone.y])
+            # Convert to numpy array for faster processing
+            active_positions = active_drones[['x', 'y']].values
+            for pos in active_positions:
+                distance = np.linalg.norm(point - pos)
                 if distance <= self.sensing_radius:
                     covered = True
                     break
