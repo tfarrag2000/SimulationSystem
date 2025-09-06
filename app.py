@@ -71,8 +71,8 @@ and practitioners to:
 - Automated parameter validation and optimization result analysis
 - Integration with comprehensive experimental suite for batch processing
 
-Version: 4.0.0 - Major upgrade with Universal Smart Optimization and enhanced AI intelligence
-Last Updated: 2025-08-22
+Version: 6.0.0 - Major upgrade with Universal Smart Optimization and enhanced AI intelligence
+Last Updated: 2025-09-06
 Author: Advanced Drone Optimization System
 Features: Smart Mode, Active/Sleep Management, Parallel Processing, Multi-Algorithm Support
 """
@@ -535,8 +535,8 @@ class DroneSimulationEnvironment:
 # Import core modules - with error handling
 try:
     # Fallback algorithm versions for display
-    algo_version = "2.4.0"
-    algo_updated = "2025-08-02"
+    algo_version = "6.0.0"
+    algo_updated = "2025-09-06"
     logger.info("✅ Core modules imported successfully")
 except ImportError as e:
     algo_version = "Unknown"
@@ -2753,5 +2753,5 @@ def enhanced_control_simulation(run_clicks, stop_clicks, reset_clicks,
     return {}, {'status': 'ready', 'message': 'System ready'}, True
 
 if __name__ == '__main__':
-    logger.info("🚀 Starting Enhanced Drone Optimization System v3.0.0 - Active/Sleep Management Edition")
+    logger.info("🚀 Starting Enhanced Drone Optimization System v6.0.0 - Active/Sleep Management Edition")
     app.run_server(debug=True, host='127.0.0.1', port=8050)
