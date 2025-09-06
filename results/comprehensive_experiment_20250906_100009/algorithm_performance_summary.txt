@@ -1,0 +1,70 @@
+
+# Algorithm Performance Summary (Text Format)
+
+## Coverage Rankings:
+algorithm
+staged_ga_sa        62.983333
+staged_greedy       61.476667
+staged_gwo          61.420000
+standard_greedy     59.373333
+standard_ga_sa      59.326667
+standard_mrfo       58.886667
+staged_mrfo         58.573333
+standard_sa         58.260000
+standard_pso        58.150000
+staged_pso          58.063333
+standard_gwo        57.986667
+staged_genetic      57.303333
+standard_genetic    56.526667
+staged_sa           53.190000
+
+## Energy Efficiency Rankings:
+algorithm
+staged_sa           24.903876
+standard_genetic    24.794192
+standard_sa         23.782762
+standard_pso        23.779606
+standard_mrfo       23.135412
+standard_gwo        22.115048
+staged_mrfo         20.976448
+standard_ga_sa      20.959919
+staged_genetic      20.240497
+standard_greedy     17.641053
+staged_pso          16.806107
+staged_gwo          16.296866
+staged_ga_sa        15.746361
+staged_greedy       13.481333
+
+## Execution Time Rankings:
+algorithm
+staged_mrfo         0.982927
+standard_gwo        1.063708
+standard_greedy     1.101130
+standard_genetic    1.157329
+standard_sa         1.181063
+staged_gwo          1.185570
+staged_genetic      1.195589
+staged_pso          1.202580
+standard_mrfo       1.209144
+standard_ga_sa      1.247432
+standard_pso        1.254507
+staged_greedy       1.270115
+staged_sa           1.324787
+staged_ga_sa        1.470557
+
+## Success Rate Rankings:
+algorithm
+staged_mrfo         0.083333
+standard_mrfo       0.083333
+staged_ga_sa        0.000000
+staged_genetic      0.000000
+staged_greedy       0.000000
+staged_gwo          0.000000
+staged_pso          0.000000
+staged_sa           0.000000
+standard_ga_sa      0.000000
+standard_genetic    0.000000
+standard_greedy     0.000000
+standard_gwo        0.000000
+standard_pso        0.000000
+standard_sa         0.000000

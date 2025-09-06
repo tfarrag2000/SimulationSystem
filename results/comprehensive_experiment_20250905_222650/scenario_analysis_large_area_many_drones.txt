@@ -1,0 +1,240 @@
+========================================================================================================================
+DETAILED SCENARIO ANALYSIS: LARGE AREA - MANY DRONES SCENARIO
+========================================================================================================================
+Analysis Date: 2025-09-05 23:25:02
+Scenario ID: large_area_many_drones
+
+📋 SCENARIO OVERVIEW
+========================================
+Name: Large Area - Many Drones Scenario
+Description: Scalability Assessment Environment
+
+🎯 Technical Specifications:
+├─ Area Size: 100×100 units
+├─ Drone Count: 30
+├─ Complexity Level: High
+├─ Primary Purpose: Large-scale deployment and scalability testing
+├─ Deployment Context: Military operations, disaster response, large infrastructure monitoring
+└─ Key Challenges: High spatial complexity, complex coordination, computational scalability
+
+📊 PERFORMANCE STATISTICS
+========================================
+Total Experiments: 27
+Algorithms Tested: 14
+
+📈 Coverage Performance:
+├─ Mean: 61.15%
+├─ Standard Deviation: 7.83%
+├─ Median: 61.92%
+├─ Minimum: 47.28%
+├─ Maximum: 74.00%
+└─ Range: 26.72 percentage points
+
+⏱️ Execution Time Performance:
+├─ Mean: 1.101s
+├─ Standard Deviation: 0.225s
+├─ Median: 1.019s
+├─ Minimum: 0.916s
+└─ Maximum: 2.106s
+
+🏆 ALGORITHM PERFORMANCE RANKING
+==================================================
+
+ 1. STANDARD MRFO
+    🥉 Good Performance
+    ├─ Coverage: 69.40% ± 6.50%
+    ├─ Range: 64.8% - 74.0%
+    ├─ Execution Time: 1.027s ± 0.013s
+    ├─ Energy Efficiency: 1.79 ± 2.52
+    ├─ 📈 Moderate Consistency (σ = 6.50%)
+    ├─ ❌ Poor Convergence (0% rate)
+    └─ Iterations Used: 448 ± 22
+    💡 Best Performer: Dominates this scenario with superior coverage
+
+ 2. STAGED SA
+    🥉 Good Performance
+    ├─ Coverage: 67.78% ± 0.48%
+    ├─ Range: 67.4% - 68.1%
+    ├─ Execution Time: 1.569s ± 0.760s
+    ├─ Energy Efficiency: 17.14 ± 4.04
+    ├─ 🎯 High Consistency (σ = 0.48%)
+    ├─ ✅ Excellent Convergence (100% rate)
+    └─ Iterations Used: 230 ± 56
+    💪 Top Tier: Strong performance suitable for deployment
+
+ 3. STAGED GREEDY
+    🥉 Good Performance
+    ├─ Coverage: 67.10% ± 7.16%
+    ├─ Range: 62.0% - 72.2%
+    ├─ Execution Time: 1.011s ± 0.005s
+    ├─ Energy Efficiency: 8.33 ± 11.79
+    ├─ 📈 Moderate Consistency (σ = 7.16%)
+    ├─ ⚠️ Moderate Convergence (50% rate)
+    └─ Iterations Used: 289 ± 197
+    💪 Top Tier: Strong performance suitable for deployment
+
+ 4. STAGED PSO
+    🥉 Good Performance
+    ├─ Coverage: 65.26% ± 8.46%
+    ├─ Range: 59.3% - 71.2%
+    ├─ Execution Time: 0.999s ± 0.017s
+    ├─ Energy Efficiency: 13.33 ± 18.86
+    ├─ 📈 Moderate Consistency (σ = 8.46%)
+    ├─ ✅ Excellent Convergence (100% rate)
+    └─ Iterations Used: 350 ± 17
+
+ 5. STANDARD GENETIC
+    🥉 Good Performance
+    ├─ Coverage: 63.78% ± 2.63%
+    ├─ Range: 61.9% - 65.6%
+    ├─ Execution Time: 1.137s ± 0.175s
+    ├─ Energy Efficiency: 21.67 ± 2.36
+    ├─ 🎯 High Consistency (σ = 2.63%)
+    ├─ ✅ Excellent Convergence (100% rate)
+    └─ Iterations Used: 312 ± 70
+
+ 6. STANDARD GREEDY
+    🥉 Good Performance
+    ├─ Coverage: 62.72% ± 9.28%
+    ├─ Range: 56.2% - 69.3%
+    ├─ Execution Time: 1.207s ± 0.059s
+    ├─ Energy Efficiency: 16.67 ± 23.57
+    ├─ 📈 Moderate Consistency (σ = 9.28%)
+    ├─ ⚠️ Moderate Convergence (50% rate)
+    └─ Iterations Used: 342 ± 209
+
+ 7. STAGED GA SA
+    🥉 Good Performance
+    ├─ Coverage: 60.90% ± 3.14%
+    ├─ Range: 58.7% - 63.1%
+    ├─ Execution Time: 1.040s ± 0.026s
+    ├─ Energy Efficiency: 25.40 ± 1.79
+    ├─ 🎯 High Consistency (σ = 3.14%)
+    ├─ ⚠️ Moderate Convergence (50% rate)
+    └─ Iterations Used: 426 ± 55
+
+ 8. STANDARD SA
+    📊 Moderate Performance
+    ├─ Coverage: 58.96% ± 16.29%
+    ├─ Range: 47.4% - 70.5%
+    ├─ Execution Time: 1.031s ± 0.018s
+    ├─ Energy Efficiency: 23.39 ± 28.20
+    ├─ 📊 Variable Performance (σ = 16.29%)
+    ├─ ⚠️ Moderate Convergence (50% rate)
+    └─ Iterations Used: 349 ± 150
+
+ 9. STANDARD PSO
+    📊 Moderate Performance
+    ├─ Coverage: 58.72% ± 14.65%
+    ├─ Range: 48.4% - 69.1%
+    ├─ Execution Time: 1.089s ± 0.151s
+    ├─ Energy Efficiency: 18.91 ± 22.03
+    ├─ 📊 Variable Performance (σ = 14.65%)
+    ├─ ⚠️ Moderate Convergence (50% rate)
+    └─ Iterations Used: 332 ± 150
+
+10. STAGED GWO
+    📊 Moderate Performance
+    ├─ Coverage: 58.22% ± 10.78%
+    ├─ Range: 50.6% - 65.8%
+    ├─ Execution Time: 0.958s ± 0.059s
+    ├─ Energy Efficiency: 28.62 ± 16.09
+    ├─ 📊 Variable Performance (σ = 10.78%)
+    ├─ ✅ Excellent Convergence (100% rate)
+    └─ Iterations Used: 219 ± 99
+
+11. STAGED MRFO
+    📊 Moderate Performance
+    ├─ Coverage: 57.12% ± nan%
+    ├─ Range: 57.1% - 57.1%
+    ├─ Execution Time: 0.999s ± nans
+    ├─ Energy Efficiency: 25.00 ± nan
+    ├─ 📊 Variable Performance (σ = nan%)
+    ├─ ✅ Excellent Convergence (100% rate)
+    └─ Iterations Used: 187 ± nan
+
+12. STAGED GENETIC
+    📊 Moderate Performance
+    ├─ Coverage: 56.40% ± 3.45%
+    ├─ Range: 54.0% - 58.8%
+    ├─ Execution Time: 1.149s ± 0.186s
+    ├─ Energy Efficiency: 25.00 ± 7.07
+    ├─ 🎯 High Consistency (σ = 3.45%)
+    ├─ ✅ Excellent Convergence (100% rate)
+    └─ Iterations Used: 283 ± 144
+
+13. STANDARD GA SA
+    📊 Moderate Performance
+    ├─ Coverage: 56.38% ± 1.05%
+    ├─ Range: 55.6% - 57.1%
+    ├─ Execution Time: 1.153s ± 0.155s
+    ├─ Energy Efficiency: 30.52 ± 0.73
+    ├─ 🎯 High Consistency (σ = 1.05%)
+    ├─ ✅ Excellent Convergence (100% rate)
+    └─ Iterations Used: 362 ± 39
+
+14. STANDARD GWO
+    📊 Moderate Performance
+    ├─ Coverage: 51.36% ± 5.77%
+    ├─ Range: 47.3% - 55.4%
+    ├─ Execution Time: 0.994s ± 0.033s
+    ├─ Energy Efficiency: 37.98 ± 1.85
+    ├─ 📈 Moderate Consistency (σ = 5.77%)
+    ├─ ⚠️ Moderate Convergence (50% rate)
+    └─ Iterations Used: 393 ± 99
+
+
+🔬 DETAILED PERFORMANCE ANALYSIS
+==================================================
+🏅 Performance Hierarchy:
+├─ Champion: Standard Mrfo
+│  └─ Achievement: 69.40% coverage
+├─ Most Challenged: Standard Gwo
+│  └─ Performance: 51.36% coverage
+└─ Performance Gap: 18.04 percentage points
+
+🎯 Consistency Analysis:
+├─ Most Consistent: Staged Sa
+│  └─ Std Dev: 0.48% (reliable performance)
+├─ Most Variable: Standard Sa
+│  └─ Std Dev: 16.29% (unpredictable performance)
+
+⚡ Execution Speed Analysis:
+├─ Fastest: Staged Gwo
+│  └─ Time: 0.958s (ideal for real-time)
+├─ Slowest: Staged Sa
+│  └─ Time: 1.569s
+
+💡 SCENARIO-SPECIFIC INSIGHTS
+========================================
+🎭 Scenario Difficulty Assessment: Moderate - Balanced challenge requiring optimization
+📊 Average Performance: 61.2% (scenario baseline)
+
+📈 Standard Algorithms Average: 60.2%
+🚀 Staged Algorithms Average: 61.8%
+💪 Staged Improvement: +1.6 percentage points
+
+🎯 DEPLOYMENT RECOMMENDATIONS
+========================================
+🏆 Recommended Algorithms for Large Area - Many Drones Scenario:
+1. Standard Mrfo
+   ├─ Coverage: 69.4% (±6.5%)
+   ├─ Speed: 1.027s execution
+   └─ Reason: Best overall performance - primary choice for this scenario
+2. Staged Sa
+   ├─ Coverage: 67.8% (±0.5%)
+   ├─ Speed: 1.569s execution
+   └─ Reason: High consistency - reliable performance
+3. Staged Greedy
+   ├─ Coverage: 67.1% (±7.2%)
+   ├─ Speed: 1.011s execution
+   └─ Reason: Strong alternative - backup choice
+
+⚠️ Algorithms to Avoid or Improve:
+• Staged Genetic: 56.4% - Below-average performance - consider alternatives
+• Standard Ga Sa: 56.4% - Below-average performance - consider alternatives
+• Standard Gwo: 51.4% - Below-average performance - consider alternatives
+
+========================================================================================================================
+END OF SCENARIO ANALYSIS
+========================================================================================================================

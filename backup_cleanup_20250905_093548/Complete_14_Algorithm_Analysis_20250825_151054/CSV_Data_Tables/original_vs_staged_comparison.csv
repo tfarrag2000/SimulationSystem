@@ -1,3 +1,0 @@
-algorithm_type,coverage_percentage_mean,coverage_percentage_std,coverage_percentage_count,energy_efficiency_mean,energy_efficiency_std,execution_time_mean,execution_time_std
-Original,37.939,13.411,42,2.953,1.785,0.026,0.032
-Staged,37.939,13.411,42,3.647,2.091,0.127,0.098

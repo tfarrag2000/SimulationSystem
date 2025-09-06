@@ -10,64 +10,110 @@ try:
 except ImportError:
     SMART_OPTIMIZER_AVAILABLE = False
     STAGED_OPTIMIZER_AVAILABLE = False
+
+# Smart coverage distribution system
+try:
+    from smart_coverage_distribution import (
+        SmartCoverageDistributor,
+        enhance_algorithm_with_smart_coverage
+    )
+    SMART_COVERAGE_AVAILABLE = True
+except ImportError:
+    SMART_COVERAGE_AVAILABLE = False
 # === STANDARD ALGORITHM FUNCTIONS ===
 def standard_greedy(simulation, **kwargs):
+    if SMART_COVERAGE_AVAILABLE:
+        return enhance_algorithm_with_smart_coverage(greedy_optimization)(simulation, **kwargs)
     return greedy_optimization(simulation, **kwargs)
 
 def standard_genetic(simulation, **kwargs):
+    if SMART_COVERAGE_AVAILABLE:
+        return enhance_algorithm_with_smart_coverage(genetic_algorithm)(simulation, **kwargs)
     return genetic_algorithm(simulation, **kwargs)
 
 def standard_pso(simulation, **kwargs):
+    if SMART_COVERAGE_AVAILABLE:
+        return enhance_algorithm_with_smart_coverage(particle_swarm_optimization)(simulation, **kwargs)
     return particle_swarm_optimization(simulation, **kwargs)
 
 def standard_sa(simulation, **kwargs):
+    if SMART_COVERAGE_AVAILABLE:
+        return enhance_algorithm_with_smart_coverage(simulated_annealing)(simulation, **kwargs)
     return simulated_annealing(simulation, **kwargs)
 
 def standard_ga_sa(simulation, **kwargs):
+    if SMART_COVERAGE_AVAILABLE:
+        return enhance_algorithm_with_smart_coverage(genetic_algorithm_with_sa)(simulation, **kwargs)
     return genetic_algorithm_with_sa(simulation, **kwargs)
 
 def standard_gwo(simulation, **kwargs):
+    if SMART_COVERAGE_AVAILABLE:
+        return enhance_algorithm_with_smart_coverage(grey_wolf_optimizer)(simulation, **kwargs)
     return grey_wolf_optimizer(simulation, **kwargs)
 
 def standard_mrfo(simulation, **kwargs):
+    if SMART_COVERAGE_AVAILABLE:
+        return enhance_algorithm_with_smart_coverage(manta_ray_foraging_optimization)(simulation, **kwargs)
     return manta_ray_foraging_optimization(simulation, **kwargs)
-
-def standard_hexagonal(simulation, **kwargs):
-    return smart_hexagonal_optimization(simulation, **kwargs)
 
 # === STAGED ALGORITHM FUNCTIONS ===
 def staged_greedy(simulation, **kwargs):
+    if SMART_COVERAGE_AVAILABLE:
+        return enhance_algorithm_with_smart_coverage(
+            lambda sim, **kw: staged_optimization_wrapper(greedy_optimization, sim, **kw)
+        )(simulation, **kwargs)
     return staged_optimization_wrapper(greedy_optimization, simulation, **kwargs)
 
 def staged_genetic(simulation, **kwargs):
+    if SMART_COVERAGE_AVAILABLE:
+        return enhance_algorithm_with_smart_coverage(
+            lambda sim, **kw: staged_optimization_wrapper(genetic_algorithm, sim, **kw)
+        )(simulation, **kwargs)
     return staged_optimization_wrapper(genetic_algorithm, simulation, **kwargs)
 
 def staged_pso(simulation, **kwargs):
+    if SMART_COVERAGE_AVAILABLE:
+        return enhance_algorithm_with_smart_coverage(
+            lambda sim, **kw: staged_optimization_wrapper(particle_swarm_optimization, sim, **kw)
+        )(simulation, **kwargs)
     return staged_optimization_wrapper(particle_swarm_optimization, simulation, **kwargs)
 
 def staged_sa(simulation, **kwargs):
+    if SMART_COVERAGE_AVAILABLE:
+        return enhance_algorithm_with_smart_coverage(
+            lambda sim, **kw: staged_optimization_wrapper(simulated_annealing, sim, **kw)
+        )(simulation, **kwargs)
     return staged_optimization_wrapper(simulated_annealing, simulation, **kwargs)
 
 def staged_ga_sa(simulation, **kwargs):
+    if SMART_COVERAGE_AVAILABLE:
+        return enhance_algorithm_with_smart_coverage(
+            lambda sim, **kw: staged_optimization_wrapper(genetic_algorithm_with_sa, sim, **kw)
+        )(simulation, **kwargs)
     return staged_optimization_wrapper(genetic_algorithm_with_sa, simulation, **kwargs)
 
 def staged_gwo(simulation, **kwargs):
+    if SMART_COVERAGE_AVAILABLE:
+        return enhance_algorithm_with_smart_coverage(
+            lambda sim, **kw: staged_optimization_wrapper(grey_wolf_optimizer, sim, **kw)
+        )(simulation, **kwargs)
     return staged_optimization_wrapper(grey_wolf_optimizer, simulation, **kwargs)
 
 def staged_mrfo(simulation, **kwargs):
+    if SMART_COVERAGE_AVAILABLE:
+        return enhance_algorithm_with_smart_coverage(
+            lambda sim, **kw: staged_optimization_wrapper(manta_ray_foraging_optimization, sim, **kw)
+        )(simulation, **kwargs)
     return staged_optimization_wrapper(manta_ray_foraging_optimization, simulation, **kwargs)
-
-def staged_hexagonal(simulation, **kwargs):
-    return staged_optimization_wrapper(smart_hexagonal_optimization, simulation, **kwargs)
 
 # === EXPORT LIST ===
 __all__ = [
     # Standard algorithms
     'standard_greedy', 'standard_genetic', 'standard_pso', 'standard_sa', 
-    'standard_ga_sa', 'standard_gwo', 'standard_mrfo', 'standard_hexagonal',
+    'standard_ga_sa', 'standard_gwo', 'standard_mrfo',
     # Staged algorithms  
     'staged_greedy', 'staged_genetic', 'staged_pso', 'staged_sa', 
-    'staged_ga_sa', 'staged_gwo', 'staged_mrfo', 'staged_hexagonal',
+    'staged_ga_sa', 'staged_gwo', 'staged_mrfo',
     # Utility functions
     'get_version_info', 'get_parallel_support', 'AlgorithmResult'
 ]
@@ -87,7 +133,7 @@ RECENT IMPROVEMENTS (2025-09-05):
 ✅ Eliminated magic numbers - Extracted constants for maintainability
 
 ARCHITECTURE:
-- 16 algorithms total: 8 standard + 8 staged variants
+- 14 algorithms total: 7 standard + 7 staged variants
 - Universal staged optimization wrapper with multi-phase optimization
 - Parallel processing support with automatic worker scaling
 - Comprehensive parameter standardization across algorithms
@@ -107,20 +153,20 @@ from scipy.spatial.distance import cdist
 # Staging and optimization parameters
 COVERAGE_PHASE_RATIO = 0.7  # 70% of iterations for coverage maximization
 ENERGY_PHASE_RATIO = 0.3    # 30% of iterations for energy optimization
-POSITION_REFINEMENT_ITERATIONS = 30  # Number of position refinement iterations
-OPTIMAL_GRID_SPACING_MULTIPLIER = 1.8  # Optimal hexagonal grid spacing multiplier
+POSITION_REFINEMENT_ITERATIONS = 35  # Universal optimization: better positioning for all algorithms
+OPTIMAL_GRID_SPACING_MULTIPLIER = 1.75  # Universal optimization: better coverage for all algorithms
 DEFAULT_SENSING_OVERLAP = 0.2  # Default overlap weight for coverage calculations
 MINIMUM_COVERAGE_THRESHOLD = 0.95  # Minimum coverage to maintain in energy phase
-SMALL_POSITION_ADJUSTMENT_STD = 2.0  # Standard deviation for small position adjustments
+SMALL_POSITION_ADJUSTMENT_STD = 3.0  # INCREASED from 2.0 for more exploration
 
 # Parallel processing limits
 MAX_RECOMMENDED_WORKERS = 8  # Maximum recommended parallel workers
 WORKER_TO_POPULATION_RATIO = 4  # Population size divided by this for worker count
 
 # Fitness function weights
-DEFAULT_COVERAGE_WEIGHT = 0.6  # Weight for coverage in fitness function
-DEFAULT_ENERGY_WEIGHT = 0.2    # Weight for energy efficiency in fitness function  
-DEFAULT_OVERLAP_WEIGHT = 0.2   # Weight for overlap penalty in fitness function
+DEFAULT_COVERAGE_WEIGHT = 0.65   # Universal optimization: slightly higher coverage priority
+DEFAULT_ENERGY_WEIGHT = 0.175    # Universal optimization: reduced energy penalty
+DEFAULT_OVERLAP_WEIGHT = 0.175   # Universal optimization: reduced overlap penalty
 
 # Version information
 __version__ = "5.0.0"
@@ -468,7 +514,7 @@ def calculate_energy_efficiency_fitness(solution, simulation, target_coverage=0.
     return fitness
 
 def calculate_coverage_first_fitness(solution, simulation, target_coverage=0.99, 
-                                    w_coverage=1000, w_bonus=200, w_energy=20, w_overlap=5):
+                                    w_coverage=2000, w_bonus=200, w_energy=10, w_overlap=3):
     """
     SMART COVERAGE-FIRST fitness function - Prioritizes maximum coverage with gap analysis
     
@@ -577,12 +623,9 @@ def calculate_coverage_first_fitness(solution, simulation, target_coverage=0.99,
                redundancy_penalty - 
                overlap_penalty)
     
-    # Additional coverage boost - ensure coverage is the PRIMARY goal
-    fitness += coverage * 500  # Extra coverage boost
-    
     # Ensure coverage gaps are heavily discouraged
     if gap_penalty > 0:
-        fitness = max(fitness * 0.7, 0)  # Significant reduction for any gaps
+        fitness = max(fitness * 0.9, 0)  # Reduction for gaps
     
     return max(fitness, 0)  # Ensure non-negative
 
@@ -605,7 +648,7 @@ def calculate_coverage_with_solution(solution, simulation):
         return 0.0
     
     # Calculate coverage using enhanced grid-based approach
-    grid_size = 75  # Increased resolution for better gap detection
+    grid_size = 85  # Universal optimization: better accuracy for all algorithms
     x_points = np.linspace(0, simulation.width, grid_size)
     y_points = np.linspace(0, simulation.height, grid_size)
     
@@ -914,7 +957,7 @@ def greedy_optimization(simulation, desired_coverage=0.85, overlap_weight=DEFAUL
     num_drones = len(simulation.drones)
     
     # Calculate optimal grid spacing (slight overlap for robustness)
-    grid_spacing = sensing_radius * OPTIMAL_GRID_SPACING_MULTIPLIER  # Optimal coverage with minimal overlap
+    grid_spacing = sensing_radius * 1.75  # Universal optimization: better overlap
     
     # Generate optimal grid positions
     cols = max(1, int(np.ceil(width / grid_spacing)))
@@ -2389,3 +2432,128 @@ def smart_hexagonal_optimization(simulation, desired_coverage=0.90, **kwargs):
     
     activation = np.ones(num_drones)
     return activation, result
+
+
+def test_smart_coverage_distribution():
+    """
+    Test smart coverage distribution system with real algorithms.
+    """
+    print("\n" + "="*80)
+    print("🧠 SMART COVERAGE DISTRIBUTION INTEGRATION TEST")
+    print("="*80)
+    
+    if not SMART_COVERAGE_AVAILABLE:
+        print("❌ Smart coverage distribution not available - skipping test")
+        return
+    
+    # Import simulation environment
+    try:
+        from app import DroneSimulationEnvironment
+    except ImportError:
+        print("❌ Cannot import DroneSimulationEnvironment - skipping test")
+        return
+    
+    # Test parameters
+    area_width, area_height = 40, 40
+    num_drones = 15
+    sensing_radius = 8.0
+    
+    print(f"📊 Test Configuration:")
+    print(f"   Area: {area_width}×{area_height}")
+    print(f"   Drones: {num_drones}")
+    print(f"   Sensing radius: {sensing_radius}")
+    
+    # Create simulation environment
+    simulation = DroneSimulationEnvironment(
+        area_width=area_width,
+        area_height=area_height,
+        num_drones=num_drones,
+        drone_range=sensing_radius
+    )
+    
+    # Test algorithms with smart coverage
+    test_algorithms = [
+        ('Standard Greedy', standard_greedy),
+        ('Staged Greedy', staged_greedy),
+        ('Standard Genetic', standard_genetic),
+        ('Staged Genetic', staged_genetic)
+    ]
+    
+    results = []
+    
+    for name, algorithm in test_algorithms:
+        print(f"\n🚀 Testing {name} with Smart Coverage...")
+        
+        try:
+            result = algorithm(simulation)
+            
+            if result and hasattr(result, 'best_solution'):
+                # Extract coverage metrics
+                base_coverage = getattr(result, 'coverage', 0)
+                
+                # Check for smart coverage analysis
+                if hasattr(result, 'smart_coverage_analysis'):
+                    analysis = result.smart_coverage_analysis
+                    quality_score = result.coverage_quality_score
+                    meaningful_drones = result.meaningful_drones
+                    redundant_drones = result.redundant_drones
+                    
+                    print(f"   ✅ Coverage: {base_coverage:.1f}%")
+                    print(f"   🎯 Quality Score: {quality_score:.1f}/100")
+                    print(f"   🔧 Meaningful Drones: {meaningful_drones}")
+                    print(f"   ⚠️  Redundant Drones: {redundant_drones}")
+                    print(f"   📊 Avg Efficiency: {analysis['average_efficiency']:.3f}")
+                    print(f"   🔄 Avg Redundancy: {analysis['average_redundancy']:.3f}")
+                    
+                    results.append({
+                        'algorithm': name,
+                        'coverage': base_coverage,
+                        'quality_score': quality_score,
+                        'meaningful_drones': meaningful_drones,
+                        'redundant_drones': redundant_drones,
+                        'efficiency': analysis['average_efficiency'],
+                        'redundancy': analysis['average_redundancy'],
+                        'smart_analysis': True
+                    })
+                else:
+                    print(f"   ⚠️  No smart coverage analysis available")
+                    results.append({
+                        'algorithm': name,
+                        'coverage': base_coverage,
+                        'smart_analysis': False
+                    })
+            else:
+                print(f"   ❌ Algorithm failed to return valid result")
+                
+        except Exception as e:
+            print(f"   ❌ Error testing {name}: {str(e)}")
+    
+    # Summary analysis
+    if results:
+        print(f"\n📊 SMART COVERAGE DISTRIBUTION SUMMARY")
+        print("-" * 50)
+        
+        smart_results = [r for r in results if r.get('smart_analysis', False)]
+        
+        if smart_results:
+            avg_quality = np.mean([r['quality_score'] for r in smart_results])
+            avg_efficiency = np.mean([r['efficiency'] for r in smart_results])
+            total_meaningful = sum([r['meaningful_drones'] for r in smart_results])
+            total_redundant = sum([r['redundant_drones'] for r in smart_results])
+            
+            print(f"✅ Smart Coverage Successfully Applied to {len(smart_results)} algorithms")
+            print(f"🎯 Average Quality Score: {avg_quality:.1f}/100")
+            print(f"📊 Average Efficiency: {avg_efficiency:.3f}")
+            print(f"🔧 Total Meaningful Drones: {total_meaningful}")
+            print(f"⚠️  Total Redundant Drones: {total_redundant}")
+            print(f"🚀 Smart Coverage Distribution System: OPERATIONAL")
+        else:
+            print("❌ No algorithms provided smart coverage analysis")
+    else:
+        print("❌ No valid results obtained from any algorithm")
+    
+    print("="*80)
+
+
+if __name__ == "__main__":
+    test_smart_coverage_distribution()
