@@ -1,7 +1,0 @@
-Scenario,Drones,Targets,Area_Size,Avg_Coverage (%),Coverage_Range
-Optimal_Small,10,25,20×20,95.3,92-100%
-Optimal_Medium,15,35,25×25,96.9,91-100%
-Optimal_Large,20,50,30×30,95.3,92-100%
-High_Density,25,60,30×30,97.2,95-100%
-Balanced_Coverage,16,45,35×35,90.0,80-98%
-Maximum_Scale,30,75,40×40,95.1,87-97%

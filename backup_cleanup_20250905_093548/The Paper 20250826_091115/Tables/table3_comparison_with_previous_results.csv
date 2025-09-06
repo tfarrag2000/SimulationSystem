@@ -1,6 +1,0 @@
-Method,Average_Coverage (%),Energy_Efficiency,Success_Rate (%),Algorithm_Count
-Original Algorithms,37.9,2.95,100.0,7
-Enhanced Algorithms,93.7,5.45,100.0,3
-Staged Enhanced,97.6,5.75,100.0,3
-Improvement (Enhanced),+147.2%,+84.7%,0.0%,-57.1%
-Improvement (Staged),+157.5%,+94.9%,0.0%,-57.1%
