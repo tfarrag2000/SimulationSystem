@@ -107,20 +107,20 @@ from scipy.spatial.distance import cdist
 # Staging and optimization parameters
 COVERAGE_PHASE_RATIO = 0.7  # 70% of iterations for coverage maximization
 ENERGY_PHASE_RATIO = 0.3    # 30% of iterations for energy optimization
-POSITION_REFINEMENT_ITERATIONS = 30  # Number of position refinement iterations
-OPTIMAL_GRID_SPACING_MULTIPLIER = 1.8  # Optimal hexagonal grid spacing multiplier
+POSITION_REFINEMENT_ITERATIONS = 35  # Universal optimization: better positioning for all algorithms
+OPTIMAL_GRID_SPACING_MULTIPLIER = 1.75  # Universal optimization: better coverage for all algorithms
 DEFAULT_SENSING_OVERLAP = 0.2  # Default overlap weight for coverage calculations
 MINIMUM_COVERAGE_THRESHOLD = 0.95  # Minimum coverage to maintain in energy phase
-SMALL_POSITION_ADJUSTMENT_STD = 2.0  # Standard deviation for small position adjustments
+SMALL_POSITION_ADJUSTMENT_STD = 3.0  # INCREASED from 2.0 for more exploration
 
 # Parallel processing limits
 MAX_RECOMMENDED_WORKERS = 8  # Maximum recommended parallel workers
 WORKER_TO_POPULATION_RATIO = 4  # Population size divided by this for worker count
 
 # Fitness function weights
-DEFAULT_COVERAGE_WEIGHT = 0.6  # Weight for coverage in fitness function
-DEFAULT_ENERGY_WEIGHT = 0.2    # Weight for energy efficiency in fitness function  
-DEFAULT_OVERLAP_WEIGHT = 0.2   # Weight for overlap penalty in fitness function
+DEFAULT_COVERAGE_WEIGHT = 0.65   # Universal optimization: slightly higher coverage priority
+DEFAULT_ENERGY_WEIGHT = 0.175    # Universal optimization: reduced energy penalty
+DEFAULT_OVERLAP_WEIGHT = 0.175   # Universal optimization: reduced overlap penalty
 
 # Version information
 __version__ = "5.0.0"
@@ -468,7 +468,7 @@ def calculate_energy_efficiency_fitness(solution, simulation, target_coverage=0.
     return fitness
 
 def calculate_coverage_first_fitness(solution, simulation, target_coverage=0.99, 
-                                    w_coverage=1000, w_bonus=200, w_energy=20, w_overlap=5):
+                                    w_coverage=2000, w_bonus=200, w_energy=10, w_overlap=3):
     """
     SMART COVERAGE-FIRST fitness function - Prioritizes maximum coverage with gap analysis
     
@@ -577,12 +577,9 @@ def calculate_coverage_first_fitness(solution, simulation, target_coverage=0.99,
                redundancy_penalty - 
                overlap_penalty)
     
-    # Additional coverage boost - ensure coverage is the PRIMARY goal
-    fitness += coverage * 500  # Extra coverage boost
-    
     # Ensure coverage gaps are heavily discouraged
     if gap_penalty > 0:
-        fitness = max(fitness * 0.7, 0)  # Significant reduction for any gaps
+        fitness = max(fitness * 0.9, 0)  # Reduction for gaps
     
     return max(fitness, 0)  # Ensure non-negative
 
@@ -605,7 +602,7 @@ def calculate_coverage_with_solution(solution, simulation):
         return 0.0
     
     # Calculate coverage using enhanced grid-based approach
-    grid_size = 75  # Increased resolution for better gap detection
+    grid_size = 85  # Universal optimization: better accuracy for all algorithms
     x_points = np.linspace(0, simulation.width, grid_size)
     y_points = np.linspace(0, simulation.height, grid_size)
     
@@ -914,7 +911,7 @@ def greedy_optimization(simulation, desired_coverage=0.85, overlap_weight=DEFAUL
     num_drones = len(simulation.drones)
     
     # Calculate optimal grid spacing (slight overlap for robustness)
-    grid_spacing = sensing_radius * OPTIMAL_GRID_SPACING_MULTIPLIER  # Optimal coverage with minimal overlap
+    grid_spacing = sensing_radius * 1.75  # Universal optimization: better overlap
     
     # Generate optimal grid positions
     cols = max(1, int(np.ceil(width / grid_spacing)))

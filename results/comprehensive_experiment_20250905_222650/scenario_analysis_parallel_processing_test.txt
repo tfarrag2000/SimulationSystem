@@ -1,0 +1,240 @@
+========================================================================================================================
+DETAILED SCENARIO ANALYSIS: PARALLEL PROCESSING TEST SCENARIO
+========================================================================================================================
+Analysis Date: 2025-09-05 23:25:02
+Scenario ID: parallel_processing_test
+
+📋 SCENARIO OVERVIEW
+========================================
+Name: Parallel Processing Test Scenario
+Description: Computational Scalability Assessment
+
+🎯 Technical Specifications:
+├─ Area Size: 80×80 units
+├─ Drone Count: 25
+├─ Complexity Level: High
+├─ Primary Purpose: Multi-core processing and computational efficiency evaluation
+├─ Deployment Context: Real-time applications, high-performance computing, distributed systems
+└─ Key Challenges: Computational parallelization, processing efficiency, real-time constraints
+
+📊 PERFORMANCE STATISTICS
+========================================
+Total Experiments: 26
+Algorithms Tested: 14
+
+📈 Coverage Performance:
+├─ Mean: 58.26%
+├─ Standard Deviation: 8.47%
+├─ Median: 59.24%
+├─ Minimum: 40.84%
+├─ Maximum: 75.00%
+└─ Range: 34.16 percentage points
+
+⏱️ Execution Time Performance:
+├─ Mean: 1.098s
+├─ Standard Deviation: 0.163s
+├─ Median: 1.053s
+├─ Minimum: 0.952s
+└─ Maximum: 1.656s
+
+🏆 ALGORITHM PERFORMANCE RANKING
+==================================================
+
+ 1. STANDARD MRFO
+    🥉 Good Performance
+    ├─ Coverage: 66.54% ± 11.96%
+    ├─ Range: 58.1% - 75.0%
+    ├─ Execution Time: 1.053s ± 0.003s
+    ├─ Energy Efficiency: 12.00 ± 16.97
+    ├─ 📊 Variable Performance (σ = 11.96%)
+    ├─ ⚠️ Moderate Convergence (50% rate)
+    └─ Iterations Used: 356 ± 105
+    💡 Best Performer: Dominates this scenario with superior coverage
+
+ 2. STANDARD GA SA
+    🥉 Good Performance
+    ├─ Coverage: 64.64% ± 7.13%
+    ├─ Range: 59.6% - 69.7%
+    ├─ Execution Time: 0.962s ± 0.015s
+    ├─ Energy Efficiency: 18.67 ± 20.74
+    ├─ 📈 Moderate Consistency (σ = 7.13%)
+    ├─ ✅ Excellent Convergence (100% rate)
+    └─ Iterations Used: 86 ± 13
+    💪 Top Tier: Strong performance suitable for deployment
+
+ 3. STAGED GA SA
+    🥉 Good Performance
+    ├─ Coverage: 63.46% ± 7.04%
+    ├─ Range: 58.5% - 68.4%
+    ├─ Execution Time: 1.035s ± 0.060s
+    ├─ Energy Efficiency: 10.87 ± 15.37
+    ├─ 📈 Moderate Consistency (σ = 7.04%)
+    ├─ ✅ Excellent Convergence (100% rate)
+    └─ Iterations Used: 326 ± 32
+    💪 Top Tier: Strong performance suitable for deployment
+
+ 4. STANDARD GWO
+    🥉 Good Performance
+    ├─ Coverage: 60.32% ± 12.22%
+    ├─ Range: 51.7% - 69.0%
+    ├─ Execution Time: 1.028s ± 0.050s
+    ├─ Energy Efficiency: 14.58 ± 20.62
+    ├─ 📊 Variable Performance (σ = 12.22%)
+    ├─ ⚠️ Moderate Convergence (50% rate)
+    └─ Iterations Used: 342 ± 158
+
+ 5. STANDARD PSO
+    📊 Moderate Performance
+    ├─ Coverage: 59.84% ± 7.47%
+    ├─ Range: 54.6% - 65.1%
+    ├─ Execution Time: 1.068s ± 0.007s
+    ├─ Energy Efficiency: 18.00 ± 19.80
+    ├─ 📈 Moderate Consistency (σ = 7.47%)
+    ├─ ✅ Excellent Convergence (100% rate)
+    └─ Iterations Used: 137 ± 86
+
+ 6. STAGED GWO
+    📊 Moderate Performance
+    ├─ Coverage: 59.76% ± nan%
+    ├─ Range: 59.8% - 59.8%
+    ├─ Execution Time: 1.139s ± nans
+    ├─ Energy Efficiency: 20.83 ± nan
+    ├─ 📊 Variable Performance (σ = nan%)
+    ├─ ✅ Excellent Convergence (100% rate)
+    └─ Iterations Used: 380 ± nan
+
+ 7. STANDARD GENETIC
+    📊 Moderate Performance
+    ├─ Coverage: 59.36% ± 8.88%
+    ├─ Range: 53.1% - 65.6%
+    ├─ Execution Time: 1.078s ± 0.084s
+    ├─ Energy Efficiency: 17.30 ± 18.57
+    ├─ 📈 Moderate Consistency (σ = 8.88%)
+    ├─ ✅ Excellent Convergence (100% rate)
+    └─ Iterations Used: 206 ± 29
+
+ 8. STAGED MRFO
+    📊 Moderate Performance
+    ├─ Coverage: 59.08% ± nan%
+    ├─ Range: 59.1% - 59.1%
+    ├─ Execution Time: 0.974s ± nans
+    ├─ Energy Efficiency: 24.00 ± nan
+    ├─ 📊 Variable Performance (σ = nan%)
+    ├─ ❌ Poor Convergence (0% rate)
+    └─ Iterations Used: 408 ± nan
+
+ 9. STAGED GENETIC
+    📊 Moderate Performance
+    ├─ Coverage: 58.82% ± 10.49%
+    ├─ Range: 51.4% - 66.2%
+    ├─ Execution Time: 1.147s ± 0.233s
+    ├─ Energy Efficiency: 21.47 ± 12.68
+    ├─ 📊 Variable Performance (σ = 10.49%)
+    ├─ ✅ Excellent Convergence (100% rate)
+    └─ Iterations Used: 354 ± 40
+
+10. STANDARD SA
+    📊 Moderate Performance
+    ├─ Coverage: 57.10% ± 3.42%
+    ├─ Range: 54.7% - 59.5%
+    ├─ Execution Time: 1.339s ± 0.449s
+    ├─ Energy Efficiency: 16.00 ± 22.63
+    ├─ 🎯 High Consistency (σ = 3.42%)
+    ├─ ⚠️ Moderate Convergence (50% rate)
+    └─ Iterations Used: 274 ± 272
+
+11. STAGED SA
+    📊 Moderate Performance
+    ├─ Coverage: 57.04% ± 10.86%
+    ├─ Range: 49.4% - 64.7%
+    ├─ Execution Time: 1.134s ± 0.164s
+    ├─ Energy Efficiency: 20.00 ± 16.97
+    ├─ 📊 Variable Performance (σ = 10.86%)
+    ├─ ✅ Excellent Convergence (100% rate)
+    └─ Iterations Used: 201 ± 25
+
+12. STAGED GREEDY
+    📊 Moderate Performance
+    ├─ Coverage: 56.26% ± 4.44%
+    ├─ Range: 53.1% - 59.4%
+    ├─ Execution Time: 1.256s ± 0.324s
+    ├─ Energy Efficiency: 22.00 ± 2.83
+    ├─ 🎯 High Consistency (σ = 4.44%)
+    ├─ ⚠️ Moderate Convergence (50% rate)
+    └─ Iterations Used: 398 ± 136
+
+13. STAGED PSO
+    📊 Moderate Performance
+    ├─ Coverage: 52.72% ± 9.73%
+    ├─ Range: 45.8% - 59.6%
+    ├─ Execution Time: 1.039s ± 0.068s
+    ├─ Energy Efficiency: 24.75 ± 18.03
+    ├─ 📈 Moderate Consistency (σ = 9.73%)
+    ├─ ✅ Excellent Convergence (100% rate)
+    └─ Iterations Used: 180 ± 84
+
+14. STANDARD GREEDY
+    📉 Needs Improvement
+    ├─ Coverage: 41.80% ± 1.36%
+    ├─ Range: 40.8% - 42.8%
+    ├─ Execution Time: 1.076s ± 0.041s
+    ├─ Energy Efficiency: 34.83 ± 9.66
+    ├─ 🎯 High Consistency (σ = 1.36%)
+    ├─ ⚠️ Moderate Convergence (50% rate)
+    └─ Iterations Used: 366 ± 49
+
+
+🔬 DETAILED PERFORMANCE ANALYSIS
+==================================================
+🏅 Performance Hierarchy:
+├─ Champion: Standard Mrfo
+│  └─ Achievement: 66.54% coverage
+├─ Most Challenged: Standard Greedy
+│  └─ Performance: 41.80% coverage
+└─ Performance Gap: 24.74 percentage points
+
+🎯 Consistency Analysis:
+├─ Most Consistent: Standard Greedy
+│  └─ Std Dev: 1.36% (reliable performance)
+├─ Most Variable: Standard Gwo
+│  └─ Std Dev: 12.22% (unpredictable performance)
+
+⚡ Execution Speed Analysis:
+├─ Fastest: Standard Ga Sa
+│  └─ Time: 0.962s (ideal for real-time)
+├─ Slowest: Standard Sa
+│  └─ Time: 1.339s
+
+💡 SCENARIO-SPECIFIC INSIGHTS
+========================================
+🎭 Scenario Difficulty Assessment: Challenging - Demanding environment testing algorithm limits
+📊 Average Performance: 58.3% (scenario baseline)
+
+📈 Standard Algorithms Average: 58.5%
+🚀 Staged Algorithms Average: 58.2%
+💪 Staged Improvement: -0.4 percentage points
+
+🎯 DEPLOYMENT RECOMMENDATIONS
+========================================
+🏆 Recommended Algorithms for Parallel Processing Test Scenario:
+1. Standard Mrfo
+   ├─ Coverage: 66.5% (±12.0%)
+   ├─ Speed: 1.053s execution
+   └─ Reason: Best overall performance - primary choice for this scenario
+2. Standard Ga Sa
+   ├─ Coverage: 64.6% (±7.1%)
+   ├─ Speed: 0.962s execution
+   └─ Reason: Fast execution - suitable for real-time applications
+3. Staged Ga Sa
+   ├─ Coverage: 63.5% (±7.0%)
+   ├─ Speed: 1.035s execution
+   └─ Reason: Strong alternative - backup choice
+
+⚠️ Algorithms to Avoid or Improve:
+• Staged Greedy: 56.3% - Below-average performance - consider alternatives
+• Staged Pso: 52.7% - Below-average performance - consider alternatives
+• Standard Greedy: 41.8% - Below-average performance - consider alternatives
+
+========================================================================================================================
+END OF SCENARIO ANALYSIS
+========================================================================================================================

@@ -1,0 +1,410 @@
+{
+  "analysis": {
+    "algorithm_performance": {
+      "standard_greedy": {
+        "small_area_few_drones": 72.08,
+        "medium_area_standard": 60.66,
+        "large_area_many_drones": 47.78,
+        "challenging_small_radius": 38.040000000000006,
+        "efficiency_test": 75.82,
+        "parallel_processing_test": 61.86
+      },
+      "standard_genetic": {
+        "small_area_few_drones": 53.980000000000004,
+        "medium_area_standard": 64.82,
+        "large_area_many_drones": 61.019999999999996,
+        "challenging_small_radius": 37.620000000000005,
+        "efficiency_test": 68.69999999999999,
+        "parallel_processing_test": 53.019999999999996
+      },
+      "standard_pso": {
+        "small_area_few_drones": 57.18000000000001,
+        "medium_area_standard": 60.96,
+        "large_area_many_drones": 61.480000000000004,
+        "challenging_small_radius": 33.4,
+        "efficiency_test": 79.52000000000001,
+        "parallel_processing_test": 56.36
+      },
+      "standard_sa": {
+        "small_area_few_drones": 71.32,
+        "medium_area_standard": 43.94,
+        "large_area_many_drones": 66.68,
+        "challenging_small_radius": 32.760000000000005,
+        "efficiency_test": 81.47999999999999,
+        "parallel_processing_test": 53.379999999999995
+      },
+      "standard_ga_sa": {
+        "small_area_few_drones": 58.1,
+        "medium_area_standard": 59.42,
+        "large_area_many_drones": 63.0,
+        "challenging_small_radius": 40.199999999999996,
+        "efficiency_test": 74.2,
+        "parallel_processing_test": 61.04
+      },
+      "standard_gwo": {
+        "small_area_few_drones": 69.41999999999999,
+        "medium_area_standard": 56.4,
+        "large_area_many_drones": 56.5,
+        "challenging_small_radius": 36.34,
+        "efficiency_test": 75.86,
+        "parallel_processing_test": 53.400000000000006
+      },
+      "standard_mrfo": {
+        "small_area_few_drones": 66.24,
+        "medium_area_standard": 54.120000000000005,
+        "large_area_many_drones": 55.4,
+        "challenging_small_radius": 37.42,
+        "efficiency_test": 92.72,
+        "parallel_processing_test": 47.42
+      },
+      "staged_greedy": {
+        "small_area_few_drones": 68.0,
+        "medium_area_standard": 49.72,
+        "large_area_many_drones": 61.0,
+        "challenging_small_radius": 36.7,
+        "efficiency_test": 83.56,
+        "parallel_processing_test": 69.88
+      },
+      "staged_genetic": {
+        "small_area_few_drones": 61.540000000000006,
+        "medium_area_standard": 59.06,
+        "large_area_many_drones": 58.31999999999999,
+        "challenging_small_radius": 36.92,
+        "efficiency_test": 69.8,
+        "parallel_processing_test": 58.18000000000001
+      },
+      "staged_pso": {
+        "small_area_few_drones": 54.400000000000006,
+        "medium_area_standard": 53.36,
+        "large_area_many_drones": 60.339999999999996,
+        "challenging_small_radius": 38.92,
+        "efficiency_test": 77.5,
+        "parallel_processing_test": 63.86
+      },
+      "staged_sa": {
+        "small_area_few_drones": 51.120000000000005,
+        "medium_area_standard": 44.260000000000005,
+        "large_area_many_drones": 59.58,
+        "challenging_small_radius": 42.3,
+        "efficiency_test": 61.08,
+        "parallel_processing_test": 60.800000000000004
+      },
+      "staged_ga_sa": {
+        "small_area_few_drones": 76.22,
+        "medium_area_standard": 65.28,
+        "large_area_many_drones": 58.42,
+        "challenging_small_radius": 36.16,
+        "efficiency_test": 79.97999999999999,
+        "parallel_processing_test": 61.84
+      },
+      "staged_gwo": {
+        "small_area_few_drones": 55.81999999999999,
+        "medium_area_standard": 57.66,
+        "large_area_many_drones": 67.84,
+        "challenging_small_radius": 39.02,
+        "efficiency_test": 83.22,
+        "parallel_processing_test": 64.96000000000001
+      },
+      "staged_mrfo": {
+        "small_area_few_drones": 51.22,
+        "medium_area_standard": 56.48,
+        "large_area_many_drones": 63.5,
+        "challenging_small_radius": 31.540000000000003,
+        "efficiency_test": 91.03999999999999,
+        "parallel_processing_test": 57.66
+      }
+    },
+    "scenario_challenges": {
+      "small_area_few_drones": {
+        "average": 61.902857142857144,
+        "minimum": 34.32,
+        "maximum": 83.32000000000001,
+        "variance": 181.2783346938776,
+        "std_dev": 13.46396430082454,
+        "algorithms_below_92": 28,
+        "algorithms_below_85": 28,
+        "total_algorithms": 28
+      },
+      "medium_area_standard": {
+        "average": 56.15285714285714,
+        "minimum": 35.44,
+        "maximum": 68.92,
+        "variance": 74.73372040816328,
+        "std_dev": 8.644866708524965,
+        "algorithms_below_92": 28,
+        "algorithms_below_85": 28,
+        "total_algorithms": 28
+      },
+      "large_area_many_drones": {
+        "average": 60.06142857142858,
+        "minimum": 46.6,
+        "maximum": 74.92,
+        "variance": 55.08656938775512,
+        "std_dev": 7.422032699183905,
+        "algorithms_below_92": 28,
+        "algorithms_below_85": 28,
+        "total_algorithms": 28
+      },
+      "challenging_small_radius": {
+        "average": 36.95285714285715,
+        "minimum": 28.84,
+        "maximum": 45.8,
+        "variance": 20.140120408163266,
+        "std_dev": 4.487774549614014,
+        "algorithms_below_92": 28,
+        "algorithms_below_85": 28,
+        "total_algorithms": 28
+      },
+      "efficiency_test": {
+        "average": 78.17714285714285,
+        "minimum": 38.68,
+        "maximum": 96.88,
+        "variance": 146.49284897959183,
+        "std_dev": 12.103423027375017,
+        "algorithms_below_92": 26,
+        "algorithms_below_85": 20,
+        "total_algorithms": 28
+      },
+      "parallel_processing_test": {
+        "average": 58.832857142857144,
+        "minimum": 42.04,
+        "maximum": 73.0,
+        "variance": 58.973606122448984,
+        "std_dev": 7.679427460589037,
+        "algorithms_below_92": 28,
+        "algorithms_below_85": 28,
+        "total_algorithms": 28
+      }
+    },
+    "universal_bottlenecks": [
+      {
+        "scenario": "small_area_few_drones",
+        "issue": "Very low average coverage",
+        "average": 61.902857142857144,
+        "severity": "HIGH"
+      },
+      {
+        "scenario": "small_area_few_drones",
+        "issue": "Most algorithms below 92% target",
+        "count": 28,
+        "total": 28,
+        "severity": "HIGH"
+      },
+      {
+        "scenario": "medium_area_standard",
+        "issue": "Very low average coverage",
+        "average": 56.15285714285714,
+        "severity": "HIGH"
+      },
+      {
+        "scenario": "medium_area_standard",
+        "issue": "Most algorithms below 92% target",
+        "count": 28,
+        "total": 28,
+        "severity": "HIGH"
+      },
+      {
+        "scenario": "large_area_many_drones",
+        "issue": "Very low average coverage",
+        "average": 60.06142857142858,
+        "severity": "HIGH"
+      },
+      {
+        "scenario": "large_area_many_drones",
+        "issue": "Most algorithms below 92% target",
+        "count": 28,
+        "total": 28,
+        "severity": "HIGH"
+      },
+      {
+        "scenario": "challenging_small_radius",
+        "issue": "Very low average coverage",
+        "average": 36.95285714285715,
+        "severity": "HIGH"
+      },
+      {
+        "scenario": "challenging_small_radius",
+        "issue": "Most algorithms below 92% target",
+        "count": 28,
+        "total": 28,
+        "severity": "HIGH"
+      },
+      {
+        "scenario": "efficiency_test",
+        "issue": "Low average coverage",
+        "average": 78.17714285714285,
+        "severity": "MEDIUM"
+      },
+      {
+        "scenario": "efficiency_test",
+        "issue": "Most algorithms below 92% target",
+        "count": 26,
+        "total": 28,
+        "severity": "HIGH"
+      },
+      {
+        "scenario": "parallel_processing_test",
+        "issue": "Very low average coverage",
+        "average": 58.832857142857144,
+        "severity": "HIGH"
+      },
+      {
+        "scenario": "parallel_processing_test",
+        "issue": "Most algorithms below 92% target",
+        "count": 28,
+        "total": 28,
+        "severity": "HIGH"
+      }
+    ],
+    "coverage_statistics": {
+      "overall_average": 58.679999999999986,
+      "overall_minimum": 28.84,
+      "overall_maximum": 96.88,
+      "overall_std_dev": 15.316752733060433,
+      "experiments_below_92": 166,
+      "experiments_below_85": 160,
+      "total_experiments": 168
+    }
+  },
+  "optimization_plan": {
+    "strategy": "Universal Coverage-First Optimization",
+    "current_status": {
+      "overall_performance": {
+        "overall_average": 58.679999999999986,
+        "overall_minimum": 28.84,
+        "overall_maximum": 96.88,
+        "overall_std_dev": 15.316752733060433,
+        "experiments_below_92": 166,
+        "experiments_below_85": 160,
+        "total_experiments": 168
+      },
+      "critical_scenarios": [
+        "small_area_few_drones",
+        "medium_area_standard",
+        "large_area_many_drones",
+        "challenging_small_radius",
+        "parallel_processing_test"
+      ],
+      "best_performing_scenarios": [],
+      "algorithm_consistency": {}
+    },
+    "universal_improvements": {
+      "environment_optimization": {
+        "description": "Optimize environment parameters to benefit all algorithms equally",
+        "adjustments": {
+          "grid_spacing_optimization": {
+            "current": 1.8,
+            "proposed": 1.75,
+            "benefit": "Better coverage without creating gaps"
+          },
+          "resolution_enhancement": {
+            "current": 75,
+            "proposed": 85,
+            "benefit": "More accurate coverage calculation"
+          },
+          "boundary_handling": {
+            "improvement": "Enhanced boundary optimization",
+            "benefit": "Better edge coverage for all algorithms"
+          }
+        }
+      },
+      "algorithm_standardization": {
+        "description": "Standardize parameters to ensure fair comparison",
+        "adjustments": {
+          "iteration_balancing": {
+            "benefit": "Ensure all algorithms get adequate optimization time",
+            "method": "Adaptive iteration counts based on algorithm type"
+          },
+          "population_standardization": {
+            "benefit": "Fair computational resources for all algorithms",
+            "method": "Balanced population sizes relative to algorithm complexity"
+          }
+        }
+      },
+      "fitness_enhancement": {
+        "description": "Improve fitness evaluation to benefit all algorithms",
+        "adjustments": {
+          "coverage_weight_adjustment": {
+            "current": 0.6,
+            "proposed": 0.65,
+            "benefit": "Slightly higher coverage priority"
+          },
+          "energy_weight_adjustment": {
+            "current": 0.2,
+            "proposed": 0.175,
+            "benefit": "Reduced energy penalty allowing better coverage"
+          },
+          "overlap_penalty_adjustment": {
+            "current": 0.2,
+            "proposed": 0.175,
+            "benefit": "Less harsh overlap penalty for better coverage"
+          }
+        }
+      },
+      "convergence_improvement": {
+        "description": "Enhance convergence for all algorithms",
+        "adjustments": {
+          "position_refinement": {
+            "current": 30,
+            "proposed": 35,
+            "benefit": "Better final positioning without over-optimization"
+          },
+          "early_stopping_enhancement": {
+            "improvement": "Smarter early stopping criteria",
+            "benefit": "Prevent premature convergence"
+          }
+        }
+      }
+    },
+    "implementation_phases": [
+      {
+        "phase": 1,
+        "name": "Conservative Universal Improvements",
+        "description": "Implement moderate improvements that benefit all algorithms",
+        "adjustments": [
+          "Grid spacing: 1.8 \u2192 1.75",
+          "Resolution: 75 \u2192 85",
+          "Coverage weight: 0.6 \u2192 0.65"
+        ],
+        "expected_impact": "Universal 3-5% coverage improvement"
+      },
+      {
+        "phase": 2,
+        "name": "Algorithm Standardization",
+        "description": "Standardize computational resources",
+        "adjustments": [
+          "Balanced iteration counts",
+          "Standardized population sizes",
+          "Enhanced boundary handling"
+        ],
+        "expected_impact": "Reduced algorithm variance"
+      },
+      {
+        "phase": 3,
+        "name": "Convergence Enhancement",
+        "description": "Improve convergence for all algorithms",
+        "adjustments": [
+          "Position refinement: 30 \u2192 35",
+          "Enhanced early stopping",
+          "Adaptive parameter adjustment"
+        ],
+        "expected_impact": "Better final solutions"
+      }
+    ],
+    "expected_outcomes": {
+      "minimum_improvement": "3-5% coverage increase for all algorithms",
+      "variance_reduction": "20-30% reduction in algorithm variance",
+      "target_achievement": "At least 50% of algorithms reach 92% target",
+      "universal_floor": "All algorithms achieve minimum 70% coverage"
+    },
+    "success_metrics": {
+      "overall_average_improvement": 5.0,
+      "minimum_algorithm_improvement": 3.0,
+      "maximum_algorithm_degradation": 1.0,
+      "variance_reduction_target": 25.0,
+      "target_achievement_rate": 0.5
+    }
+  },
+  "timestamp": "20250906_104301",
+  "source_data": "results\\comprehensive_experiment_20250906_100009\\raw_results\\all_experiments.csv"
+}
