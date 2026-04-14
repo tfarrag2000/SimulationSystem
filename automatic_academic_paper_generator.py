@@ -719,10 +719,10 @@ def generate_academic_figures(figures_dir):
         [16, 19, 22, 18, 20, 17]   # Greedy_Staged
     ])
     
-    # Professional color palette - Consistent for all figures
+    # Unified Professional Color Palette (Synced across all figures)
     academic_colors = [
-        '#2E4057', '#048A81', '#54C6EB', '#F18F01', '#C73E1D', '#7B2D26', '#A4243B',
-        '#1B365D', '#0F4C75', '#3282B8', '#BBE1FA', '#9B59B6', '#8E44AD', '#D63031'
+        '#2C3E50', '#16A085', '#3498DB', '#F39C12', '#E67E22', '#C0392B', '#D35400',
+        '#34495E', '#2980B9', '#5DADE2', '#AED6F1', '#9B59B6', '#8E44AD', '#D63031'
     ]
 
     # Generate individual figures for each test case
@@ -796,8 +796,14 @@ def generate_academic_figures(figures_dir):
                     bbox=dict(boxstyle='round,pad=0.5', facecolor='lightgreen', alpha=0.8),
                     fontsize=10, fontweight='bold', color='darkgreen')
         
+        # Unified Two-Column Legend for Precise One-to-One Correspondence
+        from matplotlib.patches import Patch
+        legend_elements = [Patch(facecolor=academic_colors[i], label=algorithms_14[i]) for i in range(len(algorithms_14))]
+        ax1.legend(handles=legend_elements, loc='lower center', ncol=2, frameon=True, fontsize=8, 
+                  title="Algorithms (Std/Staged)", title_fontsize=9)
+
         plt.tight_layout()
-        plt.savefig(f"{figures_dir}/testcase_{test_idx+1}_{test_file}.png", dpi=600, bbox_inches='tight', 
+        plt.savefig(f"{figures_dir}/testcase_{test_idx+1}_{test_file}.png", dpi=1000, bbox_inches='tight', 
                    facecolor='white', edgecolor='none', format='png')
         plt.savefig(f"{figures_dir}/testcase_{test_idx+1}_{test_file}.eps", bbox_inches='tight', 
                    facecolor='white', edgecolor='none', format='eps')
@@ -825,12 +831,13 @@ def generate_academic_figures(figures_dir):
     ax.set_title('Summary: Coverage Performance Comparison Across All Test Cases', fontweight='bold')
     ax.set_xticks(x)
     ax.set_xticklabels(test_cases, rotation=90, ha='center', fontsize=8)
-    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=4, frameon=True, fancybox=True, shadow=True)
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.2), ncol=2, frameon=True, fancybox=True, shadow=True,
+              title="Algorithms (Column 1: Standard / Column 2: Staged)", title_fontsize=10)
     ax.grid(True, alpha=0.3, axis='y')
     ax.set_ylim(50, 95)
     
     plt.tight_layout()
-    plt.savefig(f"{figures_dir}/summary_all_testcases_comparison.png", dpi=600, bbox_inches='tight',
+    plt.savefig(f"{figures_dir}/summary_all_testcases_comparison.png", dpi=1000, bbox_inches='tight',
                facecolor='white', edgecolor='none', format='png')
     plt.savefig(f"{figures_dir}/summary_all_testcases_comparison.eps", bbox_inches='tight',
                facecolor='white', edgecolor='none', format='eps')
@@ -883,7 +890,7 @@ def generate_academic_figures(figures_dir):
                 fontsize=16, fontweight='bold', pad=20)
     
     plt.tight_layout()
-    plt.savefig(f"{figures_dir}/performance_summary_table.png", dpi=600, bbox_inches='tight',
+    plt.savefig(f"{figures_dir}/performance_summary_table.png", dpi=1000, bbox_inches='tight',
                facecolor='white', edgecolor='none', format='png')
     plt.savefig(f"{figures_dir}/performance_summary_table.eps", bbox_inches='tight',
                facecolor='white', edgecolor='none', format='eps')
@@ -1023,7 +1030,7 @@ def generate_radar_chart(figures_dir, coverage_data, drone_count_data, algorithm
     plt.legend(loc='upper right', bbox_to_anchor=(1.3, 1.0), fontsize=10)
     
     plt.tight_layout()
-    plt.savefig(f"{figures_dir}/radar_algorithm_performance_profile.png", dpi=600, bbox_inches='tight',
+    plt.savefig(f"{figures_dir}/radar_algorithm_performance_profile.png", dpi=1000, bbox_inches='tight',
                facecolor='white', edgecolor='none', format='png')
     plt.close()
 
@@ -1039,7 +1046,12 @@ def generate_performance_heatmap(figures_dir, coverage_data, algorithms_14, test
     fig, ax = plt.subplots(figsize=(14, 10))
     
     # Create heatmap with custom styling
-    im = ax.imshow(performance_matrix, cmap='RdYlGn', aspect='auto', interpolation='nearest')
+    # Create heatmap using pcolormesh for infinite resolution vectors
+    # This avoids the pixelation of imshow at high DPI
+    test_indices = np.arange(len(test_cases) + 1)
+    algo_indices = np.arange(len(algorithms_14) + 1)
+    im = ax.pcolormesh(test_indices, algo_indices, performance_matrix, cmap='RdYlGn', 
+                       edgecolors='white', linewidth=0.5)
     
     # Set ticks and labels
     ax.set_xticks(np.arange(len(test_cases)))
