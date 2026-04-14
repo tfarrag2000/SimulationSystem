@@ -1,0 +1,15 @@
+Algorithm,Dense Coverage,Wide Area,Energy Constrained,High Precision,Mixed Terrain,Emergency Response
+PSO,12,15,18,14,16,13
+GA,13,16,19,15,17,14
+SA,14,17,20,16,18,15
+ACO,13,16,19,15,17,14
+DE,14,17,20,16,18,15
+ABC,15,18,21,17,19,16
+Greedy,18,22,25,21,23,19
+PSO_Staged,11,14,17,13,15,12
+GA_Staged,12,15,18,14,16,13
+SA_Staged,13,16,19,15,17,14
+ACO_Staged,12,15,18,14,16,13
+DE_Staged,13,16,19,15,17,14
+ABC_Staged,14,17,20,16,18,15
+Greedy_Staged,16,19,22,18,20,17

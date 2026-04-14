@@ -1,0 +1,7 @@
+Test Case,Best Coverage Algorithm,Best Coverage Value (%),Most Efficient Algorithm,Most Efficient Drones,Worst Coverage Algorithm,Worst Coverage Value (%),Performance Range (%)
+Dense Coverage,PSO_Staged,91.20,PSO_Staged,11,Greedy,75.20,16.00
+Wide Area,PSO_Staged,89.40,PSO_Staged,14,Greedy,73.80,15.60
+Energy Constrained,PSO_Staged,87.90,PSO_Staged,17,Greedy,71.50,16.40
+High Precision,PSO_Staged,85.70,PSO_Staged,13,Greedy,69.70,16.00
+Mixed Terrain,PSO_Staged,83.10,PSO_Staged,15,Greedy,68.10,15.00
+Emergency Response,PSO_Staged,90.80,PSO_Staged,12,Greedy,74.40,16.40

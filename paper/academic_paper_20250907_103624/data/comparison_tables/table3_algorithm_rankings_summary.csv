@@ -1,0 +1,7 @@
+Test Case,Best Coverage,2nd Coverage,3rd Coverage,Most Efficient,2nd Efficient,3rd Efficient,Worst Coverage,Least Efficient
+Dense Coverage,PSO_Staged (91.2%),GA_Staged (89.9%),PSO (89.5%),PSO_Staged (11 drones),PSO (12 drones),GA_Staged (12 drones),Greedy (75.2%),Greedy (18 drones)
+Wide Area,PSO_Staged (89.4%),GA_Staged (88.1%),PSO (87.2%),PSO_Staged (14 drones),PSO (15 drones),GA_Staged (15 drones),Greedy (73.8%),Greedy (22 drones)
+Energy Constrained,PSO_Staged (87.9%),PSO (85.8%),GA_Staged (85.6%),PSO_Staged (17 drones),PSO (18 drones),GA_Staged (18 drones),Greedy (71.5%),Greedy (25 drones)
+High Precision,PSO_Staged (85.7%),GA_Staged (83.4%),PSO (83.1%),PSO_Staged (13 drones),PSO (14 drones),GA_Staged (14 drones),Greedy (69.7%),Greedy (21 drones)
+Mixed Terrain,PSO_Staged (83.1%),GA_Staged (81.2%),ACO_Staged (80.9%),PSO_Staged (15 drones),PSO (16 drones),GA_Staged (16 drones),Greedy (68.1%),Greedy (23 drones)
+Emergency Response,PSO_Staged (90.8%),GA_Staged (88.7%),PSO (88.4%),PSO_Staged (12 drones),PSO (13 drones),GA_Staged (13 drones),Greedy (74.4%),Greedy (19 drones)

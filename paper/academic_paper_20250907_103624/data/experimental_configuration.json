@@ -1,0 +1,43 @@
+{
+  "simulation_parameters": {
+    "area_dimensions": "50x50 meters",
+    "drone_count_range": "10-30 drones",
+    "coverage_radius": "5-8 meters",
+    "energy_capacity": "100-500 units",
+    "communication_range": "15 meters"
+  },
+  "algorithm_parameters": {
+    "pso": {
+      "particles": 30,
+      "iterations": 100,
+      "w": 0.9,
+      "c1": 2.0,
+      "c2": 2.0
+    },
+    "ga": {
+      "population": 50,
+      "generations": 100,
+      "mutation_rate": 0.1,
+      "crossover_rate": 0.8
+    },
+    "sa": {
+      "initial_temp": 1000,
+      "cooling_rate": 0.95,
+      "min_temp": 0.01
+    },
+    "aco": {
+      "ants": 30,
+      "iterations": 100,
+      "alpha": 1.0,
+      "beta": 2.0,
+      "rho": 0.1
+    }
+  },
+  "evaluation_metrics": [
+    "Coverage Efficiency (%)",
+    "Energy Consumption",
+    "Execution Time",
+    "Convergence Rate",
+    "Solution Quality"
+  ]
+}

@@ -1,0 +1,7 @@
+Test Case,Environment Type,Area Size,Drone Count,Coverage Target,Primary Challenge,Algorithm Suitability
+Dense Coverage,Urban,Small (25x25m),15-20,95%+,Overlapping coverage optimization,"PSO, GA_Staged"
+Wide Area,Rural,Large (75x75m),20-30,85%+,Sparse coverage distribution,"PSO_Staged, DE_Staged"
+Energy Constrained,Mixed,Medium (50x50m),10-15,80%+,Battery optimization,"SA_Staged, ABC_Staged"
+High Precision,Critical Infrastructure,Small (30x30m),12-18,98%+,Precision positioning,"GA, PSO"
+Mixed Terrain,Complex Terrain,Variable (40x60m),15-25,88%+,Terrain adaptation,"ACO_Staged, DE"
+Emergency Response,Disaster Zone,Dynamic (35x45m),18-25,90%+,Rapid deployment,"Greedy, PSO_Staged"
